@@ -6,8 +6,9 @@ from dotenv import find_dotenv, load_dotenv
 
 
 @click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
+@click.argument(("data/raw/usagers-2021.csv", "data/raw/caracteristiques-2021.csv",
+                 "data/raw/lieux-2021.csv", "data/raw/vehicules-2021.csv"), nargs = 4, type=click.Path(exists=True))
+@click.argument('data\raw\preprocessed', type=click.Path())
 def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
