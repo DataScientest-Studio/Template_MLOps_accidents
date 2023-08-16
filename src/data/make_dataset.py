@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import click
-import logging
 import pandas as pd
 import numpy as np
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-
+import click
+import logging
 
 @click.command()
 @click.argument('input_filepath_users', type=click.Path(exists=False), required=0)
@@ -47,10 +46,9 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     for i in df_users["victim_age"] :
         if (i>120)|(i<0):
             df_users["victim_age"].replace(i,np.nan)
-
-    df_users.drop(["year_acc","an_nais"], inplace=True, axis=1)
     df_caract["hour"] = df_caract["hrmn"].astype(str).apply(lambda x : x[:-3])
     df_caract.drop(['hrmn'], inplace=True, axis=1)
+    df_users.drop(['an_nais'], inplace=True, axis=1)
 
     #--Replacing names 
     df_users.grav.replace([1,2,3,4], [1,3,4,2], inplace = True)
@@ -70,7 +68,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     df_caract = df_caract.astype(dico_to_float)
 
 
-    #--Grouping the modalities 
+    #--Grouping modalities 
     dico = {1:0, 2:1, 3:1, 4:1, 5:1, 6:1,7:1, 8:0, 9:0}
     df_caract["atm"] = df_caract["atm"].replace(dico)
     catv_value = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,30,31,32,33,34,35,36,37,38,39,40,41,42,43,50,60,80,99]
@@ -113,7 +111,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     df[col_to_fill_na] = df[col_to_fill_na].fillna(df[col_to_fill_na].mode().iloc[0])
 
     final_preprocessed_data = df.dropna(axis=0)
-
+    print(final_preprocessed_data.shape)
     # Save the final preprocessed data to the output_filepath
     final_preprocessed_data.to_csv(output_filepath, index=False)
 
