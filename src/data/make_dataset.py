@@ -5,6 +5,7 @@ from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import click
 import logging
+from sklearn.model_selection import train_test_split
 
 @click.command()
 @click.argument('input_filepath_users', type=click.Path(exists=False), required=0)
@@ -102,18 +103,33 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     #--Dropping columns 
     list_to_drop = ['senc','larrout','actp', 'manv', 'choc', 'nbv', 'prof', 'plan', 'Num_Acc', 'id_vehicule', 'num_veh', 'pr', 'pr1','voie', 'trajet',"secu2", "secu3",'adr', 'v1', 'lartpc','occutc','v2','vosp','locp','etatp', 'infra', 'obs' ]
     df.drop(list_to_drop, axis=1, inplace=True)
-    missing_values = df.isna().sum()
 
-    missing_values_sorted = missing_values.sort_values(ascending=False)
+    #--Dropping lines with NaN values
+    col_to_drop_lines = ['catv', 'vma', 'secu1', 'obsm', 'atm']
+    df = df.dropna(subset = col_to_drop_lines, axis=0)
+
+
+    target = df['grav']
+    feats = df.drop(['grav'], axis = 1)
+
+    X_train, X_test, y_train, y_test = train_test_split(feats, target, test_size=0.3, random_state = 42)
 
     #--Filling NaN values
-    col_to_fill_na = ["surf", "situ", "circ", "col", "motor"]
-    df[col_to_fill_na] = df[col_to_fill_na].fillna(df[col_to_fill_na].mode().iloc[0])
+    col_to_fill_na = ["surf", "circ", "col", "motor"]
+    X_train[col_to_fill_na] = X_train[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
+    X_test[col_to_fill_na] = X_test[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
 
-    final_preprocessed_data = df.dropna(axis=0)
-    print(final_preprocessed_data.shape)
-    # Save the final preprocessed data to the output_filepath
-    final_preprocessed_data.to_csv(output_filepath, index=False)
+    #--Defining the output file paths for each file
+    output_filepath_X_train = f"{output_filepath}\\X_train.csv"
+    output_filepath_X_test = f"{output_filepath}\\X_test.csv"
+    output_filepath_y_train = f"{output_filepath}\\y_train.csv"
+    output_filepath_y_test = f"{output_filepath}\\y_test.csv"
+
+    #--Saving the dataframes to their respective output file paths
+    X_train.to_csv(output_filepath_X_train, index=False)
+    X_test.to_csv(output_filepath_X_test, index=False)
+    y_train.to_csv(output_filepath_y_train, index=False)
+    y_test.to_csv(output_filepath_y_test, index=False)
 
 
 if __name__ == '__main__':
