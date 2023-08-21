@@ -16,6 +16,6 @@ rf_classifier = ensemble.RandomForestClassifier(n_jobs = -1, n_estimators= 100)
 rf_classifier.fit(X_train, y_train)
 
 #--Save the trained model to a file
-model_filename = 'C:/Users/lenov/Documents/Template_MLOps_accidents/src/models/trained_model.joblib'
+model_filename = '/src/models/trained_model.joblib'
 joblib.dump(rf_classifier, model_filename)
 print("Model trained and saved successfully.")
