@@ -1,7 +1,7 @@
 Project Name
 ==============================
 
-This project is a starting Pack for MLOps projects based on the subject "movie_recommandation". It's not perfect so feel free to make some modifications on it.
+This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
 
 Project Organization
 ------------
@@ -50,6 +50,28 @@ Project Organization
     │   │   └── visualize.py
     │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
 
---------
+---------
+
+---- Steps to follow ----
+
+Convention : All python scripts must be run from the root specifying the relative file path.
+
+--1-- Create a virtual environment using Virtualenv and install the packages from requirements.txt.
+
+--2-- Execute import_raw_data.py to import the 4 datasets.
+
+--3-- Execute make_dataset.py initializing "./data/raw" as input file path and "./data/preprocessed" as output file path.
+
+--4-- Execute train_model.py to instanciate the model in joblib format
+
+--5-- Finally, execute predict_model.py with respect to one of these rules :
+
+    - Provide a json file as follow : python3 ./src/models/predict_model.py ./src/models/test_features.json
+    test_features.json is an example that you can try 
+
+    - If you do not specify a json file, you will be asked to enter manually each feature. 
+
+
+------------------------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
