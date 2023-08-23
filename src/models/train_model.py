@@ -3,14 +3,17 @@ import sklearn
 import pandas as pd 
 from sklearn import ensemble
 import joblib
+import numpy as np
 
 
 X_train = pd.read_csv('data/preprocessed/X_train.csv')
 X_test = pd.read_csv('data/preprocessed/X_test.csv')
 y_train = pd.read_csv('data/preprocessed/y_train.csv')
 y_test = pd.read_csv('data/preprocessed/y_test.csv')
+y_train = np.ravel(y_train)
+y_test = np.ravel(y_test)
 
-rf_classifier = ensemble.RandomForestClassifier(n_jobs = -1, n_estimators= 100)
+rf_classifier = ensemble.RandomForestClassifier(n_jobs = -1)
 
 #--Train the model
 rf_classifier.fit(X_train, y_train)
