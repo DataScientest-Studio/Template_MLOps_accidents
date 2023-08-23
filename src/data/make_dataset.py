@@ -7,12 +7,10 @@ import logging
 from sklearn.model_selection import train_test_split
 
 @click.command()
-@click.argument('input_filepath_users', type=click.Path(exists=False), required=0)
-@click.argument('input_filepath_caract', type=click.Path(exists=False), required=0)
-@click.argument('input_filepath_places', type=click.Path(exists=False), required=0)
-@click.argument('input_filepath_veh', type=click.Path(exists=False), required=0)
+@click.argument('input_filepath', type=click.Path(exists=False), required=0)
 @click.argument('output_filepath', type=click.Path(exists=False), required=0)
-def main(input_filepath_users, input_filepath_caract, input_filepath_places, input_filepath_veh, output_filepath):
+
+def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../preprocessed).
     """
@@ -20,10 +18,11 @@ def main(input_filepath_users, input_filepath_caract, input_filepath_places, inp
     logger.info('making final data set from raw data')
 
     # Prompt the user for input file paths
-    input_filepath_users = click.prompt('Enter the file path for users data (e.g., data/users.csv)', type=click.Path(exists=True))
-    input_filepath_caract = click.prompt('Enter the file path for caract data (e.g., data/caract.csv)', type=click.Path(exists=True))
-    input_filepath_places = click.prompt('Enter the file path for places data (e.g., data/places.csv)', type=click.Path(exists=True))
-    input_filepath_veh = click.prompt('Enter the file path for veh data (e.g., data/veh.csv)', type=click.Path(exists=True))
+    input_filepath= click.prompt('Enter the file path for the input data', type=click.Path(exists=True))
+    input_filepath_users = f"{input_filepath}\\usagers-2021.csv"
+    input_filepath_caract = f"{input_filepath}\\caracteristiques-2021.csv"
+    input_filepath_places = f"{input_filepath}\\lieux-2021.csv"
+    input_filepath_veh = f"{input_filepath}\\vehicules-2021.csv"
     output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., output/preprocessed_data.csv)', type=click.Path())
     
     # Call the main data processing function with the provided file paths
@@ -47,7 +46,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
         if (i>120)|(i<0):
             df_users["victim_age"].replace(i,np.nan)
     df_caract["hour"] = df_caract["hrmn"].astype(str).apply(lambda x : x[:-3])
-    df_caract.drop(['hrmn'], inplace=True, axis=1)
+    df_caract.drop(['hrmn', 'an'], inplace=True, axis=1)
     df_users.drop(['an_nais'], inplace=True, axis=1)
 
     #--Replacing names 
