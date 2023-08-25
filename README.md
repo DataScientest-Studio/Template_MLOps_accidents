@@ -57,6 +57,9 @@ Project Organization
 Convention : All python scripts must be run from the root specifying the relative file path.
 
 --1-- Create a virtual environment using Virtualenv and install the packages from requirements.txt.
+    `python -m venv my_env`
+    `./my_env/Scripts/activate`
+    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
 
 --2-- Execute import_raw_data.py to import the 4 datasets.
 
