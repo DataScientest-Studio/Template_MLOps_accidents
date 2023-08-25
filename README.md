@@ -82,7 +82,9 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ### 5- Finally, execute predict_model.py with respect to one of these rules :
 
-    - Provide a json file as follow : `python ./src/models/predict_model.py ./src/models/test_features.json`
+    - Provide a json file as follow : 
+    
+    `python ./src/models/predict_model.py ./src/models/test_features.json`
 
     test_features.json is an example that you can try 
 
