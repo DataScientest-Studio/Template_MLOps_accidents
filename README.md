@@ -81,14 +81,15 @@ Convention : All python scripts must be run from the root specifying the relativ
     `python .\src\models\train_model.py`
 
 ### 5- Finally, execute predict_model.py with respect to one of these rules :
+  
+  - Provide a json file as follow : 
 
-    - Provide a json file as follow : 
     
     `python ./src/models/predict_model.py ./src/models/test_features.json`
 
-    test_features.json is an example that you can try 
+  test_features.json is an example that you can try 
 
-    - If you do not specify a json file, you will be asked to enter manually each feature. 
+  - If you do not specify a json file, you will be asked to enter manually each feature. 
 
 
 ------------------------
