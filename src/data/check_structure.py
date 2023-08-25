@@ -16,7 +16,7 @@ def check_existing_file(file_path):
     
     
 def check_existing_folder(folder_path):
-    '''Check if a folder already exists. If it does, ask if we want to create it.'''
+    '''Check if a folder already exists. If it doesn't, ask if we want to create it.'''
     if os.path.exists(folder_path) == False :
         while True:
             response = input(f"{os.path.basename(folder_path)} doesn't exists. Do you want to create it? (y/n): ")
