@@ -5,6 +5,8 @@ from pathlib import Path
 import click
 import logging
 from sklearn.model_selection import train_test_split
+from check_structure import check_existing_file, check_existing_folder
+import os
 
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=False), required=0)
@@ -28,7 +30,7 @@ def main(input_filepath, output_filepath):
     # Call the main data processing function with the provided file paths
     process_data(input_filepath_users, input_filepath_caract, input_filepath_places, input_filepath_veh, output_filepath)
 
-def process_data(input_filepath_users, input_filepath_caract, input_filepath_places, input_filepath_veh, output_filepath):
+def process_data(input_filepath_users, input_filepath_caract, input_filepath_places, input_filepath_veh, output_folderpath):
  
     #--Importing dataset
     df_users = pd.read_csv(input_filepath_users, sep=";")
@@ -117,18 +119,15 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     X_train[col_to_fill_na] = X_train[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
     X_test[col_to_fill_na] = X_test[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
 
-    #--Defining the output file paths for each file
-    output_filepath_X_train = f"{output_filepath}\\X_train.csv"
-    output_filepath_X_test = f"{output_filepath}\\X_test.csv"
-    output_filepath_y_train = f"{output_filepath}\\y_train.csv"
-    output_filepath_y_test = f"{output_filepath}\\y_test.csv"
+    # Create folder if necessary 
+    if check_existing_folder(output_folderpath) :
+        os.makedirs(output_folderpath)
 
     #--Saving the dataframes to their respective output file paths
-    X_train.to_csv(output_filepath_X_train, index=False)
-    X_test.to_csv(output_filepath_X_test, index=False)
-    y_train.to_csv(output_filepath_y_train, index=False)
-    y_test.to_csv(output_filepath_y_test, index=False)
-
+    for file, filename in zip([X_train, X_test, y_train, y_test], ['X_train', 'X_test', 'y_train', 'y_test']):
+        output_filepath = os.path.join(output_folderpath, f'{filename}.csv')
+        if check_existing_file(output_filepath):
+            file.to_csv(output_filepath, index=False)
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
