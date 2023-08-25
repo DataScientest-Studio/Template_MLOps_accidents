@@ -57,21 +57,34 @@ Project Organization
 Convention : All python scripts must be run from the root specifying the relative file path.
 
 --1-- Create a virtual environment using Virtualenv and install the packages from requirements.txt.
+
     `python -m venv my_env`
+
     `./my_env/Scripts/activate`
+
     `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
 
 --2-- Execute import_raw_data.py to import the 4 datasets.
+
     `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
 
---3-- Execute make_dataset.py initializing "./data/raw" as input file path and "./data/preprocessed" as output file path.
+--3-- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
+
     `python .\src\data\make_dataset.py`
 
 --4-- Execute train_model.py to instanciate the model in joblib format
+
     `python .\src\models\train_model.py`
 
 --5-- Finally, execute predict_model.py with respect to one of these rules :
-    `python .\src\models\predict_model.py .\src\models\test_features.json` ### Provide a json to make a prediction. test_features.json is an example that you can try. If you do not specify a json file, you will be asked to enter manually each feature. 
+
+    - Provide a json file as follow : `python ./src/models/predict_model.py ./src/models/test_features.json`
+    
+    test_features.json is an example that you can try 
+
+    - If you do not specify a json file, you will be asked to enter manually each feature. 
+
+
 ------------------------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
