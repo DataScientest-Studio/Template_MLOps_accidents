@@ -5,8 +5,7 @@ import sys
 import json
 
 # Load your saved model
-loaded_model = joblib.load("src/models/trained_model.joblib")
-
+loaded_model = joblib.load("./src/models/trained_model.joblib")
 
 def predict_model(features):
     input_df = pd.DataFrame([features])
@@ -32,4 +31,4 @@ if __name__ == "__main__":
         features = get_feature_values_manually(feature_names)
 
     result = predict_model(features)
-    print(result)
+    print(f"prediction : {result[0]}")

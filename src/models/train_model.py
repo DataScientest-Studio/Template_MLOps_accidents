@@ -5,6 +5,7 @@ from sklearn import ensemble
 import joblib
 import numpy as np
 
+print(joblib.__version__)
 
 X_train = pd.read_csv('data/preprocessed/X_train.csv')
 X_test = pd.read_csv('data/preprocessed/X_test.csv')
