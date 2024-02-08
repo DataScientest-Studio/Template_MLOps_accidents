@@ -21,10 +21,10 @@ def main(input_filepath, output_filepath):
 
     # Prompt the user for input file paths
     input_filepath= click.prompt('Enter the file path for the input data', type=click.Path(exists=True))
-    input_filepath_users = f"{input_filepath}\\usagers-2021.csv"
-    input_filepath_caract = f"{input_filepath}\\caracteristiques-2021.csv"
-    input_filepath_places = f"{input_filepath}\\lieux-2021.csv"
-    input_filepath_veh = f"{input_filepath}\\vehicules-2021.csv"
+    input_filepath_users = f"{input_filepath}/usagers-2021.csv"
+    input_filepath_caract = f"{input_filepath}/caracteristiques-2021.csv"
+    input_filepath_places = f"{input_filepath}/lieux-2021.csv"
+    input_filepath_veh = f"{input_filepath}/vehicules-2021.csv"
     output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., output/preprocessed_data.csv)', type=click.Path())
     
     # Call the main data processing function with the provided file paths
@@ -54,6 +54,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     #--Replacing names 
     df_users.grav.replace([1,2,3,4], [1,3,4,2], inplace = True)
     df_caract.rename({"agg" : "agg_"},  inplace = True, axis = 1)
+    df_caract.rename({"int" : "int_"},  inplace = True, axis = 1)
     corse_replace = {"2A":"201", "2B":"202"}
     df_caract["dep"] = df_caract["dep"].str.replace("2A", "201")
     df_caract["dep"] = df_caract["dep"].str.replace("2B", "202")
