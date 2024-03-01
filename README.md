@@ -91,17 +91,6 @@ Convention : All python scripts must be run from the root specifying the relativ
   test_features.json is an example that you can try 
 
   - If you do not specify a json file, you will be asked to enter manually each feature. 
-supprimer l'image
-docker container stop template_mlops_accident_container
-docker container rm template_mlops_accident_container
-docker image rm api_accident
-
-creer l'image
-docker build -t api_accident .
-<!-- docker run -d --name template_mlops_accident_container -p 8000:8000 api_accident -->
-docker run --name template_mlops_accident_container -p 8000:8000 api_accident
-
-docker run -p 9090:9090 -v/home/ubuntu/Template_MLOps_accidents/src/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
 ------------------------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>

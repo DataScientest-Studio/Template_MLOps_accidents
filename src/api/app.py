@@ -3,10 +3,11 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import numpy as np
 import joblib
-# from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Summary
 
 app = FastAPI()
-# Instrumentator().instrument(app).expose(app)
+Instrumentator().instrument(app).expose(app)
 
 # Define the Accident input model
 class Accident(BaseModel):
@@ -42,11 +43,15 @@ class Accident(BaseModel):
 
 ##########################################
 # Load the trained model
-# model = joblib.load("../models/trained_model.joblib")
-model = joblib.load("./trained_model.joblib")
+model = joblib.load("trained_model.joblib")
+
+# Create an object Summary to save the inference time
+inference_time_summary = Summary('inference_time_seconds', 'Time taken for inference')
+
 
 ##########################################
 # Endpoint for predicting the severity of the accident
+
 @app.post("/predict/")
 def predict_grav(accident: Accident):
 
@@ -59,8 +64,10 @@ def predict_grav(accident: Accident):
     features = features.reshape(1, -1)
 
     # Make the prediction
-    prediction = model.predict(features)
-    return {"prediction": prediction.tolist()}
+    with inference_time_summary.time():
+        prediction = model.predict(features)
+
+    return {"prediction": int(prediction)}
 
 
 ####################################
@@ -74,6 +81,3 @@ def root():
     </body>
     </html>
     """
-
-
-####################################

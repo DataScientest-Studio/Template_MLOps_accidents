@@ -2,18 +2,17 @@ version: "3.8"
 
 services:
   web:
-    build: ./src
+    build: ./src/api
     command: uvicorn app:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
       - ./src/:/usr/src/api/
     ports:
-      - "8002:8000"
+      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://hello_fastapi:hello_f
-# ---> Verify that Prometheus is scraping the metrics from your FastAPI app by visiting <http://localhost:9090/targets> in your web browser. The FastAPI app target should be listed with a "UP" state.
-# With Prometheus now installed and configured in a Docker container, and your FastAPI app instrumented with Prometheus metrics, you are ready to move on to the next steps of integrating Grafana for visualization and analysis.astapi@db/hello_fastapi_dev
     depends_on:
       - db
+
   db:
     image: postgres:13.1-alpine
     volumes:
@@ -22,7 +21,6 @@ services:
       - POSTGRES_USER=hello_fastapi
       - POSTGRES_PASSWORD=hello_fastapi
       - POSTGRES_DB=hello_fastapi_dev
-
     ports:
       - "5432:5432"
 
@@ -35,7 +33,6 @@ services:
       - ./prometheus_data/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-
 
   grafana:
     image: grafana/grafana
