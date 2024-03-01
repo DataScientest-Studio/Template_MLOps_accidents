@@ -58,12 +58,12 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ### 1- Create a virtual environment using Virtualenv.
 
-    `python3 -m venv my_env`
+    `virtualenv my_env`
 
 ###   Activate it 
 
+    `source my_venv/bin/activate` in linux or macOS
     `./my_env/Scripts/activate` in windows
-    `source myvenv/bin/activate` in linux or macOS
 
 ###   Install the packages from requirements.txt
 
@@ -86,7 +86,7 @@ Convention : All python scripts must be run from the root specifying the relativ
   - Provide a json file as follow : 
 
     
-    `python3 ./src/models/predict_model.py ./src/models/test_features.json`
+    `python3 ./src/models/predict_model.py ./src/data/test_features.json`
 
   test_features.json is an example that you can try 
 
