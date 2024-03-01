@@ -5,7 +5,7 @@ import sys
 import json
 
 # Load your saved model
-loaded_model = joblib.load("./src/models/trained_model.joblib")
+loaded_model = joblib.load("./models/trained_model.joblib")
 
 def predict_model(features):
     input_df = pd.DataFrame([features])
