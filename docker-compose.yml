@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   web:
-    build: ./src/api
-    command: uvicorn app:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    build: .
+    command: uvicorn src.api.app:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
       - ./src/:/usr/src/api/
     ports:
