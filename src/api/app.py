@@ -43,7 +43,7 @@ class Accident(BaseModel):
 
 ##########################################
 # Load the trained model
-model = joblib.load("trained_model.joblib")
+model = joblib.load("../../models/trained_model.joblib")
 
 # Create an object Summary to save the inference time
 inference_time_summary = Summary('inference_time_seconds', 'Time taken for inference')
