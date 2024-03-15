@@ -62,7 +62,7 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ###   Activate it 
 
-    `source my_venv/bin/activate` in linux or macOS
+    `source my_env/bin/activate` in linux or macOS
     `./my_env/Scripts/activate` in windows
 
 ###   Install the packages from requirements.txt
