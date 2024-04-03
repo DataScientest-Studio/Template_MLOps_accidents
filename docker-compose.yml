@@ -1,5 +1,9 @@
 version: "3.8"
 
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
 services:
   web:
     build: .
@@ -27,21 +31,4 @@ services:
       - 3000:3000
     volumes:
       - grafana_data:/var/lib/grafana
-
-volumes:
-  prometheus_data:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./prometheus_data
-  grafana_data:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: ./grafana_data
-
-networks:
-  default: 
-    name: hello_fastapi
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
