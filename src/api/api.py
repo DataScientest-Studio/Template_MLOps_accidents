@@ -36,7 +36,7 @@ path_db_preds_unlabeled = os.path.join(path_logs, "preds_call.jsonl")
 path_db_preds_labeled = os.path.join(path_logs, "preds_labeled.jsonl")
 path_trained_model = os.path.join(root_path, "models", "trained_model.joblib")
 path_new_trained_model = os.path.join(root_path, "models", "new_trained_model.joblib")
-path_users_db = os.path.join(root_path, "src", "api", "users_db_bis.json")
+path_users_db = os.path.join(root_path, "src", "api", "users_db.json")
 # ---------------------------- HTTP Exceptions --------------------------------
 responses = {
     200: {"description": "OK"},
