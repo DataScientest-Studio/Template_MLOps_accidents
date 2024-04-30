@@ -49,20 +49,6 @@ with open(path_users_db, 'r') as file:
 
 # ---------------------------- API --------------------------------------------
 
-# DONE 1. / : vérification du fonctionnement de l’API
-# DONE 2. /register : inscription de l’utilisateur.
-# DONE 3. /remove_user : suppression d'un utilisateur.
-#    /login : identification de l’utilisateur.
-#             -> inutile? cela se fait via la requête non?
-# DONE 4. /predict_from_test : prédiction de la priorité de l'intervention
-# à partir d'échantillon issu de X_test
-# DONE 5. /predict_from_call : prédiction de la priorité de l'intervention
-# à partir d'entrée manuelle
-# 6. /train : entraîner le modèle avec de nouvelles données.
-# 7. /update_data : mettre à jour la base de données avec de nouvelles données
-#                   sur les accidents.
-
-
 api = FastAPI(
     title="🛡️ SHIELD",
     description="API permettant l'utilisation de l'application SHIELD (Safety \
@@ -221,8 +207,8 @@ async def get_pred_from_test(identification=Header(None)):
 
         # Calcul du F1 score macro average
         # f1_score_macro_average = f1_score(y_true=y_true,
-                                          # y_pred=y_pred,
-                                          # average="macro")
+        # y_pred=y_pred,
+        # average="macro")
 
         # Préparation des métadonnées pour exportation
         metadata_dictionary = {
@@ -404,7 +390,7 @@ async def get_train(identification=Header(None)):
             # Sauvegarde du modèle:
             # Sauvegarde dans new_trained_model.joblib dans un premier temps
             # TODO: Versioning du modèle
-            
+
             joblib.dump(rf_classifier, path_new_trained_model)
             return {"Modèle ré-entrainé et sauvegardé!"}
 
@@ -578,7 +564,7 @@ async def update_f1_score(identification=Header(None)):
 
                 # Chargement des variables de sortie dans le DataFrame y_test_new
                 y_record = pd.Series(record["verified_prediction"])
-                if y_test_new.empty is True: ## Pour éviter l'avertissement suivant : « FutureWarning: The behavior of array concatenation with empty entries is deprecated. »
+                if y_test_new.empty is True:  # Pour éviter l'avertissement suivant : « FutureWarning: The behavior of array concatenation with empty entries is deprecated. »
                     y_test_new = y_record
                 else:
                     y_test_new = pd.concat([y_test_new, y_record])
@@ -607,7 +593,7 @@ async def update_f1_score(identification=Header(None)):
             with open(path_log_file, "a") as file:
                 file.write(metadata_json + "\n")
 
-            return("Le F1 score du modèle a été mis à jour.")
+            return ("Le F1 score du modèle a été mis à jour.")
 
         else:
             raise HTTPException(status_code=401,
