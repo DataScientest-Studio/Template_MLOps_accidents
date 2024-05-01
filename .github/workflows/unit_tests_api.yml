@@ -1,4 +1,4 @@
-name: Unit Tests (New)
+name: API Unit Tests
 
 on:
   push:
