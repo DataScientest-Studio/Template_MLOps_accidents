@@ -27,7 +27,7 @@ jobs:
           pip install -r test_requirements.txt
       - name: Get data from S3
         run: |
-          mkdir data/preprocessed
+          mkdir -r data/preprocessed
           cd data/preprocessed
           wget https://aw-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_test.csv
           wget https://aw-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_train.csv
@@ -35,9 +35,9 @@ jobs:
           wget https://aw-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
       - name: Get model from S3
         run: |
-          cd src/models
+          cd models
           wget https://aw-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib
       - name: Change working directory
-        run: cd src/features/api
+        run: cd src/api
       - name: Run unit tests
-        run: python -m unittest src/features/api/test_api.py
+        run: python -m unittest src/api/test_api.py
