@@ -47,7 +47,7 @@ jobs:
         run : cd models
 
       - name: Get model from S3
-        uses: actions/aws/cli@v2
+        uses: aws-actions/s3
         with:
           args: s3 cp s3://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib .
         # run: |
