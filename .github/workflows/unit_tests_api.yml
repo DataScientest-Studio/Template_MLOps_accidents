@@ -34,14 +34,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
-      #- name: Get data from S3
-        #run: |
-          #mkdir -p data/preprocessed
-          #cd data/preprocessed
-          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_test.csv
-          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_train.csv
-          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
-          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
+      - name: Get data from S3
+        run: |
+          mkdir -p data/preprocessed
+          cd data/preprocessed
+          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_test.csv
+          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_train.csv
+          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
+          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
 
       #- name: Navigate to models directory
         #run : cd models
