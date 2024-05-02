@@ -32,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: <your-region>
+          aws-region: eu-west-3
 
       - name: Get data from S3
         run: |
@@ -47,7 +47,7 @@ jobs:
         run: |
           cd models
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib
-          
+
       - name: Change working directory
         run: cd src/api
 
