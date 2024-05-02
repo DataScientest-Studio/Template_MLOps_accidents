@@ -34,13 +34,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
-      - name: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
-        with:
-          version: 2                         # default
-          verbose: false                     # default
-          arch: amd64                        # allowed values: amd64, arm64
-
       #- name: Get data from S3
         #run: |
           #mkdir -p data/preprocessed
@@ -50,16 +43,16 @@ jobs:
           #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
           #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
 
-      - name: Navigate to models directory
-        run : cd models
+      #- name: Navigate to models directory
+        #run : cd models
 
       - name: Get model from S3
-        uses: actions/aws/cli@v1
-        with:
-          args: s3 cp s3://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib .
-        # run: |
-          # cd models
-          # wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib
+        #uses: actions/aws/cli@v1
+        #with:
+          #args: s3 cp s3://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib .
+        run: |
+          cd models
+          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib
 
       - name: Change working directory
         run: cd src/api
