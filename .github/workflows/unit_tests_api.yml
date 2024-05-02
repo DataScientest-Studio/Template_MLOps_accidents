@@ -34,19 +34,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
 
-      - name: Get data from S3
-        run: |
-          mkdir -p data/preprocessed
-          cd data/preprocessed
-          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_test.csv
-          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_train.csv
-          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
-          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
+      #- name: Get data from S3
+        #run: |
+          #mkdir -p data/preprocessed
+          #cd data/preprocessed
+          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_test.csv
+          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_train.csv
+          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
+          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
+
+      - name: Navigate to models directory
+        run : cd models
 
       - name: Get model from S3
-        run: |
-          cd models
-          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib
+        uses: actions/aws/cli@v1
+        with:
+          args: s3 cp s3://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib .
+        # run: |
+          # cd models
+          # wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/models/trained_model.joblib
 
       - name: Change working directory
         run: cd src/api
