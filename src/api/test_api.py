@@ -38,7 +38,7 @@ class TestAPI(unittest.TestCase):
                                   json=new_user_data,
                                   headers={"identification": "admin:4dmin"})
         # Vérification que la réponse est OK (code 200)
-        self.assertTrue(response.status_code == 200, "EP2 /register: FAILED")
+        self.assertTrue(response.status_code == 200, "EP 2 /register: FAILED")
         print("EP2 /register: PASSED")
 
     def test_remove_user(self):
@@ -48,7 +48,7 @@ class TestAPI(unittest.TestCase):
                                   json=old_user_data,
                                   headers={"identification": "admin:4dmin"})
         # Vérification que la réponse est OK (code 200)
-        self.assertTrue(response.status_code == 200, "EP3 /remove_user: FAILED")
+        self.assertTrue(response.status_code == 200, "EP 3 /remove_user: FAILED")
         print("EP3 /remove_user: PASSED")
 
     # @unittest.skip("Exclu temporairement en raison d'une erreur")
@@ -59,7 +59,7 @@ class TestAPI(unittest.TestCase):
         response = client.get('/predict_from_test',
                               headers={"identification": f"{user}:{psw}"})
         # Vérification que la réponse est OK (code 200)
-        self.assertTrue(response.status_code == 200, "EP4 /predict_from_test: FAILED")
+        self.assertTrue(response.status_code == 200, "EP 4 /predict_from_test: FAILED")
         print("EP4 /predict_from_test: PASSED")
 
     # @unittest.skip("Exclu temporairement en raison d'une erreur")
@@ -117,7 +117,7 @@ class TestAPI(unittest.TestCase):
                                   json=year_list,
                                   headers={"identification": "admin:4dmin"})
         # Vérification que la réponse est OK (code 200)
-        self.assertTrue(response.status_code == 200, "EP7 /update_data: FAILED")
+        self.assertTrue(response.status_code == 200, "EP 7 /update_data: FAILED")
         print("EP7 /update_data: PASSED")
 
     def test_label_prediction(self):
@@ -132,7 +132,7 @@ class TestAPI(unittest.TestCase):
         response = client.post('/label_prediction', json=prediction, headers=header)
 
         # Vérification de la réponse
-        self.assertTrue(response.status_code == 200, "EP8 /label_prediction: FAILED")
+        self.assertTrue(response.status_code == 200, "EP 8 /label_prediction: FAILED")
         print("EP8 /label_prediction: PASSED")
 
     # @unittest.skip("Exclu temporairement car dépendant des fichiers non stockés sur le repo distant")
@@ -146,7 +146,7 @@ class TestAPI(unittest.TestCase):
         response = client.get('/update_f1_score', headers=header)
 
         # Vérification de la réponse
-        self.assertTrue(response.status_code == 200, "EP9 /update_f1_score: FAILED")
+        self.assertTrue(response.status_code == 200, "EP 9 /update_f1_score: FAILED")
         print("EP9 /update_f1_score: PASSED")
 
 
