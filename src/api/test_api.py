@@ -41,8 +41,8 @@ class TestAPI(unittest.TestCase):
                                   json=new_user_data,
                                   headers={"identification": "admin:4dmin"})
         # Check response (code 200)
-        self.assertTrue(response.status_code == 200, "EP 2 add_user: FAILED")
-        print("EP2 add_user: PASSED")
+        self.assertTrue(response.status_code == 200, "EP2 /add_user: FAILED")
+        print("EP2 /add_user: PASSED")
 
     def test_remove_user(self):
         old_user_data = {"user": "test_user"}
@@ -52,7 +52,7 @@ class TestAPI(unittest.TestCase):
                                   headers={"identification": "admin:4dmin"})
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 3 /remove_user: FAILED")
+                        "EP3 /remove_user: FAILED")
         print("EP3 /remove_user: PASSED")
 
     def test_predict_from_test(self):
@@ -62,7 +62,7 @@ class TestAPI(unittest.TestCase):
                                   headers={"identification": "fdo:c0ps"})
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 4 /predict_from_test: FAILED")
+                        "EP4 /predict_from_test: FAILED")
         print("EP4 /predict_from_test: PASSED")
 
     def test_predict_from_call(self):
@@ -73,8 +73,8 @@ class TestAPI(unittest.TestCase):
                                   headers={"identification": "admin:4dmin"})
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 5 /predict_from_call: FAILED")
-        print("EP 5 /predict_from_call: PASSED")
+                        "EP5 /predict_from_call: FAILED")
+        print("EP5 /predict_from_call: PASSED")
 
     def test_train_model(self):
         # EP 6
@@ -83,8 +83,8 @@ class TestAPI(unittest.TestCase):
                                   headers={"identification": "admin:4dmin"})
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 6 /train: FAILED")
-        print("EP 6 /train: PASSED")
+                        "EP6 /train: FAILED")
+        print("EP6 /train: PASSED")
 
     def test_update_data(self):
         year_list = {"start_year": 2019, "end_year": 2020}
@@ -95,7 +95,7 @@ class TestAPI(unittest.TestCase):
                                   headers={"identification": "admin:4dmin"})
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 7 /update_data: FAILED")
+                        "EP7 /update_data: FAILED")
         print("EP7 /update_data: PASSED")
 
     def test_label_prediction(self):
@@ -114,7 +114,7 @@ class TestAPI(unittest.TestCase):
 
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 8 /label_prediction: FAILED")
+                        "EP8 /label_prediction: FAILED")
         print("EP8 /label_prediction: PASSED")
 
     def test_update_f1_score(self):
@@ -124,13 +124,13 @@ class TestAPI(unittest.TestCase):
         header = {"identification": "admin:4dmin"}
 
         # EP 9
-        response = client.reponse(method="GET",
+        response = client.request(method="GET",
                                   url='/update_f1_score',
                                   headers=header)
 
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
-                        "EP 9 /update_f1_score: FAILED")
+                        "EP9 /update_f1_score: FAILED")
         print("EP9 /update_f1_score: PASSED")
 
 
