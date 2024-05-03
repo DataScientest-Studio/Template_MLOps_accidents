@@ -110,12 +110,15 @@ class TestAPI(unittest.TestCase):
         self.assertTrue(response.status_code == 200, "EP 6 /train: FAILED")
         print("EP 6 /train: PASSED")
 
-#    def test_update_data(self):
-#        # Envoyer une requête GET à l'endpoint /update_data
-#        response = client.get('/update_data', headers={"identification": "admin:4dmin"})
-#        # Vérification que la réponse est OK (code 200)
-#        self.assertTrue(response.status_code == 200, "EP7 /update_data: FAILED")
-#        print("EP7 /update_data: PASSED")
+    def test_update_data(self):
+        year_list = {"start_year": 2019, "end_year": 2020}
+        # Envoyer une requête GET à l'endpoint /update_data
+        response = client.request(method="POST", url='/update_data',
+                                  json=year_list,
+                                  headers={"identification": "admin:4dmin"})
+        # Vérification que la réponse est OK (code 200)
+        self.assertTrue(response.status_code == 200, "EP7 /update_data: FAILED")
+        print("EP7 /update_data: PASSED")
 
     def test_label_prediction(self):
         """Test unitaire pour l'endpoint /label_prediction"""
