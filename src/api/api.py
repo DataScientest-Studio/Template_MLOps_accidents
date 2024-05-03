@@ -84,7 +84,7 @@ class User(BaseModel):
     rights: Optional[int] = 0  # Droits par défaut: utilisateur fdo
 
 
-@api.post('/register',
+@api.post('/add_user',
           name="Ajout d'un nouvel utilisateur",
           tags=['USERS'], responses=responses)
 async def post_user(new_user: User, identification=Header(None)):
