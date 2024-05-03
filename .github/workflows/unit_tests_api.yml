@@ -26,6 +26,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r test_requirements.txt
+          
+      - name: Create data tree
+        run: |
+          mkdir data
+          cd data
+          mkdir raw
+          mkdir interim
+          mkdir preprocessed    
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -36,23 +44,18 @@ jobs:
 
       - name: Get data from S3/preprocessed
         run: |
-          mkdir -p data/preprocessed
           cd data/preprocessed
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_test.csv
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/X_train.csv
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
 
-      - name: Get data from S3/raw
-        run: |
-          cd data
-          mkdir raw
-          cd raw
-          wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/raw/ressources.csv
-
-
-      #- name: Navigate to models directory
-        #run : cd models
+      #- name: Get data from S3/raw
+        #run: |
+          #cd data
+          #mkdir raw
+          #cd raw
+          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/raw/ressources.csv
 
       - name: Get model from S3
         #uses: actions/aws/cli@v1
