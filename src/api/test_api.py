@@ -5,12 +5,11 @@ import os
 from pathlib import Path
 import sys
 import unittest
-# internal
-from api import api
 
-# paths for internal imports:
+# internal:
 root_path = Path(os.path.realpath(__file__)).parents[2]
 sys.path.append(os.path.join(root_path, "src", "api"))
+from api import api
 
 # paths
 # path_users_db = os.path.join(root_path, "src", "api", "users_db.json")
