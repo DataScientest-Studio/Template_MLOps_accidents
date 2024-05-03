@@ -50,13 +50,6 @@ jobs:
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_test.csv
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/preprocessed/y_train.csv
 
-      #- name: Get data from S3/raw
-        #run: |
-          #cd data
-          #mkdir raw
-          #cd raw
-          #wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/raw/ressources.csv
-
       - name: Get model from S3
         #uses: actions/aws/cli@v1
         #with:
