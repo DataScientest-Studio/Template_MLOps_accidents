@@ -45,8 +45,9 @@ jobs:
 
       - name: Get data from S3/raw
         run: |
-          mkdir -p data/raw
-          cd data/raw
+          cd data
+          mkdir raw
+          cd raw
           wget https://awinger-shield-project.s3.eu-west-3.amazonaws.com/data/raw/ressources.csv
 
 
