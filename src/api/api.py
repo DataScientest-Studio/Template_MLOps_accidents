@@ -23,7 +23,7 @@ import string
 # 3 folders upper of the current
 root_path = Path(os.path.realpath(__file__)).parents[2]
 sys.path.append(os.path.join(root_path, "src", "data"))
-# import datalib -not found in test
+from update_data import data_update
 
 # set commonly used paths as variables
 path_data_preprocessed = os.path.join(root_path, "data", "preprocessed")
@@ -406,53 +406,59 @@ async def get_train(identification=Header(None)):
 # ---------- 7. Mise à jour de la base de données -----------------------------
 
 
-#class UpdateData(BaseModel):
-    #start_year: Optional[int] = 2021
-    #end_year: Optional[int] = 2021
-#
-#
-#@api.post('/update_data', name='Mise à jour des données accidents', tags=['UPDATE'])
-#async def update_data(update_data: UpdateData, identification=Header(None)):
-    #"""Fonction pour mettre à jour les données accidents.
-    #"""
-    ## Récupération des identifiants et mots de passe:
-    #user, psw = identification.split(":")
-#
-    ## Test d'autorisation:
-    #if users_db[user]['rights'] == 1:
-#
-        ## Test d'identification:
-        #if users_db[user]['password'] == psw:
-            ## download, clean and preprocess data => X_train.csv, X_test.csv, y_train.csv, y_test.csv files
-            #exec_time_start = time.time()
-            #data = datalib.Data(update_data.start_year, update_data.end_year, root_path)
-            #exec_time_end = time.time()
-#
-            ## Préparation des métadonnées pour exportation
-            #metadata_dictionary = {
-                #"request_id": "".join(random.choices(string.digits, k=16)),
-                #"time_stamp": str(datetime.datetime.now()),
-                #"user_name": user,
-                #"response_status_code": 200,
-                #"start_year": update_data.start_year,
-                #"end_year": update_data.end_year,
-                #"execution_time": exec_time_end - exec_time_start
-                #}
-            #metadata_json = json.dumps(obj=metadata_dictionary)
-#
-            ## Exportation des métadonnées
-            #path_log_file = os.path.join(path_logs, "update_data.jsonl")
-            #with open(path_log_file, "a") as file:
-                #file.write(metadata_json + "\n")
-#
-        #else:
-            #raise HTTPException(
-                #status_code=401,
-                #detail="Identifiant ou mot de passe invalide(s)")
-    #else:
-        #raise HTTPException(
-                #status_code=403,
-                #detail="Vous n'avez pas les droits d'administrateur.")
+class UpdateData(BaseModel):
+    start_year: Optional[int] = 2019
+    end_year: Optional[int] = 2020
+
+# post ou put?
+@api.post('/update_data', name='Mise à jour des données accidents', tags=['UPDATE'])
+async def update_data(update_data: UpdateData, identification=Header(None)):
+    """Fonction pour mettre à jour les données accidents.
+    """
+    # Récupération des identifiants et mots de passe:
+    user, psw = identification.split(":")
+
+    # Create year_list:
+    year_list = [update_data.start_year, update_data.end_year]
+    
+    # Test d'autorisation:
+    if users_db[user]['rights'] == 1:
+
+        # Test d'identification:
+        if users_db[user]['password'] == psw:
+            
+            # download, clean and preprocess data => X_train.csv, X_test.csv, y_train.csv, y_test.csv files
+            exec_time_start = time.time()
+            data_update(year_list)
+            exec_time_end = time.time()
+
+            # Préparation des métadonnées pour exportation
+            metadata_dictionary = {
+                "request_id": "".join(random.choices(string.digits, k=16)),
+                "time_stamp": str(datetime.datetime.now()),
+                "user_name": user,
+                "response_status_code": 200,
+                "start_year": update_data.start_year,
+                "end_year": update_data.end_year,
+                "execution_time": exec_time_end - exec_time_start
+                }
+            metadata_json = json.dumps(obj=metadata_dictionary)
+
+            # Exportation des métadonnées
+            path_log_file = os.path.join(path_logs, "update_data.jsonl")
+            with open(path_log_file, "a") as file:
+                file.write(metadata_json + "\n")
+            
+            return {"Données mises à jour!"}
+
+        else:
+            raise HTTPException(
+                status_code=401,
+                detail="Identifiant ou mot de passe invalide(s)")
+    else:
+        raise HTTPException(
+                status_code=403,
+                detail="Vous n'avez pas les droits d'administrateur.")
 
 # -------- 8. Labellisation d'une prédiction enregistrée --------
 
