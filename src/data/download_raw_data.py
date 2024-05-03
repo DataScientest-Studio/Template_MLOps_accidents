@@ -44,8 +44,6 @@ def download_raw_data(year_list):
         data_files_list = [f'{item}-{year}.csv' for item in file_list_template
                            for year in year_list]
 
-        # len_data_files = len(data_files_list): unused
-
         with open(output_file, "r", encoding="utf-8") as my_file:
             contents = my_file.readline()
             while contents:
