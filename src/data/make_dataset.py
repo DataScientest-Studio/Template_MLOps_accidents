@@ -2,42 +2,39 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import click
 import logging
 from sklearn.model_selection import train_test_split
-from check_structure import check_existing_file, check_existing_folder
 import os
 
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=False), required=0)
-@click.argument('output_filepath', type=click.Path(exists=False), required=0)
 def main(input_filepath, output_filepath):
-    """ Runs data processing scripts to turn raw data from (../raw) into
+    """ Runs data processing scripts to turn raw data from (../interim) into
         cleaned data ready to be analyzed (saved in ../preprocessed).
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
     # Prompt the user for input file paths
-    input_filepath = click.prompt('Enter the file path for the input data',
-                                  type=click.Path(exists=True))
-    input_filepath_users = f"{input_filepath}\\usagers-2021.csv"
-    input_filepath_caract = f"{input_filepath}\\caracteristiques-2021.csv"
-    input_filepath_places = f"{input_filepath}\\lieux-2021.csv"
-    input_filepath_veh = f"{input_filepath}\\vehicules-2021.csv"
-    output_filepath = click.prompt('Enter the file path for the output \
-                                   preprocessed data \
-                                   (e.g., output/preprocessed_data.csv)',
-                                   type=click.Path())
+
+    input_filepath_users = os.path.join(input_filepath, "usagers.csv")
+    input_filepath_caract = os.path.join(input_filepath,
+                                         "caracteristiques.csv")
+    input_filepath_places = os.path.join(input_filepath, "lieux.csv")
+    input_filepath_veh = os.path.join(input_filepath, "vehicules.csv")
 
     # Call the main data processing function with the provided file paths
-    process_data(input_filepath_users, input_filepath_caract,
-                 input_filepath_places, input_filepath_veh, output_filepath)
+    process_data(input_filepath_users,
+                 input_filepath_caract,
+                 input_filepath_places,
+                 input_filepath_veh,
+                 output_filepath)
 
 
-def process_data(input_filepath_users, input_filepath_caract,
-                 input_filepath_places, input_filepath_veh, output_folderpath):
+def process_data(input_filepath_users,
+                 input_filepath_caract,
+                 input_filepath_places,
+                 input_filepath_veh,
+                 output_folderpath):
 
     # -- Importing dataset
     df_users = pd.read_csv(input_filepath_users, sep=";")
@@ -138,16 +135,12 @@ def process_data(input_filepath_users, input_filepath_caract,
     X_test[col_to_fill_na] = \
         X_test[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
 
-    # Create folder if necessary
-    if check_existing_folder(output_folderpath):
-        os.makedirs(output_folderpath)
-
     # -- Saving the dataframes to their respective output file paths
     for file, filename in zip([X_train, X_test, y_train, y_test],
                               ['X_train', 'X_test', 'y_train', 'y_test']):
         output_filepath = os.path.join(output_folderpath, f'{filename}.csv')
-        if check_existing_file(output_filepath):
-            file.to_csv(output_filepath, index=False)
+        # if check_existing_file(output_filepath):
+        file.to_csv(output_filepath, index=False)
 
 
 if __name__ == '__main__':
@@ -157,4 +150,5 @@ if __name__ == '__main__':
     # not used in this stub but often useful for finding various files
     project_dir = Path(__file__).resolve().parents[2]
 
-    main()
+    main(input_filepath="./data/interim",
+         output_filepath="./data/preprocessed")
