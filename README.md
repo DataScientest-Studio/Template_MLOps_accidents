@@ -1,9 +1,9 @@
-Project Name
-==============================
+# 🛡️ Project Name: SHIELD
 
-This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
+(Safety Hazard Identification and Emergency Law Deployment)
 
-Project Organization
+
+## Project Organization
 ------------
 
     ├── LICENSE
@@ -33,10 +33,15 @@ Project Organization
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
+    │   ├── api           <- Scripts concerning the api  
+    │   │   ├── api.py 
+    │   │   └── test_api.py
+    │   │
     │   ├── data           <- Scripts to download or generate data
-    │   │   ├── check_structure.py    
+    │   │   ├── create_data_tree.py 
     │   │   ├── import_raw_data.py 
-    │   │   └── make_dataset.py
+    │   │   ├── make_dataset.py 
+    │   │   └── update_data.py
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
@@ -52,7 +57,7 @@ Project Organization
 
 ---------
 
-## Steps to follow 
+## Steps to follow on Linux
 
 Convention : All python scripts must be run from the root specifying the relative file path.
 
@@ -62,36 +67,118 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ###   Activate it 
 
-    `./my_env/Scripts/activate`
+    `chmod +x my_env/bin/activate
+    source my_env/bin/activate`
 
 ###   Install the packages from requirements.txt
 
-    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
+    `pip install -r requirements.txt` 
 
-### 2- Execute import_raw_data.py to import the 4 datasets.
+### 3- Create data tree:
 
-    `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
+    `python src/data/create_data_tree.py`
 
-### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
+### 4- Execute import_raw_data.py to import the 4 datasets.
 
-    `python .\src\data\make_dataset.py`
+   `python src/data/import_raw_data.py`
 
-### 4- Execute train_model.py to instanciate the model in joblib format
+### 5- Execute make_dataset.py 
 
-    `python .\src\models\train_model.py`
+    `python src/data/make_dataset.py`
 
-### 5- Finally, execute predict_model.py with respect to one of these rules :
-  
-  - Provide a json file as follow : 
+### 6- Execute train_model.py to instanciate the model in joblib format
 
-    
-    `python ./src/models/predict_model.py ./src/models/test_features.json`
+    `python src/models/train_model.py`
 
-  test_features.json is an example that you can try 
+### 7- Run the api:
 
-  - If you do not specify a json file, you will be asked to enter manually each feature. 
+    `uvicorn --app-dir src/api api:api --reload --host=127.0.0.1 --port=8000`
+
+### 8- Check if the api is running:
+
+In a new terminal, type:
+
+    `curl -X GET http://127.0.0.1:8000/status`
+
+It should return: "L'api fonctionne."
+
+### 9- Run the tests:
+
+    `python src/api/test_api.py`
+
+### 10- Manually test the api:
+
+In your navigator, go to http://127.0.0.1:8000/docs
+
+You can test all the endpoints. When needed, you will be asked a username and a password. We implemented two types of users:
+_ Adminstrator Users: try it with `admin:4dmin`. This user's type can run every endpoint.
+_ Standard Users: try it with `fdo:c0ps`. This user's type can only run the following endpoints: /status (which doesn't requires any identification), /predict_from_call, /predict_from_test, /label
+
+### 11- Test the api with terminal command:
+
+All commands are written in the file ./src/api/Readme_api.md
 
 
 ------------------------
+## Steps to follow on Windows
+
+Convention : All python scripts must be run from the root specifying the relative file path.
+
+### 1- Create a virtual environment using Virtualenv.
+
+    `python -m venv my_env`
+
+###   Activate it 
+
+    `my_env/Scripts/activate`
+
+###   Install the packages from requirements.txt
+
+    `pip install -r requirements.txt` 
+
+### 3- Create data tree:
+
+    `python src/data/create_data_tree.py`
+
+### 4- Execute import_raw_data.py to import the 4 datasets.
+
+    `python src/data/import_raw_data.py`
+
+### 5- Execute make_dataset.py 
+
+    `python src/data/make_dataset.py`
+
+### 6- Execute train_model.py to instanciate the model in joblib format
+
+    `python src/models/train_model.py`
+
+### 7- Run the api:
+
+    `uvicorn --app-dir src/api api:api --reload --host=127.0.0.1 --port=8000`
+
+### 8- Check if the api is running:
+
+In a new terminal, type:
+
+    `curl -X GET http://127.0.0.1:8000/status`
+
+It should return: "L'api fonctionne."
+
+### 9- Run the tests:
+
+    `python src/api/test_api.py`
+
+### 10- Manually test the api:
+
+In your navigator, go to http://127.0.0.1:8000/docs
+
+You can test all the endpoints. When needed, you will be asked a username and a password. We implemented two types of users:
+_ Adminstrator Users: try it with `admin:4dmin`. This user's type can run every endpoint.
+_ Standard Users: try it with `fdo:c0ps`. This user's type can only run the following endpoints: /status (which doesn't requires any identification), /predict_from_call, /predict_from_test, /label
+
+### 11- Test the api with terminal command:
+
+All commands are written in the file ./src/api/Readme_api.md
+
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>

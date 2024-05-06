@@ -1,0 +1,9 @@
+fastapi
+pytest
+flake8
+httpx
+requests
+numpy
+pandas
+joblib
+scikit-learn
