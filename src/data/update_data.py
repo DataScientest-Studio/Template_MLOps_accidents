@@ -103,4 +103,4 @@ def data_update(year_list):
 
 
 if __name__ == '__main__':
-    UpdateData(year_list=[2019, 2020])
+    data_update(year_list=[2019, 2020])
