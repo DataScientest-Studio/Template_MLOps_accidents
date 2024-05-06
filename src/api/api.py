@@ -10,12 +10,12 @@ import os
 from pathlib import Path
 from pydantic import BaseModel
 import random
-from sklearn import ensemble
+# from sklearn import ensemble
 from sklearn.metrics import f1_score
 import sys
 import time
 from typing import Optional
-import numpy as np
+# import numpy as np
 import string
 
 # internal
@@ -37,7 +37,8 @@ path_logs = os.path.join(root_path, "logs")
 path_db_preds_unlabeled = os.path.join(path_logs, "preds_call.jsonl")
 path_db_preds_labeled = os.path.join(path_logs, "preds_labeled.jsonl")
 path_trained_model = os.path.join(root_path, "models", "trained_model.joblib")
-path_new_trained_model = os.path.join(root_path, "models", "new_trained_model.joblib")
+path_new_trained_model = os.path.join(root_path, "models",
+                                      "new_trained_model.joblib")
 path_users_db = os.path.join(root_path, "src", "api", "users_db.json")
 # ---------------------------- HTTP Exceptions --------------------------------
 responses = {
@@ -138,7 +139,8 @@ class OldUser(BaseModel):
             tags=['USERS'], responses=responses)
 async def remove_user(old_user: OldUser, identification=Header(None)):
     """Fonction pour supprimer un nouvel utilisateur.
-       Il faut être administrateur pour pouvoir supprimer un nouvel utilisateur.
+       Il faut être administrateur pour pouvoir supprimer un nouvel
+       utilisateur.
        Identification: entrez votre identifiant et votre mot de passe
        au format identifiant:mot_de_passe
     """
@@ -195,7 +197,7 @@ async def get_pred_from_test(identification=Header(None)):
 
         # Chargement des données test:
         X_test = pd.read_csv(path_X_test)
-        y_test = pd.read_csv(path_y_test)
+        # y_test = pd.read_csv(path_y_test)
 
         # Prédiction d'une donnée aléatoire:
         i = random.choice(X_test.index)
@@ -204,8 +206,8 @@ async def get_pred_from_test(identification=Header(None)):
         pred_time_end = time.time()
 
         # Prédiction générale de y
-        y_pred = rdf.predict(X_test)
-        y_true = y_test
+        # y_pred = rdf.predict(X_test)
+        # y_true = y_test
 
         # Calcul du F1 score macro average
         # f1_score_macro_average = f1_score(y_true=y_true,
@@ -385,7 +387,8 @@ async def post_train(new_model: UpdateModel,
                 "estimator_type": str(type(rdf)),
                 "estimator_parameters": rdf.get_params(),
                 "feature_importances": dict(zip(X_train.columns.to_list(),
-                                                list(rdf.feature_importances_))),
+                                                list(rdf.feature_importances_))
+                                            ),
                 "train_time": train_time_end - train_time_start
                 }
             metadata_json = json.dumps(obj=metadata_dictionary)
@@ -413,8 +416,11 @@ class UpdateData(BaseModel):
     start_year: Optional[int] = 2019
     end_year: Optional[int] = 2020
 
+
 # post ou put?
-@api.post('/update_data', name='Mise à jour des données accidents', tags=['UPDATE'])
+@api.post('/update_data',
+          name='Mise à jour des données accidents',
+          tags=['UPDATE'])
 async def update_data(update_data: UpdateData, identification=Header(None)):
     """Fonction pour mettre à jour les données accidents.
     """
@@ -423,14 +429,14 @@ async def update_data(update_data: UpdateData, identification=Header(None)):
 
     # Create year_list:
     year_list = [update_data.start_year, update_data.end_year]
-    
+
     # Test d'autorisation:
     if users_db[user]['rights'] == 1:
 
         # Test d'identification:
         if users_db[user]['password'] == psw:
-            
-            # download, clean and preprocess data => X_train.csv, X_test.csv, y_train.csv, y_test.csv files
+
+            # download, clean and preprocess data
             exec_time_start = time.time()
             data_update(year_list)
             exec_time_end = time.time()
@@ -451,7 +457,7 @@ async def update_data(update_data: UpdateData, identification=Header(None)):
             path_log_file = os.path.join(path_logs, "update_data.jsonl")
             with open(path_log_file, "a") as file:
                 file.write(metadata_json + "\n")
-            
+
             return {"Données mises à jour!"}
 
         else:
@@ -476,13 +482,19 @@ class Prediction(BaseModel):
     """Label de la prédiction"""
 
 
-@api.post('/label_prediction', name="Labellisation d'une prédiction enregistrée", tags=['UPDATE'])
-async def label_prediction(prediction: Prediction, identification=Header(None)):
-    """Fonction qui labellise une prédiction enregistrée à partir du retour utilisateur
+@api.post('/label_prediction',
+          name="Labellisation d'une prédiction enregistrée",
+          tags=['UPDATE'])
+async def label_prediction(prediction: Prediction,
+                           identification=Header(None)):
+    """Fonction qui labellise une prédiction enregistrée
+    à partir du retour utilisateur.
 
     Paramètres :
-        prediction (class Prediction) : référence de la prédiction à labelliser et label correspondant
-        identification (str) : identifiants utilisateur selon le format nom_d_utilisateur:mot_de_passe
+        prediction (class Prediction) : référence de la prédiction à
+        labelliser et label correspondant
+        identification (str) : identifiants utilisateur selon le format
+        nom_d_utilisateur:mot_de_passe
 
     Lève :
         HTTPException401 : identifiants non valables
@@ -509,7 +521,7 @@ async def label_prediction(prediction: Prediction, identification=Header(None)):
                 record_exists = "yes"
                 record_to_update = record
 
-                # Mise à jour du champ verified_prediction avec la valeur de y_true
+                # Update verified_prediction with y_true
                 record_to_update["verified_prediction"] = prediction.y_true
 
                 # Mise à jour de la base de données de prédictions labellisées
@@ -520,20 +532,26 @@ async def label_prediction(prediction: Prediction, identification=Header(None)):
         if record_exists == "yes":
             return {"Enregistrement mis à jour. Merci pour votre retour."}
         else:
-            raise HTTPException(status_code=404, detail="Aucun enregistrement trouvé. Merci de fournir une référence (request_id) valable.")
+            raise HTTPException(status_code=404,
+                                detail="Aucun enregistrement trouvé. Merci de fournir une référence (request_id) valable.")
 
     else:
-        raise HTTPException(status_code=401, detail="Identifiants non valables.")
+        raise HTTPException(status_code=401,
+                            detail="Identifiants non valables.")
 
 # -------- 9. Mise à jour du F1 score --------
 
 
-@api.get('/update_f1_score', name="Mise à jour du F1 score", tags=['UPDATE'])
+@api.get('/update_f1_score',
+         name="Mise à jour du F1 score",
+         tags=['UPDATE'])
 async def update_f1_score(identification=Header(None)):
-    """Fonction qui calcule et enregistre le dernier F1 score du modèle en élargissant X_test et y_test aux nouvelles données labellisées
+    """Fonction qui calcule et enregistre le dernier F1 score du modèle
+    en élargissant X_test et y_test aux nouvelles données labellisées
 
     Paramètres :
-        identification (str) : identifiants administrateur selon le format nom_d_utilisateur:mot_de_passe
+        identification (str) : identifiants administrateur selon
+        le format nom_d_utilisateur:mot_de_passe
 
     Lève :
         HTTPException401 : identifiants non valables
@@ -565,13 +583,13 @@ async def update_f1_score(identification=Header(None)):
             X_test_new = pd.DataFrame()
             y_test_new = pd.Series()
             for record in db_preds_labeled:
-                # Chargement des variables d'entrée dans le DataFrame X_test_new
+                # Chargement des variables d'entrée dans le df X_test_new
                 X_record = record["input_features"]
                 X_record = {key: [value] for key, value in X_record.items()}
                 X_record = pd.DataFrame(X_record)
                 X_test_new = pd.concat([X_test_new, X_record])
 
-                # Chargement des variables de sortie dans le DataFrame y_test_new
+                # Chargement des variables de sortie dans le df y_test_new
                 y_record = pd.Series(record["verified_prediction"])
                 if y_test_new.empty is True:  # Pour éviter l'avertissement suivant : « FutureWarning: The behavior of array concatenation with empty entries is deprecated. »
                     y_test_new = y_record
