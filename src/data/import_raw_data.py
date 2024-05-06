@@ -3,7 +3,11 @@ import os
 import logging
 import shutil
 
+# S3 url:
+s3_url = "https://mlops-project-db.s3.eu-west-1.amazonaws.com/accidents/"
 
+
+# --------------- import_raw_data ---------------------------------------------
 def import_raw_data(raw_data_relative_path,
                     interim_data_relative_path,
                     filenames,
@@ -34,11 +38,12 @@ def import_raw_data(raw_data_relative_path,
         shutil.copyfile(src, dest)
 
 
+# --------------- main ---------------------------------------------
 def main(raw_data_relative_path="./data/raw",
          interim_data_relative_path="./data/interim",
          filenames=["caracteristiques-2021.csv", "lieux-2021.csv",
                     "usagers-2021.csv", "vehicules-2021.csv"],
-         bucket_folder_url="https://mlops-project-db.s3.eu-west-1.amazonaws.com/accidents/"
+         bucket_folder_url=s3_url
          ):
     """ Upload data from AWS s3 in ./data/raw
     """
