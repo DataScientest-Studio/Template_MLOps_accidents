@@ -1,26 +1,35 @@
-
 # import sklearn
 import pandas as pd
 from sklearn import ensemble
 import joblib
 import numpy as np
+import os
+from pathlib import Path
 
-print(joblib.__version__)
 
-X_train = pd.read_csv('data/preprocessed/X_train.csv')
-X_test = pd.read_csv('data/preprocessed/X_test.csv')
-y_train = pd.read_csv('data/preprocessed/y_train.csv')
-y_test = pd.read_csv('data/preprocessed/y_test.csv')
-y_train = np.ravel(y_train)
-y_test = np.ravel(y_test)
+def train_and_save_model(model_name="trained_model"):
+    # paths:
+    root_path = Path(os.path.realpath(__file__)).parents[2]
+    path_data_preprocessed = os.path.join(root_path, "data", "preprocessed")
+    path_X_train = os.path.join(path_data_preprocessed, "X_train.csv")
+    path_y_train = os.path.join(path_data_preprocessed, "y_train.csv")
+    path_model = os.path.join(root_path, "models")
 
-rf_classifier = ensemble.RandomForestClassifier(n_jobs=-1)
+    # Train import:
+    X_train = pd.read_csv(path_X_train)
+    y_train = pd.read_csv(path_y_train)
+    y_train = np.ravel(y_train)
 
-# -- Train the model
-rf_classifier.fit(X_train, y_train)
+    rf_classifier = ensemble.RandomForestClassifier(n_jobs=-1)
 
-# -- Save the trained model to a file
-# model_filename = './src/models/trained_model.joblib'
-model_filename = './models/trained_model.joblib'
-joblib.dump(rf_classifier, model_filename)
-print("Model trained and saved successfully.")
+    # -- Train the model
+    rf_classifier.fit(X_train, y_train)
+
+    # -- Save the trained model to a file
+    model_filename = os.path.join(path_model, f"{model_name}.joblib")
+    joblib.dump(rf_classifier, model_filename)
+    print(f"Model {model_name}.joblib trained and saved successfully.")
+
+
+if __name__ == '__main__':
+    train_and_save_model()
