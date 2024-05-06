@@ -1,11 +1,11 @@
 
-# 1. Test / : vérification du fonctionnement de l’API:
+# 1. Test /status : vérification du fonctionnement de l’API:
 curl -X 'GET' 'http://127.0.0.1:8000/' -H 'accept: application/json'
 
-# 2. Test /register: inscription d'un nouvel utilisateur:
+# 2. Test /add_user: inscription d'un nouvel utilisateur:
 
 curl -X 'POST' \
-  'http://127.0.0.1:8000/register' \
+  'http://127.0.0.1:8000/add_user' \
   -H 'accept: application/json' \
   -H 'identification: admin:4dmin' \
   -H 'Content-Type: application/json' \
@@ -76,10 +76,14 @@ curl -X 'POST' \
 
 # 6. Test /train:
 
-curl -X 'GET' \
+curl -X 'POST' \
   'http://127.0.0.1:8000/train' \
   -H 'accept: application/json' \
-  -H 'identification: admin:4dmin'
+  -H 'identification: admin:4dmin' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "test_trained_model"
+}'
 
   # 7. Test /update_data: 
 
@@ -89,8 +93,8 @@ curl -X 'POST' \
   -H 'identification: admin:4dmin' \
   -H 'Content-Type: application/json' \
   -d '{
-  "start_year": 2021,
-  "end_year": 2021
+  "start_year": 2019,
+  "end_year": 2020
 }'
 
 # 8. Test /label_prediction
