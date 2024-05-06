@@ -33,8 +33,7 @@ Project Organization
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   ├── check_structure.py    
+    │   ├── data           <- Scripts to download or generate data  
     │   │   ├── import_raw_data.py 
     │   │   └── make_dataset.py
     │   │
@@ -68,11 +67,14 @@ Convention : All python scripts must be run from the root specifying the relativ
 
     `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
 
+### Create data tree:
+    `python ./src/data/create_data_tree.py`
+
 ### 2- Execute import_raw_data.py to import the 4 datasets.
 
-    `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
+    `python .\src\data\import_raw_data.py`
 
-### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
+### 3- Execute make_dataset.py 
 
     `python .\src\data\make_dataset.py`
 
