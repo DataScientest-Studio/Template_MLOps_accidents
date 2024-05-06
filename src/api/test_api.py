@@ -77,9 +77,11 @@ class TestAPI(unittest.TestCase):
         print("EP5 /predict_from_call: PASSED")
 
     def test_train_model(self):
+        model_name = {"name": "test_retrained_model"}
         # EP 6
-        response = client.request(method="GET",
+        response = client.request(method="POST",
                                   url='/train',
+                                  json=model_name,
                                   headers={"identification": "admin:4dmin"})
         # Check response (code 200)
         self.assertTrue(response.status_code == 200,
