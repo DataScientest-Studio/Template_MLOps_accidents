@@ -1,4 +1,4 @@
-# Project Name: SHIELD
+# 🛡️ Project Name: SHIELD
 
 (Safety Hazard Identification and Emergency Law Deployment)
 
