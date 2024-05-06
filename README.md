@@ -67,16 +67,16 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ###   Activate it 
 
-    `chmod +x ./my_env/bin/activate
-    ./my_env/bin/activate`
+    `chmod +x my_env/bin/activate
+    source my_env/bin/activate`
 
 ###   Install the packages from requirements.txt
 
-    `pip install -r .\requirements.txt` 
+    `pip install -r requirements.txt` 
 
 ### 3- Create data tree:
 
-    `python ./src/data/create_data_tree.py`
+    `python src/data/create_data_tree.py`
 
 ### 4- Execute import_raw_data.py to import the 4 datasets.
 
@@ -92,7 +92,7 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ### 7- Run the api:
 
-    `uvicorn --app-dir ./src/api api:api --reload --host=127.0.0.1 --port=8000`
+    `uvicorn --app-dir src/api api:api --reload --host=127.0.0.1 --port=8000`
 
 ### 8- Check if the api is running:
 
@@ -116,7 +116,7 @@ _ Standard Users: try it with `fdo:c0ps`. This user's type can only run the foll
 
 ### 11- Test the api with terminal command:
 
-All commands are written in the file ./src/features/api/Readme_api.md
+All commands are written in the file ./src/api/Readme_api.md
 
 
 
