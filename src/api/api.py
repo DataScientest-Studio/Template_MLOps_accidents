@@ -23,7 +23,9 @@ import string
 # 3 folders upper of the current
 root_path = Path(os.path.realpath(__file__)).parents[2]
 sys.path.append(os.path.join(root_path, "src", "data"))
+sys.path.append(os.path.join(root_path, "src", "models"))
 from update_data import data_update
+from train_model import train_and_save_model
 
 # set commonly used paths as variables
 path_data_preprocessed = os.path.join(root_path, "data", "preprocessed")
@@ -340,11 +342,15 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
 
 # ---------- 6. Entraîner le modèle avec de nouvelles données: ----------------
 
+class UpdateModel(BaseModel):
+    name: Optional[str] = "test_trained_model"
 
-@api.get('/train',
-         name='Entrainement du modèle',
-         tags=['UPDATE'])
-async def get_train(identification=Header(None)):
+
+@api.post('/train',
+          name='Entrainement du modèle',
+          tags=['UPDATE'])
+async def post_train(new_model: UpdateModel,
+                     identification=Header(None)):
     """Fonction pour entrainer le modèle.
     """
 # Récupération des identifiants et mots de passe:
@@ -356,17 +362,19 @@ async def get_train(identification=Header(None)):
         # Test d'identification:
         if users_db[user]['password'] == psw:
 
-            # Chargement des données:
+            # Chargement des données pour les métadonnées:
             X_train = pd.read_csv(path_X_train)
-            y_train = pd.read_csv(path_y_train)
-            y_train = np.ravel(y_train)
 
-            rf_classifier = ensemble.RandomForestClassifier(n_jobs=-1)
-
-            # Entrainement du modèle:
+            # Entrainement et sauvegarde du nouveau modèle:
             train_time_start = time.time()
-            rf_classifier.fit(X_train, y_train)
+            train_and_save_model(model_name=new_model.name)
             train_time_end = time.time()
+
+            # Chargement du nouveau modèle:
+            path_new_trained_model = os.path.join(root_path,
+                                                  "models",
+                                                  f"{new_model.name}.joblib")
+            rdf = joblib.load(path_new_trained_model)
 
             # Préparation des métadonnées pour exportation
             metadata_dictionary = {
@@ -374,10 +382,10 @@ async def get_train(identification=Header(None)):
                 "time_stamp": str(datetime.datetime.now()),
                 "user_name": user,
                 "response_status_code": 200,
-                "estimator_type": str(type(rf_classifier)),
-                "estimator_parameters": rf_classifier.get_params(),
+                "estimator_type": str(type(rdf)),
+                "estimator_parameters": rdf.get_params(),
                 "feature_importances": dict(zip(X_train.columns.to_list(),
-                                                list(rf_classifier.feature_importances_))),
+                                                list(rdf.feature_importances_))),
                 "train_time": train_time_end - train_time_start
                 }
             metadata_json = json.dumps(obj=metadata_dictionary)
@@ -387,11 +395,6 @@ async def get_train(identification=Header(None)):
             with open(path_log_file, "a") as file:
                 file.write(metadata_json + "\n")
 
-            # Sauvegarde du modèle:
-            # Sauvegarde dans new_trained_model.joblib dans un premier temps
-            # TODO: Versioning du modèle
-
-            joblib.dump(rf_classifier, path_new_trained_model)
             return {"Modèle ré-entrainé et sauvegardé!"}
 
         else:
