@@ -1,9 +1,9 @@
-Project Name
-==============================
+# Project Name: SHIELD
 
-This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
+(Safety Hazard Identification and Emergency Law Deployment)
 
-Project Organization
+
+## Project Organization
 ------------
 
     ├── LICENSE
@@ -33,9 +33,15 @@ Project Organization
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data  
+    │   ├── api           <- Scripts concerning the api  
+    │   │   ├── api.py 
+    │   │   └── test_api.py
+    │   │
+    │   ├── data           <- Scripts to download or generate data
+    │   │   ├── create_data_tree.py 
     │   │   ├── import_raw_data.py 
-    │   │   └── make_dataset.py
+    │   │   ├── make_dataset.py 
+    │   │   └── update_data.py
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
@@ -51,7 +57,7 @@ Project Organization
 
 ---------
 
-## Steps to follow 
+## Steps to follow on Linux
 
 Convention : All python scripts must be run from the root specifying the relative file path.
 
@@ -61,37 +67,57 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ###   Activate it 
 
-    `./my_env/Scripts/activate`
+    `chmod +x ./my_env/bin/activate
+    ./my_env/bin/activate`
 
 ###   Install the packages from requirements.txt
 
-    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
+    `pip install -r .\requirements.txt` 
 
-### Create data tree:
+### 3- Create data tree:
+
     `python ./src/data/create_data_tree.py`
 
-### 2- Execute import_raw_data.py to import the 4 datasets.
+### 4- Execute import_raw_data.py to import the 4 datasets.
 
-    `python .\src\data\import_raw_data.py`
+   `python src/data/import_raw_data.py`
 
-### 3- Execute make_dataset.py 
+### 5- Execute make_dataset.py 
 
-    `python .\src\data\make_dataset.py`
+    `python src/data/make_dataset.py`
 
-### 4- Execute train_model.py to instanciate the model in joblib format
+### 6- Execute train_model.py to instanciate the model in joblib format
 
-    `python .\src\models\train_model.py`
+    `python src/models/train_model.py`
 
-### 5- Finally, execute predict_model.py with respect to one of these rules :
-  
-  - Provide a json file as follow : 
+### 7- Run the api:
 
-    
-    `python ./src/models/predict_model.py ./src/models/test_features.json`
+    `uvicorn --app-dir ./src/api api:api --reload --host=127.0.0.1 --port=8000`
 
-  test_features.json is an example that you can try 
+### 8- Check if the api is running:
 
-  - If you do not specify a json file, you will be asked to enter manually each feature. 
+In a new terminal, type:
+
+    `curl -X GET http://127.0.0.1:8000/status`
+
+It should return: "L'api fonctionne."
+
+### 9- Run the tests:
+
+    `python src/api/test_api.py`
+
+### 10- Manually test the api:
+
+In your navigator, go to http://127.0.0.1:8000/docs
+
+You can test all the endpoints. When needed, you will be asked a username and a password. We implemented two types of users:
+_ Adminstrator Users: try it with `admin:4dmin`. This user's type can run every endpoint.
+_ Standard Users: try it with `fdo:c0ps`. This user's type can only run the following endpoints: /status (which doesn't requires any identification), /predict_from_call, /predict_from_test, /label
+
+### 11- Test the api with terminal command:
+
+All commands are written in the file ./src/features/api/Readme_api.md
+
 
 
 ------------------------
