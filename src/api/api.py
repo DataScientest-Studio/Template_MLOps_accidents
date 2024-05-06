@@ -509,7 +509,7 @@ async def label_prediction(prediction: Prediction,
     # Test d'identification
     if users_db[user]['password'] == psw:
 
-        # Chargement de la base de données de prédictions non labellisées
+        # Load preds_call.jsonl
         with open(path_db_preds_unlabeled, "r") as file:
             db_preds_unlabeled = [json.loads(line) for line in file]
 
@@ -611,8 +611,11 @@ async def update_f1_score(identification=Header(None)):
                                               average="macro")
 
             # Préparation des métadonnées pour exportation
-            metadata_dictionary = {"request_id": db_preds_labeled[-1]["request_id"],
-                                   "f1_score_macro_average": f1_score_macro_average}
+            metadata_dictionary = {
+                "request_id": db_preds_labeled[-1]["request_id"],
+                "time_stamp": str(datetime.datetime.now()),
+                "user_name": user,
+                "f1_score_macro_average": f1_score_macro_average}
             metadata_json = json.dumps(obj=metadata_dictionary)
 
             # Exportation des métadonnées
