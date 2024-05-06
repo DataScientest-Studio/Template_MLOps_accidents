@@ -119,7 +119,66 @@ _ Standard Users: try it with `fdo:c0ps`. This user's type can only run the foll
 All commands are written in the file ./src/api/Readme_api.md
 
 
-
 ------------------------
+## Steps to follow on Windows
+
+Convention : All python scripts must be run from the root specifying the relative file path.
+
+### 1- Create a virtual environment using Virtualenv.
+
+    `python -m venv my_env`
+
+###   Activate it 
+
+    `my_env/Scripts/activate`
+
+###   Install the packages from requirements.txt
+
+    `pip install -r requirements.txt` 
+
+### 3- Create data tree:
+
+    `python src/data/create_data_tree.py`
+
+### 4- Execute import_raw_data.py to import the 4 datasets.
+
+    `python src/data/import_raw_data.py`
+
+### 5- Execute make_dataset.py 
+
+    `python src/data/make_dataset.py`
+
+### 6- Execute train_model.py to instanciate the model in joblib format
+
+    `python src/models/train_model.py`
+
+### 7- Run the api:
+
+    `uvicorn --app-dir src/api api:api --reload --host=127.0.0.1 --port=8000`
+
+### 8- Check if the api is running:
+
+In a new terminal, type:
+
+    `curl -X GET http://127.0.0.1:8000/status`
+
+It should return: "L'api fonctionne."
+
+### 9- Run the tests:
+
+    `python src/api/test_api.py`
+
+### 10- Manually test the api:
+
+In your navigator, go to http://127.0.0.1:8000/docs
+
+You can test all the endpoints. When needed, you will be asked a username and a password. We implemented two types of users:
+_ Adminstrator Users: try it with `admin:4dmin`. This user's type can run every endpoint.
+_ Standard Users: try it with `fdo:c0ps`. This user's type can only run the following endpoints: /status (which doesn't requires any identification), /predict_from_call, /predict_from_test, /label
+
+### 11- Test the api with terminal command:
+
+All commands are written in the file ./src/api/Readme_api.md
+
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
