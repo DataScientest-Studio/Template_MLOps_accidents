@@ -3,7 +3,7 @@ name: API Unit Tests
 on:
   push:
     branches:
-      - Restart
+      - Docker
   pull_request:
     branches:
       - master
