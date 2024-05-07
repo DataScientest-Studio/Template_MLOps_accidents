@@ -41,21 +41,21 @@
 # -------------- Image 4. Train Model ---------------------------------------
 
 # Création de l'image depuis la racine:
-docker image build  -f ./src/models/model.Dockerfile -t shield_train_model_image .
+    docker image build  -f ./src/models/model.Dockerfile -t shield_train_model_image .
 
 # Lancement depuis la racine: 
 
-docker run --mount type=volume,src=shield_volume,dst=/home/volume shield_train_model_image
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_train_model_image
 
 # --------------- Image 5. API ---------------------------------------------------
 # Création de l'image `api`: 
-docker image build  -f ./src/features/api/api.Dockerfile -t shield_api_image .
+    docker image build  -f ./src/api/api.Dockerfile -t shield_api_image .
 
 # Lancement du conteneur à partir de l'image:
-docker run -p 8000:8000 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ shield_api_image
+    docker run -p 8000:8000 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ shield_api_image
 
 # Test de l'api dans un autre terminal:
-curl.exe -X GET -i http://127.0.0.1:8010/status
+curl.exe -X GET -i http://127.0.0.1:8000/status
 
 # L'autre voie ne fonctionne pas, malgré beaucoup d'essais et d'investigation:
 curl.exe -X GET -i http://172.17.0.2:8000/status
