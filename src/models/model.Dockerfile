@@ -21,7 +21,7 @@ mkdir models ; \
 # Train model:
 python3 src/models/train_model.py ; \
 # Create directory inside volume for model save:
-mkdir ../volume/models ; \
+mkdir -p ../volume/models ; \
 # Copy model save into volume for persistency:
 cp models/trained_model.joblib  ../volume/models/ \
 "]
