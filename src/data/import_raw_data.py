@@ -2,9 +2,16 @@ import requests
 import os
 import logging
 import shutil
+from pathlib import Path
+
 
 # S3 url:
 s3_url = "https://mlops-project-db.s3.eu-west-1.amazonaws.com/accidents/"
+
+# paths:
+root_path = Path(os.path.realpath(__file__)).parents[2]
+path_data_raw = os.path.join(root_path, "data", "raw")
+path_data_interim = os.path.join(root_path, "data", "interim")
 
 
 # --------------- import_raw_data ---------------------------------------------
@@ -39,8 +46,8 @@ def import_raw_data(raw_data_relative_path,
 
 
 # --------------- main ---------------------------------------------
-def main(raw_data_relative_path="./data/raw",
-         interim_data_relative_path="./data/interim",
+def main(raw_data_relative_path=path_data_raw,
+         interim_data_relative_path=path_data_interim,
          filenames=["caracteristiques-2021.csv", "lieux-2021.csv",
                     "usagers-2021.csv", "vehicules-2021.csv"],
          bucket_folder_url=s3_url
