@@ -12,7 +12,7 @@ sys.path.append(os.path.join(root_path, "src", "api"))
 from api import api
 
 # paths
-# path_users_db = os.path.join(root_path, "src", "api", "users_db.json")
+# path_users_db = os.path.join(root_path, "src", "users_db", "users_db.json")
 path_test_features = os.path.join(root_path, "src", "models",
                                   "test_features.json")
 
