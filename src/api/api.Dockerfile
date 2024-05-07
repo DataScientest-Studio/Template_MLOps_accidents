@@ -26,7 +26,7 @@ cp -r ../volume/data data ; \
 # Create logs directory inside container:
 mkdir logs/ ; \
 # Export api script into volume:
-mkdir ../volume/src/api ; \
+mkdir -p ../volume/src/api ; \
 cp src/api/api.py ../volume/src/api ; \
 # Run the api:
 uvicorn --app-dir src/api api:api --reload --host=0.0.0.0\
