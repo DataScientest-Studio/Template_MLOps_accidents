@@ -57,7 +57,7 @@
 # Test de l'api dans un autre terminal:
 curl.exe -X GET -i http://127.0.0.1:8000/status
 
-# L'autre voie ne fonctionne pas, malgré beaucoup d'essais et d'investigation:
+# L'autre voie  en utilisant l'IP du conteneur ne fonctionne pas, malgré beaucoup d'essais et d'investigation:
 curl.exe -X GET -i http://172.17.0.2:8000/status
 # curl: (28) Failed to connect to 172.17.0.2 port 8000 after 21042 ms: Couldn't connect to server
 
