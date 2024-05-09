@@ -58,7 +58,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     df = add_new_columns(df, nb_victim, nb_vehicules)
 
     # Modify target variable
-    #df = modif_target_variable(df)
+    df = modif_target_variable(df)
 
     # Replace values -1 and 0
     #df = replace_values(df)
