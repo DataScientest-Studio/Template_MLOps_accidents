@@ -67,7 +67,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     df = drop_columns(df)
 
     # Drop lines with NaN values
-    #df = drop_lines_with_nan_values(df)
+    df = drop_lines_with_nan_values(df)
 
     # Split data into training and testing sets
     X_train, X_test, y_train, y_test = split_data(df)
