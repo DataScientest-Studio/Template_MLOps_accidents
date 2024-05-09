@@ -62,6 +62,12 @@ curl.exe -X GET -i http://172.17.0.2:8000/status
 # curl: (28) Failed to connect to 172.17.0.2 port 8000 after 21042 ms: Couldn't connect to server
 
 # --------------- Image 6. Test -----------------------------------------------
+# Création de l'image `test_api`: 
+    docker image build  -f ./src/api/test_api.Dockerfile -t shield_test_api_image .
+
+# Lancement depuis la racine: 
+
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_test_api_image
 
 # --------------- Image 7. Monitoring model -----------------------------------
 
