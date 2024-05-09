@@ -57,6 +57,26 @@ services:
     container_name: api
     ports:
       - "8000:8000" # pour ne pas avoir à modifier nos commandes curl
+    #healthcheck:
+      #test: ["CMD", "curl", "-f", "http://127.0.0.1:8000"]
+      #interval: 1ms
+      #timeout: 10s
+      #retries: 3
+      #start_period: 20s
+      #start_interval: 5s
+    volumes:
+      - type: volume
+        source: app_volume
+        target: /home/volume
+  
+  test_api_shield:
+    depends_on:
+      train_model:
+        condition: service_completed_successfully
+    image: shield_test_api_image
+    container_name: test_api
+    ports:
+      - "8006:8006" # pour ne pas avoir à modifier nos commandes curl
     volumes:
       - type: volume
         source: app_volume
