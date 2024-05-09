@@ -90,11 +90,15 @@ Convention : All python scripts must be run from the root specifying the relativ
 
     `python src/models/train_model.py`
 
-### 7- Run the api:
+### 7- Create users database:
+
+    `python src/users_db/create_users_db.py
+
+### 8- Run the api:
 
     `uvicorn --app-dir src/api api:api --reload --host=127.0.0.1 --port=8000`
 
-### 8- Check if the api is running:
+### 9- Check if the api is running:
 
 In a new terminal, type:
 
@@ -102,11 +106,11 @@ In a new terminal, type:
 
 It should return: "L'api fonctionne."
 
-### 9- Run the tests:
+### 10- Run the tests:
 
     `python src/api/test_api.py`
 
-### 10- Manually test the api:
+### 11- Manually test the api:
 
 In your navigator, go to http://127.0.0.1:8000/docs
 
@@ -114,7 +118,7 @@ You can test all the endpoints. When needed, you will be asked a username and a 
 _ Adminstrator Users: try it with `admin:4dmin`. This user's type can run every endpoint.
 _ Standard Users: try it with `fdo:c0ps`. This user's type can only run the following endpoints: /status (which doesn't requires any identification), /predict_from_call, /predict_from_test, /label
 
-### 11- Test the api with terminal command:
+### 12- Test the api with terminal command:
 
 All commands are written in the file ./src/api/Readme_api.md
 
@@ -152,11 +156,15 @@ Convention : All python scripts must be run from the root specifying the relativ
 
     `python src/models/train_model.py`
 
-### 7- Run the api:
+### 7- Create users database:
+
+    `python src/users_db/create_users_db.py
+
+### 8- Run the api:
 
     `uvicorn --app-dir src/api api:api --reload --host=127.0.0.1 --port=8000`
 
-### 8- Check if the api is running:
+### 9- Check if the api is running:
 
 In a new terminal, type:
 
@@ -164,11 +172,11 @@ In a new terminal, type:
 
 It should return: "L'api fonctionne."
 
-### 9- Run the tests:
+### 10- Run the tests:
 
     `python src/api/test_api.py`
 
-### 10- Manually test the api:
+### 11- Manually test the api:
 
 In your navigator, go to http://127.0.0.1:8000/docs
 
@@ -176,7 +184,7 @@ You can test all the endpoints. When needed, you will be asked a username and a 
 _ Adminstrator Users: try it with `admin:4dmin`. This user's type can run every endpoint.
 _ Standard Users: try it with `fdo:c0ps`. This user's type can only run the following endpoints: /status (which doesn't requires any identification), /predict_from_call, /predict_from_test, /label
 
-### 11- Test the api with terminal command:
+### 12- Test the api with terminal command:
 
 All commands are written in the file ./src/api/Readme_api.md
 
