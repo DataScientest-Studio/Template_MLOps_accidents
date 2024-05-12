@@ -1,4 +1,4 @@
-name: ci
+name: Build and Push images
 
 on:
   push:
@@ -9,26 +9,59 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      -
-        name: Set up QEMU
+
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      -
-        name: Login to Docker Hub
+
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
-      -
-        name: Build and push
+
+      - name: Build and push IMPORT DATA
         uses: docker/build-push-action@v5
         with:
-          #context: "{{defaultContext}}:src/data"
           file: src/data/import_data.Dockerfile
           push: true
           tags: alexandrewinger/shield:import_data
+      
+      - name: Build and push MAKE DATASET
+        uses: docker/build-push-action@v5
+        with:
+          file: src/data/make_dataset.Dockerfile
+          push: true
+          tags: alexandrewinger/shield:make_dataset
+      
+      - name: Build and push CREATE USERS DB
+        uses: docker/build-push-action@v5
+        with:
+          file: src/users_db/create_users_db.Dockerfile
+          push: true
+          tags: alexandrewinger/shield:create_users_db
+
+      - name: Build and push TRAIN MODEL
+        uses: docker/build-push-action@v5
+        with:
+          file: src/models/model.Dockerfile
+          push: true
+          tags: alexandrewinger/shield:train_model
+
+      - name: Build and push API
+        uses: docker/build-push-action@v5
+        with:
+          file: src/api/api.Dockerfile
+          push: true
+          tags: alexandrewinger/shield:api
+
+      - name: Build and push TEST API
+        uses: docker/build-push-action@v5
+        with:
+          file: src/api/test_api.Dockerfile
+          push: true
+          tags: alexandrewinger/shield:test_api
