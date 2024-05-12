@@ -29,6 +29,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           #context: "{{defaultContext}}:src/data"
-          file: import_data.Dockerfile
+          file: src/data/import_data.Dockerfile
           push: true
           tags: alexandrewinger/shield:import_data
