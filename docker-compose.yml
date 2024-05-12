@@ -1,6 +1,6 @@
 services:
   import_data:
-    image: shield_import_data
+    image: alexandrewinger/shield:import_data
     container_name: import_data
     ports:
       - "8011:8001"
@@ -13,7 +13,7 @@ services:
     depends_on:
       import_data:
         condition: service_completed_successfully
-    image: shield_make_dataset
+    image: alexandrewinger/shield:make_dataset
     container_name: make_dataset
     ports:
       - "8012:8002"
@@ -23,7 +23,7 @@ services:
         target: /home/volume
   
   create_users_db:
-    image: shield_create_users_db_image
+    image: alexandrewinger/shield:create_users_db
     depends_on:
       make_dataset:
         condition: service_completed_successfully
@@ -36,7 +36,7 @@ services:
         target: /home/volume
   
   train_model:
-    image: shield_train_model_image
+    image: alexandrewinger/shield:train_model
     depends_on:
       create_users_db:
         condition: service_completed_successfully
@@ -53,7 +53,7 @@ services:
     depends_on:
       train_model:
         condition: service_completed_successfully
-    image: shield_api_image
+    image: alexandrewinger/shield:api
     container_name: api
     ports:
       - "8000:8000" # pour ne pas avoir à modifier nos commandes curl
@@ -73,10 +73,10 @@ services:
     depends_on:
       train_model:
         condition: service_completed_successfully
-    image: shield_test_api_image
+    image: alexandrewinger/shield:test_api
     container_name: test_api
     ports:
-      - "8006:8006" # pour ne pas avoir à modifier nos commandes curl
+      - "8006:8006" 
     volumes:
       - type: volume
         source: app_volume

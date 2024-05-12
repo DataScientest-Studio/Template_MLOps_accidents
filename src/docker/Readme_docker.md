@@ -14,45 +14,45 @@
 # -------------- 1. Image Import Data -----------------------------------------
 
 # Création de l'image depuis la racine:
-    docker image build  -f ./src/data/import_data.Dockerfile -t shield_import_data .
+    docker image build  -f ./src/data/import_data.Dockerfile -t alexandrewinger/shield:import_data .
 
 # Lancement depuis la racine: 
-    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_import_data
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:import_data
 
 # -------------- 2. Image Make Dataset -----------------------------------------
 
 # Création de l'image depuis la racine:
-    docker image build  -f ./src/data/make_dataset.Dockerfile -t shield_make_dataset .
+    docker image build  -f ./src/data/make_dataset.Dockerfile -t alexandrewinger/shield:make_dataset .
 
 # Lancement depuis la racine: 
-    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_make_dataset
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:make_dataset
 
 
 # -------------- Image 3. Create users db ---------------------------------------
 
 # Création de l'image depuis la racine:
-    docker image build  -f ./src/users_db/create_users_db.Dockerfile -t shield_create_users_db_image .
+    docker image build  -f ./src/users_db/create_users_db.Dockerfile -t alexandrewinger/shield:create_users_db .
 
 # Lancement depuis la racine: 
 
-    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_create_users_db_image
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:create_users_db
 
 
 # -------------- Image 4. Train Model ---------------------------------------
 
 # Création de l'image depuis la racine:
-    docker image build  -f ./src/models/model.Dockerfile -t shield_train_model_image .
+    docker image build  -f ./src/models/model.Dockerfile -t alexandrewinger/shield:train_model .
 
 # Lancement depuis la racine: 
 
-    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_train_model_image
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:train_model
 
 # --------------- Image 5. API ---------------------------------------------------
 # Création de l'image `api`: 
-    docker image build  -f ./src/api/api.Dockerfile -t shield_api_image .
+    docker image build  -f ./src/api/api.Dockerfile -t alexandrewinger/shield:api .
 
 # Lancement du conteneur à partir de l'image:
-    docker run -p 8000:8000 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ shield_api_image
+    docker run -p 8000:8000 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ alexandrewinger/shield:api
 
 # Test de l'api dans un autre terminal:
 curl.exe -X GET -i http://127.0.0.1:8000/status
@@ -63,11 +63,11 @@ curl.exe -X GET -i http://172.17.0.2:8000/status
 
 # --------------- Image 6. Test -----------------------------------------------
 # Création de l'image `test_api`: 
-    docker image build  -f ./src/api/test_api.Dockerfile -t shield_test_api_image .
+    docker image build  -f ./src/api/test_api.Dockerfile -t alexandrewinger/shield:test_api .
 
 # Lancement depuis la racine: 
 
-    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume shield_test_api_image
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:test_api
 
 # --------------- Image 7. Monitoring model -----------------------------------
 
