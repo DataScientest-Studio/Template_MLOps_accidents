@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       
       - name: Run tests
-        run: docker compose up
+        run: docker compose up --detach
 
       - name: Build and push IMPORT DATA
         uses: docker/build-push-action@v5
