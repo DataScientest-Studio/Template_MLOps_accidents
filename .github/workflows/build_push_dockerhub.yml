@@ -3,7 +3,7 @@ name: Build and Push images
 on:
   push:
     branches:
-      - container_rebuild
+      - feature/test_shield
   pull_request:
     branches:
       - master
