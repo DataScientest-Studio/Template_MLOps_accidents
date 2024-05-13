@@ -43,6 +43,12 @@
     │   │   ├── make_dataset.py 
     │   │   └── update_data.py
     │   │
+    │   ├── docker           <- Scripts to manage docker
+    │   │   ├── build_images.sh
+    │   │   ├── build_push_images.sh
+    │   │   ├── push_images.sh 
+    │   │   └── Readme_docker.md
+    |   |
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │

@@ -52,7 +52,7 @@
     docker image build  -f ./src/api/api.Dockerfile -t alexandrewinger/shield:api .
 
 # Lancement du conteneur à partir de l'image:
-    docker run -p 8000:8000 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ alexandrewinger/shield:api
+    docker run -p 8000:8000 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ --network=shield-network --name api alexandrewinger/shield:api
 
 # Test de l'api dans un autre terminal:
 curl.exe -X GET -i http://127.0.0.1:8000/status
@@ -69,7 +69,14 @@ curl.exe -X GET -i http://172.17.0.2:8000/status
 
     docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:test_api
 
-# --------------- Image 7. Monitoring model -----------------------------------
+# --------------- Image 7. Test Shield -----------------------------------
+# Création de l'image `test_shield`: 
+docker image build  -f ./src/test/test_shield.Dockerfile -t alexandrewinger/shield:test_shield .
+
+# Lancement depuis la racine: 
+
+    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume --network=shield-network --name test_shield alexandrewinger/shield:test_shield
+
 
 # --------------- Image 8. Watch Data -----------------------------------------
 # Création de l'image `watch_data`: 

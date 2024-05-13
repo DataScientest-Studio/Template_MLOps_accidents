@@ -5,6 +5,8 @@ ADD /src/data/update_data.py /home/shield/src/data/
 ADD /src/data/make_dataset.py /home/shield/src/data/
 ADD /src/models/train_model.py /home/shield/src/models/
 ADD /src/api/requirements_api.txt /home/shield/src/api/
+ADD logs /home/shield/logs
+
 
 WORKDIR /home/shield/
 VOLUME /home/volume/
@@ -23,8 +25,6 @@ mkdir models ; \
 cp ../volume/models/trained_model.joblib models ; \
 # Import data from volume:
 cp -r ../volume/data data ; \
-# Create logs directory inside container:
-mkdir logs/ ; \
 # Export api script into volume:
 mkdir -p ../volume/src/api ; \
 cp src/api/api.py ../volume/src/api ; \

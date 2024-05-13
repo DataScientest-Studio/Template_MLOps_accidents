@@ -8,7 +8,9 @@ services:
       - type: volume
         source: app_volume
         target: /home/volume
-  
+    networks:
+      - app_network
+
   make_dataset:
     depends_on:
       import_data:
@@ -21,7 +23,9 @@ services:
       - type: volume
         source: app_volume
         target: /home/volume
-  
+    networks:
+      - app_network
+
   create_users_db:
     image: alexandrewinger/shield:create_users_db
     depends_on:
@@ -34,7 +38,9 @@ services:
       - type: volume
         source: app_volume
         target: /home/volume
-  
+    networks:
+      - app_network
+
   train_model:
     image: alexandrewinger/shield:train_model
     depends_on:
@@ -47,7 +53,8 @@ services:
       - type: volume
         source: app_volume
         target: /home/volume
-
+    networks:
+      - app_network
 
   api_shield:
     depends_on:
@@ -68,19 +75,28 @@ services:
       - type: volume
         source: app_volume
         target: /home/volume
+    networks:
+      - app_network  
   
   test_api_shield:
     depends_on:
       train_model:
         condition: service_completed_successfully
-    image: alexandrewinger/shield:test_api
-    container_name: test_api
+    image: alexandrewinger/shield:test_shield
+    container_name: test_shield
     ports:
-      - "8006:8006" 
+      - "8007:8007" 
     volumes:
       - type: volume
         source: app_volume
         target: /home/volume
+    networks:
+      - app_network
 
 volumes:
   app_volume:
+
+networks:
+  app_network:
+    driver: bridge
+

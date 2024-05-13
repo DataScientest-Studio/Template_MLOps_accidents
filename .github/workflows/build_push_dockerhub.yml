@@ -3,7 +3,7 @@ name: Build and Push images
 on:
   push:
     branches:
-      - container_rebuild
+      - feature/test_shield
   pull_request:
     branches:
       - master
@@ -26,6 +26,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
+      
+      - name: Run tests
+        run: docker compose up --detach
 
       - name: Build and push IMPORT DATA
         uses: docker/build-push-action@v5
@@ -62,9 +65,9 @@ jobs:
           push: true
           tags: alexandrewinger/shield:api
 
-      - name: Build and push TEST API
+      - name: Build and push TEST SHIELD
         uses: docker/build-push-action@v5
         with:
-          file: src/api/test_api.Dockerfile
+          file: src/test/test_shield.Dockerfile
           push: true
-          tags: alexandrewinger/shield:test_api
+          tags: alexandrewinger/shield:test_shield
