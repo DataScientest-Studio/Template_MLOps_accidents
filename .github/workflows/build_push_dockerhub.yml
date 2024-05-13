@@ -62,9 +62,9 @@ jobs:
           push: true
           tags: alexandrewinger/shield:api
 
-      - name: Build and push TEST API
+      - name: Build and push TEST SHIELD
         uses: docker/build-push-action@v5
         with:
-          file: src/api/test_api.Dockerfile
+          file: src/test/test_shield.Dockerfile
           push: true
-          tags: alexandrewinger/shield:test_api
+          tags: alexandrewinger/shield:test_shield
