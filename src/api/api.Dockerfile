@@ -3,6 +3,7 @@ FROM ubuntu:22.04
 ADD /src/api/api.py /home/shield/src/api/ 
 ADD /src/data/update_data.py /home/shield/src/data/
 ADD /src/data/make_dataset.py /home/shield/src/data/
+ADD /src/data/data_id.json /home/shield/src/data/
 ADD /src/models/train_model.py /home/shield/src/models/
 ADD /src/api/requirements_api.txt /home/shield/src/api/
 ADD logs /home/shield/logs
