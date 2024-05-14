@@ -1,0 +1,56 @@
+{
+    "2019": {
+        "caracteristiques": {
+            "id": "e22ba475-45a3-46ac-a0f7-9ca9ed1e283a",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/e22ba475-45a3-46ac-a0f7-9ca9ed1e283a"
+        },
+        "lieux":{
+            "id": "2ad65965-36a1-4452-9c08-61a6c874e3e6",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/2ad65965-36a1-4452-9c08-61a6c874e3e6"
+        },
+        "usagers": {
+            "id": "36b1b7b3-84b4-4901-9163-59ae8a9e3028",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/36b1b7b3-84b4-4901-9163-59ae8a9e3028"
+        },
+        "vehicules": {
+            "id": "780cd335-5048-4bd6-a841-105b44eb2667",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/780cd335-5048-4bd6-a841-105b44eb2667"
+        }
+    },
+    "2020": {
+        "caracteristiques": {
+            "id": "07a88205-83c1-4123-a993-cba5331e8ae0",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/07a88205-83c1-4123-a993-cba5331e8ae0"
+        },
+        "lieux":{
+            "id": "e85c41f7-d4ea-4faf-877f-ab69a620ce21",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/e85c41f7-d4ea-4faf-877f-ab69a620ce21"
+        },
+        "usagers": {
+            "id": "78c45763-d170-4d51-a881-e3147802d7ee",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/78c45763-d170-4d51-a881-e3147802d7ee"
+        },
+        "vehicules": {
+            "id": "a66be22f-c346-49af-b196-71df24702250",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/a66be22f-c346-49af-b196-71df24702250"
+        }
+    },
+    "2021": {
+        "caracteristiques": {
+            "id": "85cfdc0c-23e4-4674-9bcd-79a970d7269b",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/85cfdc0c-23e4-4674-9bcd-79a970d7269b"
+        },
+        "lieux":{
+            "id": "8a4935aa-38cd-43af-bf10-0209d6d17434",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/8a4935aa-38cd-43af-bf10-0209d6d17434"
+        },
+        "usagers": {
+            "id": "ba5a1956-7e82-41b7-a602-89d7dd484d7a",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/ba5a1956-7e82-41b7-a602-89d7dd484d7a"
+        },
+        "vehicules": {
+            "id": "0bb5953a-25d8-46f8-8c25-b5c2f5ba905e",
+            "url": "https://www.data.gouv.fr/fr/datasets/r/0bb5953a-25d8-46f8-8c25-b5c2f5ba905e"
+        }
+    }
+}

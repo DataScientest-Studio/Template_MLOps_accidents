@@ -17,3 +17,6 @@ docker image build  -f ./src/api/api.Dockerfile -t alexandrewinger/shield:api .
 
 # TEST_API
 docker image build  -f ./src/api/test_api.Dockerfile -t alexandrewinger/shield:test_api .
+
+# TEST_SHIELD
+docker image build  -f ./src/test/test_shield.Dockerfile -t alexandrewinger/shield:test_shield .
