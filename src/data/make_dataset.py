@@ -41,7 +41,7 @@ def process_data(input_filepath_users,
     df_caract = pd.read_csv(input_filepath_caract, sep=";",
                             header=0, low_memory=False)
     df_places = pd.read_csv(input_filepath_places, sep=";",
-                            encoding='utf-8', 
+                            encoding='utf-8',
                             low_memory=False)
     df_veh = pd.read_csv(input_filepath_veh, sep=";")
 
