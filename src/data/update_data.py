@@ -14,9 +14,10 @@ from make_dataset import main
 path_data_raw = os.path.join(root_path, "data", "raw")
 path_data_interim = os.path.join(root_path, "data", "interim")
 path_data_preprocessed = os.path.join(root_path, "data", "preprocessed")
+path_data_id = os.path.join(root_path, "src", "data", "data_id.json")
 
 # Load data_id:
-with open("data_id.json", 'r') as file:
+with open(path_data_id, 'r') as file:
     data_id = json.load(file)
 
 
