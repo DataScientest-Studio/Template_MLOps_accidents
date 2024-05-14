@@ -40,7 +40,9 @@ def process_data(input_filepath_users,
     df_users = pd.read_csv(input_filepath_users, sep=";")
     df_caract = pd.read_csv(input_filepath_caract, sep=";",
                             header=0, low_memory=False)
-    df_places = pd.read_csv(input_filepath_places, sep=";", encoding='utf-8')
+    df_places = pd.read_csv(input_filepath_places, sep=";",
+                            encoding='utf-8', 
+                            low_memory=False)
     df_veh = pd.read_csv(input_filepath_veh, sep=";")
 
     # -- Creating new columns
@@ -57,7 +59,7 @@ def process_data(input_filepath_users,
     df_users.drop(['an_nais'], inplace=True, axis=1)
 
     # -- Replacing names
-    df_users.grav.replace([1, 2, 3, 4], [1, 3, 4, 2], inplace=True)
+    df_users['grav'] = df_users['grav'].replace([1, 2, 3, 4], [1, 3, 4, 2])
     df_caract.rename({"agg": "agg_"}, inplace=True, axis=1)
     # corse_replace = {"2A": "201", "2B": "202"}
     df_caract["dep"] = df_caract["dep"].str.replace("2A", "201")
@@ -83,7 +85,7 @@ def process_data(input_filepath_users,
     catv_value_new = [0, 1, 1, 2, 1, 1, 6, 2, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3,
                       3, 4, 4, 1, 1, 1, 1, 1, 6, 6, 3, 3, 3, 3, 1, 1, 1, 1, 1,
                       0, 0]
-    df_veh['catv'].replace(catv_value, catv_value_new, inplace=True)
+    df_veh['catv'] = df_veh['catv'].replace(catv_value, catv_value_new)
 
     # -- Merging datasets
     fusion1 = df_users.merge(df_veh, on=["Num_Acc", "num_veh", "id_vehicule"],
@@ -101,7 +103,7 @@ def process_data(input_filepath_users,
 
     # -- Modification of the target variable:
     # --  1 : prioritary // 0 : non-prioritary
-    df['grav'].replace([2, 3, 4], [0, 1, 1], inplace=True)
+    df['grav'] = df['grav'].replace([2, 3, 4], [0, 1, 1])
 
     # -- Replacing values -1 and 0
     col_to_replace0_na = ["trajet", "catv", "motor"]
@@ -150,5 +152,5 @@ if __name__ == '__main__':
     # not used in this stub but often useful for finding various files
     project_dir = Path(__file__).resolve().parents[2]
 
-    main(input_filepath="./data/interim",
-         output_filepath="./data/preprocessed")
+    main(input_filepath="../../data/interim",
+         output_filepath="../../data/preprocessed")
