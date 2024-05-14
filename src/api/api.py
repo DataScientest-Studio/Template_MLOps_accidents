@@ -27,7 +27,7 @@ sys.path.append(os.path.join(root_path, "src", "models"))
 from update_data import data_update
 from train_model import train_and_save_model
 
-# set commonly used paths as variables
+# ---------------------------- Paths ------------------------------------------
 path_data_preprocessed = os.path.join(root_path, "data", "preprocessed")
 path_X_train = os.path.join(path_data_preprocessed, "X_train.csv")
 path_y_train = os.path.join(path_data_preprocessed, "y_train.csv")
@@ -40,6 +40,7 @@ path_trained_model = os.path.join(root_path, "models", "trained_model.joblib")
 path_new_trained_model = os.path.join(root_path, "models",
                                       "new_trained_model.joblib")
 path_users_db = os.path.join(root_path, "src", "users_db", "users_db.json")
+
 # ---------------------------- HTTP Exceptions --------------------------------
 responses = {
     200: {"description": "OK"},
