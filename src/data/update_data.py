@@ -110,6 +110,7 @@ def data_update(year_list):
     sys.path.append(os.path.join(root_path, "src", "data"))
     main(input_filepath=path_data_interim,
          output_filepath=path_data_preprocessed)
+    print("Data updated and preprocessed successfully.")
 
 
 if __name__ == '__main__':
