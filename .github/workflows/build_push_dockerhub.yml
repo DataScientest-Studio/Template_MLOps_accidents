@@ -1,9 +1,9 @@
-name: Build and Push images
+name: Build , Test and Push images
 
 on:
-  push:
-    branches:
-      - feature/test_shield
+#  push:
+#    branches:
+#      - feature/test_shield
   pull_request:
     branches:
       - master
@@ -27,9 +27,54 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
+      # ---------- BUILD IMAGES -----------------------------------------------
+      - name: Build IMPORT DATA
+        uses: docker/build-push-action@v5
+        with:
+          file: src/data/import_data.Dockerfile
+          load: true
+          tags: alexandrewinger/shield:import_data
+      
+      - name: Build MAKE DATASET
+        uses: docker/build-push-action@v5
+        with:
+          file: src/data/make_dataset.Dockerfile
+          load: true
+          tags: alexandrewinger/shield:make_dataset
+      
+      - name: Build CREATE USERS DB
+        uses: docker/build-push-action@v5
+        with:
+          file: src/users_db/create_users_db.Dockerfile
+          load: true
+          tags: alexandrewinger/shield:create_users_db
+
+      - name: Build TRAIN MODEL
+        uses: docker/build-push-action@v5
+        with:
+          file: src/models/model.Dockerfile
+          load: true
+          tags: alexandrewinger/shield:train_model
+
+      - name: Build API
+        uses: docker/build-push-action@v5
+        with:
+          file: src/api/api.Dockerfile
+          load: true
+          tags: alexandrewinger/shield:api
+
+      - name: Build TEST SHIELD
+        uses: docker/build-push-action@v5
+        with:
+          file: src/test/test_shield.Dockerfile
+          load: true
+          tags: alexandrewinger/shield:test_shield
+      
+      # ---------- TEST -------------------------------------------------------
       - name: Run tests
         run: docker compose up --detach
 
+      # ---------- PUSH -------------------------------------------------------
       - name: Build and push IMPORT DATA
         uses: docker/build-push-action@v5
         with:
