@@ -114,11 +114,11 @@ def test_label_prediction():
     print(message)
 
 
-# ---------- EP8bis: /label_pred_test -------------------------------------------
+# ---------- EP8bis: /label_pred_test -----------------------------------------
 def test_label_pred_test():
     time.sleep(delay)
     response = requests.get(url="http://api:8000/label_pred_test",
-                             headers=header_admin)
+                            headers=header_admin)
     assert response.status_code == 200
     message = "Test EP2: /add_user: PASSED"
     print(message)
