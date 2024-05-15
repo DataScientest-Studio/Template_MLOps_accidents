@@ -709,3 +709,51 @@ async def update_f1_score(identification=Header(None)):
     else:
         raise HTTPException(status_code=403,
                             detail="Vous n'avez pas les droits d'administrateur.")
+    
+# -------- 10. Get f1-score --------
+
+
+@api.get('/get_f1_score',
+         name="Get f1-score",
+         tags=['UPDATE'])
+async def get_f1_score(identification=Header(None)):
+    """Returns latest f1-score.
+    Paramètres :
+        identification (str) : identifiants administrateur selon
+        le format nom_d_utilisateur:mot_de_passe
+
+    Lève :
+        HTTPException401 : identifiants non valables
+        HTTPException403 : accès non autorisé
+
+    Retourne :
+        float : latest f1-score.
+    """
+    # Récupération des identifiants
+    user, psw = identification.split(":")
+
+    # Test d'autorisation
+    if users_db[user]['rights'] == 1:
+
+        # Test d'identification
+        if users_db[user]['password'] == psw:
+
+            # Load f1_scores.jsonl
+            path_db_f1_scores = os.path.join(path_logs, "f1_scores.jsonl")
+            with open(path_db_f1_scores, "r") as file:
+                f1_scores = [json.loads(line) for line in file]
+
+            # Get latest f1_score:
+            latest_f1 = f1_scores[-1]["f1_score_macro_average"]
+
+            # Return:
+            return {latest_f1}
+
+        else:
+            raise HTTPException(status_code=401,
+                                detail="Identifiants non valables.")
+
+    else:
+        raise HTTPException(status_code=403,
+                            detail="Vous n'avez pas les droits d'administrateur.")
+
