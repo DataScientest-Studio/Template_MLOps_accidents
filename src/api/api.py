@@ -611,7 +611,7 @@ async def label_prediction_test(identification=Header(None)):
                 for item in preds_test:
                     file.write(json.dumps(item) + '\n')
 
-        return {"{number} enregistrement(s) mis à jour.".format(number = n)}
+        return {"{number} enregistrement(s) mis à jour.".format(number=n)}
     else:
         raise HTTPException(status_code=401,
                             detail="Identifiants non valables.")
