@@ -200,31 +200,42 @@ async def get_pred_from_test(identification=Header(None)):
         X_test = pd.read_csv(path_X_test)
         # y_test = pd.read_csv(path_y_test)
 
-        # Prédiction d'une donnée aléatoire:
-        i = random.choice(X_test.index)
+        # Trouver l'index médian
+        median_index = len(X_test) // 2
+
+        # Diviser le DataFrame en deux parties
+        #X_test_eval = X_test.iloc[:median_index]
+        X_test_pool = X_test.iloc[median_index:]
+
+        #y_test_eval = y_test.iloc[:median_index]
+        #y_test_pool = y_test.iloc[median_index:]
+
+        # Sélection de la donnée suivante dans X_test_pool:
+        path_db_preds_test = os.path.join(path_logs, "preds_test.jsonl")
+        with open(path_db_preds_test, "r") as file:
+            preds_test = [json.loads(line) for line in file]
+            if preds_test != []:
+                i = preds_test[-1]['index'] + 1
+            else: 
+                i = X_test_pool.index.tolist()[0]
+
+        # Prédiction de la donnée sélectionnée:
         pred_time_start = time.time()
-        pred = rdf.predict(X_test.iloc[[i]])
+        pred = rdf.predict(X_test_pool.loc[[i]])
         pred_time_end = time.time()
-
-        # Prédiction générale de y
-        # y_pred = rdf.predict(X_test)
-        # y_true = y_test
-
-        # Calcul du F1 score macro average
-        # f1_score_macro_average = f1_score(y_true=y_true,
-        # y_pred=y_pred,
-        # average="macro")
 
         # Préparation des métadonnées pour exportation
         metadata_dictionary = {
             "request_id": "".join(random.choices(string.digits, k=16)),
+            "index": i,
             "time_stamp": str(datetime.datetime.now()),
             "user_name": user,
+            "context": "test",
             "response_status_code": 200,
-            "input_features": X_test.iloc[[i]].to_dict(orient="records")[0],
             "output_prediction": int(pred[0]),
             "verified_prediction": None,
-            "prediction_time": pred_time_end - pred_time_start
+            "prediction_time": pred_time_end - pred_time_start,
+            "input_features": X_test.iloc[[i]].to_dict(orient="records")[0]
             }
         metadata_json = json.dumps(obj=metadata_dictionary)
 
@@ -316,6 +327,7 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
             "request_id": "".join(random.choices(string.digits, k=16)),
             "time_stamp": str(datetime.datetime.now()),
             "user_name": user,
+            "context": "call",
             "response_status_code": 200,
             "input_features": test.to_dict(orient="records")[0],
             "output_prediction": int(pred[0]),
