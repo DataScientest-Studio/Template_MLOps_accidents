@@ -4,6 +4,7 @@ import time
 import requests
 import os
 from pathlib import Path
+import pytest
 
 # >>>>>>>>>> VARIABLES <<<<<<<<<<
 
@@ -56,7 +57,7 @@ def test_remove_user():
                                json=old_user,
                                headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /remove_user: PASSED"
+    message = "Test EP3: /remove_user: PASSED"
     print(message)
 
 
@@ -66,7 +67,7 @@ def test_predict_from_test():
     response = requests.get(url="http://api:8000/predict_from_test",
                             headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP1: /status: PASSED"
+    message = "Test EP4: /predict_from_test: PASSED"
     print(message)
 
 
@@ -77,7 +78,7 @@ def test_predict_from_call():
                              json=test_features,
                              headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /add_user: PASSED"
+    message = "Test EP5: /predict_from_call: PASSED"
     print(message)
 
 
@@ -88,18 +89,19 @@ def test_train_model():
                              json=model_name,
                              headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /add_user: PASSED"
+    message = "Test EP6: /train: PASSED"
     print(message)
 
 
 # ---------- EP7: /update_data ------------------------------------------------
+@pytest.mark.skip(reason="too many downloads from data gouv")
 def test_update_data():
     time.sleep(delay)
     response = requests.post(url="http://api:8000/update_data",
                              json=year_list,
                              headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /add_user: PASSED"
+    message = "Test EP7: /update_data: PASSED"
     print(message)
 
 
@@ -110,7 +112,7 @@ def test_label_prediction():
                              json=prediction,
                              headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /add_user: PASSED"
+    message = "Test EP8: /label_prediction: PASSED"
     print(message)
 
 
@@ -120,7 +122,7 @@ def test_label_pred_test():
     response = requests.get(url="http://api:8000/label_pred_test",
                             headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /add_user: PASSED"
+    message = "Test EP8bis: /label_pred_test: PASSED"
     print(message)
 
 
@@ -130,5 +132,15 @@ def test_update_f1_score():
     response = requests.get(url="http://api:8000/update_f1_score",
                             headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP2: /add_user: PASSED"
+    message = "Test EP9: /update_f1_score: PASSED"
+    print(message)
+
+
+# ---------- EP10: /get_f1_score ----------------------------------------------
+def test_get_f1_score():
+    time.sleep(delay)
+    response = requests.get(url="http://api:8000/get_f1_score",
+                            headers=header_admin)
+    assert response.status_code == 200
+    message = "Test EP9: /get_f1_score: PASSED"
     print(message)
