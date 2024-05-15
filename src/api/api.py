@@ -35,6 +35,7 @@ path_X_test = os.path.join(path_data_preprocessed, "X_test.csv")
 path_y_test = os.path.join(path_data_preprocessed, "y_test.csv")
 path_logs = os.path.join(root_path, "logs")
 path_db_preds_unlabeled = os.path.join(path_logs, "preds_call.jsonl")
+path_db_preds_test_unlabeled = os.path.join(path_logs, "preds_test.jsonl")
 path_db_preds_labeled = os.path.join(path_logs, "preds_labeled.jsonl")
 path_trained_model = os.path.join(root_path, "models", "trained_model.joblib")
 path_new_trained_model = os.path.join(root_path, "models",
@@ -204,11 +205,11 @@ async def get_pred_from_test(identification=Header(None)):
         median_index = len(X_test) // 2
 
         # Diviser le DataFrame en deux parties
-        #X_test_eval = X_test.iloc[:median_index]
+        # X_test_eval = X_test.iloc[:median_index]
         X_test_pool = X_test.iloc[median_index:]
 
-        #y_test_eval = y_test.iloc[:median_index]
-        #y_test_pool = y_test.iloc[median_index:]
+        # y_test_eval = y_test.iloc[:median_index]
+        # y_test_pool = y_test.iloc[median_index:]
 
         # Sélection de la donnée suivante dans X_test_pool:
         path_db_preds_test = os.path.join(path_logs, "preds_test.jsonl")
@@ -216,7 +217,7 @@ async def get_pred_from_test(identification=Header(None)):
             preds_test = [json.loads(line) for line in file]
             if preds_test != []:
                 i = preds_test[-1]['index'] + 1
-            else: 
+            else:
                 i = X_test_pool.index.tolist()[0]
 
         # Prédiction de la donnée sélectionnée:
@@ -548,6 +549,69 @@ async def label_prediction(prediction: Prediction,
             raise HTTPException(status_code=404,
                                 detail="Aucun enregistrement trouvé. Merci de fournir une référence (request_id) valable.")
 
+    else:
+        raise HTTPException(status_code=401,
+                            detail="Identifiants non valables.")
+
+# -------- 8bis. Labellisation d'une prédiction from test --------
+
+
+@api.get('/label_pred_test',
+         name="Labellisation d'une prédiction test enregistrée",
+         tags=['UPDATE'])
+async def label_prediction_test(identification=Header(None)):
+    """Fonction qui labellise une prédiction test enregistrée
+    à partir des données dans y_test.
+
+    Lève :
+        HTTPException401 : identifiants non valables
+        HTTPException404 : enregistrement non existant
+
+    Retourne :
+        str : confirmation de la mise à jour de l'enregistrement
+    """
+    # Récupération des identifiants
+    user, psw = identification.split(":")
+
+    # Test d'identification
+    if users_db[user]['password'] == psw:
+
+        # Load preds_test.jsonl
+        path_db_preds_test = os.path.join(path_logs, "preds_test.jsonl")
+        with open(path_db_preds_test, "r") as file:
+            preds_test = [json.loads(line) for line in file]
+
+        # Load y_test:
+        y_test = pd.read_csv(path_y_test)
+
+        # Extraction de l'enregistrement correspondant au request_id reçu
+        record_to_update = {}
+        n = 0
+        for j, record in enumerate(preds_test):
+            if record["verified_prediction"] is None:
+                n += 1
+                record_to_update = record
+                index = record["index"]
+
+                # Update verified_prediction with y_true
+                real_y = y_test.loc[index]['grav']
+                record_to_update["verified_prediction"] = int(real_y)
+
+                # Mise à jour de l'entrée dans preds_test.jsonl:
+                preds_test[j]["verified_prediction"] = int(real_y)
+
+                # Mise à jour de la base de données de prédictions labellisées
+                metadata_json = json.dumps(obj=record_to_update)
+                with open(path_db_preds_labeled, "a") as file:
+                    file.write(metadata_json + "\n")
+
+        # Mise à jour du fichier preds_test.jsonl:
+        if n != 0:
+            with open(path_db_preds_test, 'w') as file:
+                for item in preds_test:
+                    file.write(json.dumps(item) + '\n')
+
+        return {"{number} enregistrement(s) mis à jour.".format(number = n)}
     else:
         raise HTTPException(status_code=401,
                             detail="Identifiants non valables.")
