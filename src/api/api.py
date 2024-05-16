@@ -28,6 +28,8 @@ path_X_train = os.path.join(path_data_preprocessed, "X_train.csv")
 path_y_train = os.path.join(path_data_preprocessed, "y_train.csv")
 path_X_test = os.path.join(path_data_preprocessed, "X_test.csv")
 path_y_test = os.path.join(path_data_preprocessed, "y_test.csv")
+path_X_test_eval = os.path.join(path_data_preprocessed, "eval_X_test.csv")
+path_y_test_eval = os.path.join(path_data_preprocessed, "eval_y_test.csv")
 path_logs = os.path.join(root_path, "logs")
 path_db_preds_unlabeled = os.path.join(path_logs, "preds_call.jsonl")
 path_db_preds_test_unlabeled = os.path.join(path_logs, "preds_test.jsonl")
@@ -718,9 +720,9 @@ async def post_new_model_score(update_data: UpdateData,
 
         # ----- Evaluate new model ----- :
 
-        # Chargement des données de test:
-        X_test = pd.read_csv(path_X_test)
-        y_test = pd.read_csv(path_y_test)
+        # TODO : Change paths Chargement des données de test:
+        X_test = pd.read_csv(path_X_test_eval)
+        y_test = pd.read_csv(path_y_test_eval)
 
         # Prédiction générale de y
         y_pred = rdf.predict(X_test)
