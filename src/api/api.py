@@ -19,8 +19,8 @@ import string
 root_path = Path(os.path.realpath(__file__)).parents[2]
 sys.path.append(os.path.join(root_path, "src", "data"))
 sys.path.append(os.path.join(root_path, "src", "models"))
-from update_data import data_update
-from train_model import train_and_save_model
+from update_data import data_update, data_update_without_saving
+from train_model import train_and_save_model, train_without_saving
 
 # ---------------------------- Paths ------------------------------------------
 path_data_preprocessed = os.path.join(root_path, "data", "preprocessed")
@@ -188,8 +188,8 @@ async def get_pred_from_test(identification=Header(None)):
     """Enpoint to make a prediction from a single record in test pool. \n
        Fictionnal endpoint for monitoring (no real life use):
         - Split X_test in two parts : eval and pool
-        - Get a single line from pool, make prediction and add it to eval
-        - Write log in preds_test.jsonl
+        - Get a single line from pool and make prediction on it.
+        - Write result log in preds_test.jsonl
 
        Basic rights required. \n
        Identification: enter username and password as username:password.
@@ -410,19 +410,23 @@ async def post_train(new_model: UpdateModel,
 
 class UpdateData(BaseModel):
     start_year: Optional[int] = 2019
-    end_year: Optional[int] = 2020
+    end_year: Optional[int] = 2019
 
 
 @api.post('/update_data',
           name='Mise à jour des données accidents',
           tags=['UPDATE'])
 async def update_data(update_data: UpdateData, identification=Header(None)):
-    """Fonction pour mettre à jour les données accidents.
+    """
+    Fonction pour mettre à jour les données accidents. \n
+    Ecrase définitivement X/y_train/test.csv avec les nouvelles données
     """
 
     if check_user(identification, 1) is True:
+
         # Récupération de l'identifiant:
         user = identification.split(":")[0]
+
         # Create year_list:
         year_list = [update_data.start_year, update_data.end_year]
 
@@ -577,7 +581,8 @@ async def label_prediction_test(identification=Header(None)):
          tags=['UPDATE'])
 async def update_f1_score(identification=Header(None)):
     """Fonction qui calcule et enregistre le dernier F1 score du modèle
-    en élargissant X_test et y_test aux nouvelles données labellisées
+    en élargissant X_test et y_test aux nouvelles données labellisées.
+    Ne modifie pas X_test.csv.
 
     Paramètres :
         identification (str) : identifiants administrateur selon
@@ -597,37 +602,45 @@ async def update_f1_score(identification=Header(None)):
 
         # Chargement du modèle
         rdf = joblib.load(path_trained_model)
+
         # Chargement des données de test
         X_test = pd.read_csv(path_X_test)
         y_test = pd.read_csv(path_y_test)
+
         # Chargement de la base de données de prédictions labellisées
         with open(path_db_preds_labeled, "r") as file:
             db_preds_labeled = [json.loads(line) for line in file]
         X_test_new = pd.DataFrame()
         y_test_new = pd.Series()
+
         for record in db_preds_labeled:
             # Chargement des variables d'entrée dans le df X_test_new
             X_record = record["input_features"]
             X_record = {key: [value] for key, value in X_record.items()}
             X_record = pd.DataFrame(X_record)
             X_test_new = pd.concat([X_test_new, X_record])
+
             # Chargement des variables de sortie dans le df y_test_new
             y_record = pd.Series(record["verified_prediction"])
             if y_test_new.empty is True:
                 y_test_new = y_record
             else:
                 y_test_new = pd.concat([y_test_new, y_record])
-        # Consolidation des données pour la prédiction générale
+
+        # Concaténation X/y_test et X/y_test_new:
         X_test = pd.concat([X_test, X_test_new]).reset_index(drop=True)
         y_test_new = pd.Series(y_test_new, name="grav")
         y_test = pd.concat([y_test, y_test_new]).reset_index(drop=True)
+
         # Prédiction générale de y
         y_pred = rdf.predict(X_test)
         y_true = y_test
+
         # Calcul du nouveau F1 score macro average
         f1_score_macro_average = f1_score(y_true=y_true,
                                           y_pred=y_pred,
                                           average="macro")
+
         # Préparation des métadonnées pour exportation
         metadata_dictionary = {
             "request_id": db_preds_labeled[-1]["request_id"],
@@ -635,20 +648,22 @@ async def update_f1_score(identification=Header(None)):
             "user_name": user,
             "f1_score_macro_average": f1_score_macro_average}
         metadata_json = json.dumps(obj=metadata_dictionary)
+
         # Exportation des métadonnées
         path_log_file = os.path.join(path_logs, "f1_scores.jsonl")
         with open(path_log_file, "a") as file:
             file.write(metadata_json + "\n")
         return ("Le F1 score du modèle a été mis à jour.")
 
-# -------- 10. Get f1-score --------
+# -------- 10. Get f1-score ---------------------------------------------------
 
 
 @api.get('/get_f1_score',
          name="Get f1-score",
          tags=['UPDATE'])
 async def get_f1_score(identification=Header(None)):
-    """Returns latest f1-score.
+    """
+    Returns latest f1-score.
     Paramètres :
         identification (str) : identifiants administrateur selon
         le format nom_d_utilisateur:mot_de_passe
@@ -669,6 +684,53 @@ async def get_f1_score(identification=Header(None)):
 
         # Get latest f1_score:
         latest_f1 = f1_scores[-1]["f1_score_macro_average"]
-        
+
         # Return:
         return {latest_f1}
+
+
+# ---------- 11. Evaluate new model -------------------------------------------
+
+@api.post("/evaluate_new_model",
+         name="Evaluate new model",
+         tags=["MONITORING"]
+         )
+async def post_new_model_score(update_data: UpdateData,
+                              identification=Header(None)):
+    """
+    Triggers:
+        - update data by adding a new year
+        - train model on new data
+        - evaluate model
+    Returns: new_f1_score
+    Does not overwrite anything.
+    """
+    if check_user(identification, 1) is True:
+
+        # Create year_list:
+        year_list = [update_data.start_year, update_data.end_year]
+
+        # Update data without saving:
+        data_update_without_saving(year_list)
+
+        # Get new model:
+        rdf = train_without_saving()
+
+        # ----- Evaluate new model ----- :
+
+        # Chargement des données de test:
+        X_test = pd.read_csv(path_X_test)
+        y_test = pd.read_csv(path_y_test)
+
+        # Prédiction générale de y
+        y_pred = rdf.predict(X_test)
+        y_true = y_test
+
+        # Calcul du nouveau F1 score macro average
+        new_f1_score_macro_average = f1_score(y_true=y_true,
+                                          y_pred=y_pred,
+                                          average="macro")
+        # TODO: Erase all eval_ files
+
+        # Return:
+        return {new_f1_score_macro_average}
