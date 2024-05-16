@@ -45,14 +45,55 @@ path_users_db = os.path.join(root_path, "src", "users_db", "users_db.json")
 # ---------------------------- HTTP Exceptions --------------------------------
 responses = {
     200: {"description": "OK"},
-    401: {"description": "Identifiant ou mot de passe invalide(s)"}
+    401: {"description": "Invalid username and/or password."}
 }
 
 # ---------------------------- Chargement base de données users ---------------
 with open(path_users_db, 'r') as file:
     users_db = json.load(file)
 
+
+# ---------------------------- Functions --------------------------------------
+def check_user(header, rights):
+    """
+    Checks in users_db.json if the user has enough rights.
+
+    Arguments:
+        - header: {"identification": "username:password"}
+        provided by fastapi Header module.
+        - rights: int
+                - 0: basic access for common users
+                - 1: full access to all features.
+    """
+    with open(path_users_db, 'r') as file:
+        users_db = json.load(file)
+    try:
+        user, psw = header.split(":")
+    except:
+        raise HTTPException(
+            status_code=401,
+            detail="Wrong format: you must sign following the pattern username:password ."
+        )
+    try:
+        users_db[user]
+    except:
+        raise HTTPException(
+            status_code=401,
+            detail="Unknown user."
+        )
+    if users_db[user]["password"] == psw:
+        if users_db[user]["rights"] < rights:
+            raise HTTPException(
+                status_code=403,
+                detail="Access refused: rights.")
+        else:
+            return True
+    else:
+        raise HTTPException(
+                status_code=401,
+                detail="Invalid password")
 # ---------------------------- API --------------------------------------------
+
 
 api = FastAPI(
     title="🛡️ SHIELD",
@@ -70,17 +111,17 @@ api = FastAPI(
          'description': 'Mises à jour du modèle et des données'}
         ])
 
-# ---------- 1. Vérification du fonctionnement de l’API: ----------------------
+# ---------- 1. Check status --------------------------------------------------
 
 
-@api.get('/status', name="test de fonctionnement de l'API", tags=['GET'])
+@api.get('/status', name="Check status.", tags=['GET'])
 async def is_fonctionnal():
     """
-    Vérifie que l'api fonctionne.
+    Check if API is running.
     """
-    return {"L'api fonctionne."}
+    return {"Shield API running well!"}
 
-# ---------- 2. Inscription d'un utilisateur: ---------------------------------
+# ---------- 2. Add user: -----------------------------------------------------
 
 
 class User(BaseModel):
@@ -90,46 +131,30 @@ class User(BaseModel):
 
 
 @api.post('/add_user',
-          name="Ajout d'un nouvel utilisateur",
+          name="Add new user to users database.",
           tags=['USERS'], responses=responses)
 async def post_user(new_user: User, identification=Header(None)):
-    """Fonction pour ajouter un nouvel utilisateur.
-       Il faut être administrateur pour pouvoir ajouter un nouvel utilisateur.
-       Identification: entrez votre identifiant et votre mot de passe
-       au format identifiant:mot_de_passe
+    """Enpoint to add new user to users database. \n
+       Admin rights required. \n
+       Identification: enter username and password as username:password.
     """
-    # Récupération des identifiants et mots de passe:
-    user, psw = identification.split(":")
+    if check_user(identification, 1) is True:
 
-    # Test d'autorisation:
-    if users_db[user]['rights'] == 1:
+        # Record new user:
+        users_db[new_user.username] = {
+            "username": new_user.username,
+            "password": new_user.password,
+            "rights": new_user.rights
+        }
+        # Update database:
+        update_users_db = json.dumps(users_db, indent=4)
+        with open(path_users_db, "w") as outfile:
+            outfile.write(update_users_db)
 
-        # Test d'identification:
-        if users_db[user]['password'] == psw:
+        # Return:
+        return {"New user successfully added!"}
 
-            # Enregistrement du nouvel utilisateur:
-            users_db[new_user.username] = {
-                "username": new_user.username,
-                "password": new_user.password,
-                "rights": new_user.rights
-            }
-            update_users_db = json.dumps(users_db, indent=4)
-            with open(path_users_db, "w") as outfile:
-                outfile.write(update_users_db)
-
-            return {"Nouvel utilisateur ajouté!"}
-
-        else:
-            raise HTTPException(
-                status_code=401,
-                detail="Identifiant ou mot de passe invalide(s)")
-    else:
-        raise HTTPException(
-                status_code=403,
-                detail="Vous n'avez pas les droits d'administrateur.")
-
-
-# ---------- 3. Suppresion d'un utilisateur: ----------------------------------
+# ---------- 3. Remove user: ----------------------------------------------------------------------
 
 
 class OldUser(BaseModel):
@@ -137,81 +162,65 @@ class OldUser(BaseModel):
 
 
 @api.delete('/remove_user',
-            name="Suppression d'un utilisateur existant.",
+            name="Remove existing user.",
             tags=['USERS'], responses=responses)
 async def remove_user(old_user: OldUser, identification=Header(None)):
-    """Fonction pour supprimer un nouvel utilisateur.
-       Il faut être administrateur pour pouvoir supprimer un nouvel
-       utilisateur.
-       Identification: entrez votre identifiant et votre mot de passe
-       au format identifiant:mot_de_passe
+    """Enpoint to remove existing user to users database. \n
+       Admin rights required. \n
+       Identification: enter username and password as username:password.
     """
-    # Récupération des identifiants et mots de passe:
-    user, psw = identification.split(":")
+    if check_user(identification, 1) is True:
 
-    # Test d'autorisation:
-    if users_db[user]['rights'] == 1:
-
-        # Test d'identification:
-        if users_db[user]['password'] == psw:
-
-            # Suppression de l'ancien utilisateur:
-            try:
-                users_db.pop(old_user.user)
-                update_users_db = json.dumps(users_db, indent=4)
-                with open(path_users_db, "w") as outfile:
-                    outfile.write(update_users_db)
-                return {"Utilisateur supprimé!"}
-
-            except KeyError:
-                return "L'utilisateur spécifié n'existe pas."
-
-        else:
-            raise HTTPException(
-                status_code=401,
-                detail="Identifiant ou mot de passe invalide(s)")
-    else:
-        raise HTTPException(
-                status_code=403,
-                detail="Vous n'avez pas les droits d'administrateur.")
+        # Remove existing user:
+        try:
+            users_db.pop(old_user.user)
+            update_users_db = json.dumps(users_db, indent=4)
+            with open(path_users_db, "w") as outfile:
+                outfile.write(update_users_db)
+            return {"User removed!"}
+        except KeyError:
+            return "User doesn't exists."
 
 
-# ---------- 4. Prédictions de priorité à partir des données test: ------------
+# ---------- 4. Predict from test: --------------------------------------------
 
 @api.get('/predict_from_test',
-         name="Effectue une prediction à partir d'un échantillon test.",
+         name="Make a prediction from a line in X_test.",
          tags=['PREDICTIONS'],
          responses=responses)
 async def get_pred_from_test(identification=Header(None)):
-    """Fonction pour effectuer une prédiction à partir d'une donnée
-        issue de l'échantillon de test.
-        Identification: entrez votre identifiant et votre mot de passe
-        au format identifiant:mot_de_passe
+    """Enpoint to make a prediction from a single record in test pool. \n
+       Fictionnal endpoint for monitoring (no real life use):
+        - Split X_test in two parts : eval and pool
+        - Get a single line from pool, make prediction and add it to eval
+        - Write log in preds_test.jsonl
+
+       Basic rights required. \n
+       Identification: enter username and password as username:password.
     """
-    # Récupération des identifiants et mots de passe:
-    user, psw = identification.split(":")
+    if check_user(identification, 0) is True:
 
-    # Test d'identification:
-    if users_db[user]['password'] == psw:
+        # Get user:
+        user = identification.split(":")[0]
 
-        # Chargement du modèle:
+        # Load model:
         rdf = joblib.load(path_trained_model)
 
-        # Chargement des données test:
+        # Load test data:
         X_test = pd.read_csv(path_X_test)
         # y_test = pd.read_csv(path_y_test)
 
-        # Trouver l'index médian
+        # Find median index
         median_index = len(X_test) // 2
 
-        # Diviser le DataFrame en deux parties
+        # Divide dataframe in two parts
         # X_test_eval = X_test.iloc[:median_index]
         X_test_pool = X_test.iloc[median_index:]
 
         # y_test_eval = y_test.iloc[:median_index]
         # y_test_pool = y_test.iloc[median_index:]
 
-        # Sélection de la donnée suivante dans X_test_pool:
+        # Select next line in X_test_pool:
         path_db_preds_test = os.path.join(path_logs, "preds_test.jsonl")
         with open(path_db_preds_test, "r") as file:
             preds_test = [json.loads(line) for line in file]
@@ -220,12 +229,12 @@ async def get_pred_from_test(identification=Header(None)):
             else:
                 i = X_test_pool.index.tolist()[0]
 
-        # Prédiction de la donnée sélectionnée:
+        # Make prediction on selected line:
         pred_time_start = time.time()
         pred = rdf.predict(X_test_pool.loc[[i]])
         pred_time_end = time.time()
 
-        # Préparation des métadonnées pour exportation
+        # Create log entry:
         metadata_dictionary = {
             "request_id": "".join(random.choices(string.digits, k=16)),
             "index": i,
@@ -240,23 +249,17 @@ async def get_pred_from_test(identification=Header(None)):
             }
         metadata_json = json.dumps(obj=metadata_dictionary)
 
-        # Exportation des métadonnées
+        # Export log entry:
         path_log_file = os.path.join(path_logs, "preds_test.jsonl")
         with open(path_log_file, "a") as file:
             file.write(metadata_json + "\n")
 
-        # Réponse:
+        # Response:
         priority = pred[0]
         if priority == 1:
             return "L'intervention est prioritaire."
         else:
             return "L'intervention n'est pas prioritaire."
-
-    else:
-        raise HTTPException(
-            status_code=401,
-            detail="Identifiant ou mot de passe invalide(s)"
-        )
 
 # ---------- 5. Prédictions de priorité à partir de données saisies: ----------
 
@@ -305,11 +308,11 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
        Identification: entrez votre identifiant et votre mot de passe
        au format identifiant:mot_de_passe
     """
-    # Récupération des identifiants et mots de passe:
-    user, psw = identification.split(":")
 
-    # Test d'identification:
-    if users_db[user]['password'] == psw:
+    if check_user(identification, 0) is True:
+
+        # Récupération de l'identifiant:
+        user = identification.split(":")[0]
 
         # Chargement du modèle:
         rdf = joblib.load(path_trained_model)
@@ -349,12 +352,6 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
         else:
             return "L'intervention n'est pas prioritaire."
 
-    else:
-        raise HTTPException(
-            status_code=401,
-            detail="Identifiant ou mot de passe invalide(s)"
-        )
-
 
 # ---------- 6. Entraîner le modèle avec de nouvelles données: ----------------
 
@@ -369,59 +366,42 @@ async def post_train(new_model: UpdateModel,
                      identification=Header(None)):
     """Fonction pour entrainer le modèle.
     """
-# Récupération des identifiants et mots de passe:
-    user, psw = identification.split(":")
 
-    # Test d'autorisation:
-    if users_db[user]['rights'] == 1:
+    if check_user(identification, 1) is True:
 
-        # Test d'identification:
-        if users_db[user]['password'] == psw:
+        # Récupération de l'identifiant:
+        user = identification.split(":")[0]
+        # Chargement des données pour les métadonnées:
+        X_train = pd.read_csv(path_X_train)
+        # Entrainement et sauvegarde du nouveau modèle:
+        train_time_start = time.time()
+        train_and_save_model(model_name=new_model.name)
+        train_time_end = time.time()
+        # Chargement du nouveau modèle:
+        path_new_trained_model = os.path.join(root_path,
+                                              "models",
+                                              f"{new_model.name}.joblib")
+        rdf = joblib.load(path_new_trained_model)
+        # Préparation des métadonnées pour exportation
+        metadata_dictionary = {
+            "request_id": "".join(random.choices(string.digits, k=16)),
+            "time_stamp": str(datetime.datetime.now()),
+            "user_name": user,
+            "response_status_code": 200,
+            "estimator_type": str(type(rdf)),
+            "estimator_parameters": rdf.get_params(),
+            "feature_importances": dict(zip(X_train.columns.to_list(),
+                                            list(rdf.feature_importances_))
+                                        ),
+            "train_time": train_time_end - train_time_start
+            }
+        metadata_json = json.dumps(obj=metadata_dictionary)
+        # Exportation des métadonnées
+        path_log_file = os.path.join(path_logs, "train.jsonl")
+        with open(path_log_file, "a") as file:
+            file.write(metadata_json + "\n")
+        return {"Modèle ré-entrainé et sauvegardé!"}
 
-            # Chargement des données pour les métadonnées:
-            X_train = pd.read_csv(path_X_train)
-
-            # Entrainement et sauvegarde du nouveau modèle:
-            train_time_start = time.time()
-            train_and_save_model(model_name=new_model.name)
-            train_time_end = time.time()
-
-            # Chargement du nouveau modèle:
-            path_new_trained_model = os.path.join(root_path,
-                                                  "models",
-                                                  f"{new_model.name}.joblib")
-            rdf = joblib.load(path_new_trained_model)
-
-            # Préparation des métadonnées pour exportation
-            metadata_dictionary = {
-                "request_id": "".join(random.choices(string.digits, k=16)),
-                "time_stamp": str(datetime.datetime.now()),
-                "user_name": user,
-                "response_status_code": 200,
-                "estimator_type": str(type(rdf)),
-                "estimator_parameters": rdf.get_params(),
-                "feature_importances": dict(zip(X_train.columns.to_list(),
-                                                list(rdf.feature_importances_))
-                                            ),
-                "train_time": train_time_end - train_time_start
-                }
-            metadata_json = json.dumps(obj=metadata_dictionary)
-
-            # Exportation des métadonnées
-            path_log_file = os.path.join(path_logs, "train.jsonl")
-            with open(path_log_file, "a") as file:
-                file.write(metadata_json + "\n")
-
-            return {"Modèle ré-entrainé et sauvegardé!"}
-
-        else:
-            raise HTTPException(
-                status_code=401,
-                detail="Identifiant ou mot de passe invalide(s)")
-    else:
-        raise HTTPException(
-                status_code=403,
-                detail="Vous n'avez pas les droits d'administrateur.")
 
 # ---------- 7. Mise à jour de la base de données -----------------------------
 
@@ -431,57 +411,40 @@ class UpdateData(BaseModel):
     end_year: Optional[int] = 2020
 
 
-# post ou put?
 @api.post('/update_data',
           name='Mise à jour des données accidents',
           tags=['UPDATE'])
 async def update_data(update_data: UpdateData, identification=Header(None)):
     """Fonction pour mettre à jour les données accidents.
     """
-    # Récupération des identifiants et mots de passe:
-    user, psw = identification.split(":")
 
-    # Create year_list:
-    year_list = [update_data.start_year, update_data.end_year]
+    if check_user(identification, 1) is True:
+        # Récupération de l'identifiant:
+        user = identification.split(":")[0]
+        # Create year_list:
+        year_list = [update_data.start_year, update_data.end_year]
 
-    # Test d'autorisation:
-    if users_db[user]['rights'] == 1:
+        # download, clean and preprocess data
+        exec_time_start = time.time()
+        data_update(year_list)
+        exec_time_end = time.time()
+        # Préparation des métadonnées pour exportation
+        metadata_dictionary = {
+            "request_id": "".join(random.choices(string.digits, k=16)),
+            "time_stamp": str(datetime.datetime.now()),
+            "user_name": user,
+            "response_status_code": 200,
+            "start_year": update_data.start_year,
+            "end_year": update_data.end_year,
+            "execution_time": exec_time_end - exec_time_start
+            }
+        metadata_json = json.dumps(obj=metadata_dictionary)
+        # Exportation des métadonnées
+        path_log_file = os.path.join(path_logs, "update_data.jsonl")
+        with open(path_log_file, "a") as file:
+            file.write(metadata_json + "\n")
+        return {"Données mises à jour!"}
 
-        # Test d'identification:
-        if users_db[user]['password'] == psw:
-
-            # download, clean and preprocess data
-            exec_time_start = time.time()
-            data_update(year_list)
-            exec_time_end = time.time()
-
-            # Préparation des métadonnées pour exportation
-            metadata_dictionary = {
-                "request_id": "".join(random.choices(string.digits, k=16)),
-                "time_stamp": str(datetime.datetime.now()),
-                "user_name": user,
-                "response_status_code": 200,
-                "start_year": update_data.start_year,
-                "end_year": update_data.end_year,
-                "execution_time": exec_time_end - exec_time_start
-                }
-            metadata_json = json.dumps(obj=metadata_dictionary)
-
-            # Exportation des métadonnées
-            path_log_file = os.path.join(path_logs, "update_data.jsonl")
-            with open(path_log_file, "a") as file:
-                file.write(metadata_json + "\n")
-
-            return {"Données mises à jour!"}
-
-        else:
-            raise HTTPException(
-                status_code=401,
-                detail="Identifiant ou mot de passe invalide(s)")
-    else:
-        raise HTTPException(
-                status_code=403,
-                detail="Vous n'avez pas les droits d'administrateur.")
 
 # -------- 8. Labellisation d'une prédiction enregistrée --------
 
@@ -517,11 +480,7 @@ async def label_prediction(prediction: Prediction,
     Retourne :
         str : confirmation de la mise à jour de l'enregistrement
     """
-    # Récupération des identifiants
-    user, psw = identification.split(":")
-
-    # Test d'identification
-    if users_db[user]['password'] == psw:
+    if check_user(identification, 0) is True:
 
         # Load preds_call.jsonl
         with open(path_db_preds_unlabeled, "r") as file:
@@ -549,9 +508,6 @@ async def label_prediction(prediction: Prediction,
             raise HTTPException(status_code=404,
                                 detail="Aucun enregistrement trouvé. Merci de fournir une référence (request_id) valable.")
 
-    else:
-        raise HTTPException(status_code=401,
-                            detail="Identifiants non valables.")
 
 # -------- 8bis. Labellisation d'une prédiction from test --------
 
@@ -570,11 +526,7 @@ async def label_prediction_test(identification=Header(None)):
     Retourne :
         str : confirmation de la mise à jour de l'enregistrement
     """
-    # Récupération des identifiants
-    user, psw = identification.split(":")
-
-    # Test d'identification
-    if users_db[user]['password'] == psw:
+    if check_user(identification, 0) is True:
 
         # Load preds_test.jsonl
         path_db_preds_test = os.path.join(path_logs, "preds_test.jsonl")
@@ -612,9 +564,6 @@ async def label_prediction_test(identification=Header(None)):
                     file.write(json.dumps(item) + '\n')
 
         return {"{number} enregistrement(s) mis à jour.".format(number=n)}
-    else:
-        raise HTTPException(status_code=401,
-                            detail="Identifiants non valables.")
 
 # -------- 9. Mise à jour du F1 score --------
 
@@ -637,79 +586,57 @@ async def update_f1_score(identification=Header(None)):
     Retourne :
         str : confirmation de la mise à jour du F1 score
     """
-    # Récupération des identifiants
-    user, psw = identification.split(":")
+    if check_user(identification, 1) is True:
 
-    # Test d'autorisation
-    if users_db[user]['rights'] == 1:
+        # Récupération de l'identifiant:
+        user = identification.split(":")[0]
 
-        # Test d'identification
-        if users_db[user]['password'] == psw:
+        # Chargement du modèle
+        rdf = joblib.load(path_trained_model)
+        # Chargement des données de test
+        X_test = pd.read_csv(path_X_test)
+        y_test = pd.read_csv(path_y_test)
+        # Chargement de la base de données de prédictions labellisées
+        with open(path_db_preds_labeled, "r") as file:
+            db_preds_labeled = [json.loads(line) for line in file]
+        X_test_new = pd.DataFrame()
+        y_test_new = pd.Series()
+        for record in db_preds_labeled:
+            # Chargement des variables d'entrée dans le df X_test_new
+            X_record = record["input_features"]
+            X_record = {key: [value] for key, value in X_record.items()}
+            X_record = pd.DataFrame(X_record)
+            X_test_new = pd.concat([X_test_new, X_record])
+            # Chargement des variables de sortie dans le df y_test_new
+            y_record = pd.Series(record["verified_prediction"])
+            if y_test_new.empty is True:  # Pour éviter l'avertissement suivant : « FutureWarning: The behavior of array concatenation with empty entries is deprecated. »
+                y_test_new = y_record
+            else:
+                y_test_new = pd.concat([y_test_new, y_record])
+        # Consolidation des données pour la prédiction générale
+        X_test = pd.concat([X_test, X_test_new]).reset_index(drop=True)
+        y_test_new = pd.Series(y_test_new, name="grav")
+        y_test = pd.concat([y_test, y_test_new]).reset_index(drop=True)
+        # Prédiction générale de y
+        y_pred = rdf.predict(X_test)
+        y_true = y_test
+        # Calcul du nouveau F1 score macro average
+        f1_score_macro_average = f1_score(y_true=y_true,
+                                          y_pred=y_pred,
+                                          average="macro")
+        # Préparation des métadonnées pour exportation
+        metadata_dictionary = {
+            "request_id": db_preds_labeled[-1]["request_id"],
+            "time_stamp": str(datetime.datetime.now()),
+            "user_name": user,
+            "f1_score_macro_average": f1_score_macro_average}
+        metadata_json = json.dumps(obj=metadata_dictionary)
+        # Exportation des métadonnées
+        path_log_file = os.path.join(path_logs, "f1_scores.jsonl")
+        with open(path_log_file, "a") as file:
+            file.write(metadata_json + "\n")
+        return ("Le F1 score du modèle a été mis à jour.")
 
-            # Chargement du modèle
-            rdf = joblib.load(path_trained_model)
-
-            # Chargement des données de test
-            X_test = pd.read_csv(path_X_test)
-            y_test = pd.read_csv(path_y_test)
-
-            # Chargement de la base de données de prédictions labellisées
-            with open(path_db_preds_labeled, "r") as file:
-                db_preds_labeled = [json.loads(line) for line in file]
-
-            X_test_new = pd.DataFrame()
-            y_test_new = pd.Series()
-            for record in db_preds_labeled:
-                # Chargement des variables d'entrée dans le df X_test_new
-                X_record = record["input_features"]
-                X_record = {key: [value] for key, value in X_record.items()}
-                X_record = pd.DataFrame(X_record)
-                X_test_new = pd.concat([X_test_new, X_record])
-
-                # Chargement des variables de sortie dans le df y_test_new
-                y_record = pd.Series(record["verified_prediction"])
-                if y_test_new.empty is True:  # Pour éviter l'avertissement suivant : « FutureWarning: The behavior of array concatenation with empty entries is deprecated. »
-                    y_test_new = y_record
-                else:
-                    y_test_new = pd.concat([y_test_new, y_record])
-
-            # Consolidation des données pour la prédiction générale
-            X_test = pd.concat([X_test, X_test_new]).reset_index(drop=True)
-            y_test_new = pd.Series(y_test_new, name="grav")
-            y_test = pd.concat([y_test, y_test_new]).reset_index(drop=True)
-
-            # Prédiction générale de y
-            y_pred = rdf.predict(X_test)
-            y_true = y_test
-
-            # Calcul du nouveau F1 score macro average
-            f1_score_macro_average = f1_score(y_true=y_true,
-                                              y_pred=y_pred,
-                                              average="macro")
-
-            # Préparation des métadonnées pour exportation
-            metadata_dictionary = {
-                "request_id": db_preds_labeled[-1]["request_id"],
-                "time_stamp": str(datetime.datetime.now()),
-                "user_name": user,
-                "f1_score_macro_average": f1_score_macro_average}
-            metadata_json = json.dumps(obj=metadata_dictionary)
-
-            # Exportation des métadonnées
-            path_log_file = os.path.join(path_logs, "f1_scores.jsonl")
-            with open(path_log_file, "a") as file:
-                file.write(metadata_json + "\n")
-
-            return ("Le F1 score du modèle a été mis à jour.")
-
-        else:
-            raise HTTPException(status_code=401,
-                                detail="Identifiants non valables.")
-
-    else:
-        raise HTTPException(status_code=403,
-                            detail="Vous n'avez pas les droits d'administrateur.")
-    
 # -------- 10. Get f1-score --------
 
 
@@ -729,31 +656,13 @@ async def get_f1_score(identification=Header(None)):
     Retourne :
         float : latest f1-score.
     """
-    # Récupération des identifiants
-    user, psw = identification.split(":")
+    if check_user(identification, 1) is True:
 
-    # Test d'autorisation
-    if users_db[user]['rights'] == 1:
-
-        # Test d'identification
-        if users_db[user]['password'] == psw:
-
-            # Load f1_scores.jsonl
-            path_db_f1_scores = os.path.join(path_logs, "f1_scores.jsonl")
-            with open(path_db_f1_scores, "r") as file:
-                f1_scores = [json.loads(line) for line in file]
-
-            # Get latest f1_score:
-            latest_f1 = f1_scores[-1]["f1_score_macro_average"]
-
-            # Return:
-            return {latest_f1}
-
-        else:
-            raise HTTPException(status_code=401,
-                                detail="Identifiants non valables.")
-
-    else:
-        raise HTTPException(status_code=403,
-                            detail="Vous n'avez pas les droits d'administrateur.")
-
+        # Load f1_scores.jsonl
+        path_db_f1_scores = os.path.join(path_logs, "f1_scores.jsonl")
+        with open(path_db_f1_scores, "r") as file:
+            f1_scores = [json.loads(line) for line in file]
+        # Get latest f1_score:
+        latest_f1 = f1_scores[-1]["f1_score_macro_average"]
+        # Return:
+        return {latest_f1}
