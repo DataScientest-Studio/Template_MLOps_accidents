@@ -1,5 +1,4 @@
 # ---------------------------- Imports ----------------------------------------
-
 # external
 import datetime
 from fastapi import FastAPI, Header, HTTPException
@@ -10,17 +9,13 @@ import os
 from pathlib import Path
 from pydantic import BaseModel
 import random
-# from sklearn import ensemble
 from sklearn.metrics import f1_score
 import sys
 import time
 from typing import Optional
-# import numpy as np
 import string
 
 # internal
-# add path to import datalib which is in src/data
-# 3 folders upper of the current
 root_path = Path(os.path.realpath(__file__)).parents[2]
 sys.path.append(os.path.join(root_path, "src", "data"))
 sys.path.append(os.path.join(root_path, "src", "models"))
@@ -72,7 +67,8 @@ def check_user(header, rights):
     except:
         raise HTTPException(
             status_code=401,
-            detail="Wrong format: you must sign following the pattern username:password ."
+            detail="Wrong format: you must sign following the pattern "
+                   "username:password ."
         )
     try:
         users_db[user]
@@ -154,7 +150,7 @@ async def post_user(new_user: User, identification=Header(None)):
         # Return:
         return {"New user successfully added!"}
 
-# ---------- 3. Remove user: ----------------------------------------------------------------------
+# ---------- 3. Remove user: --------------------------------------------------
 
 
 class OldUser(BaseModel):
@@ -371,17 +367,21 @@ async def post_train(new_model: UpdateModel,
 
         # Récupération de l'identifiant:
         user = identification.split(":")[0]
+
         # Chargement des données pour les métadonnées:
         X_train = pd.read_csv(path_X_train)
+
         # Entrainement et sauvegarde du nouveau modèle:
         train_time_start = time.time()
         train_and_save_model(model_name=new_model.name)
         train_time_end = time.time()
+
         # Chargement du nouveau modèle:
         path_new_trained_model = os.path.join(root_path,
                                               "models",
                                               f"{new_model.name}.joblib")
         rdf = joblib.load(path_new_trained_model)
+
         # Préparation des métadonnées pour exportation
         metadata_dictionary = {
             "request_id": "".join(random.choices(string.digits, k=16)),
@@ -396,10 +396,12 @@ async def post_train(new_model: UpdateModel,
             "train_time": train_time_end - train_time_start
             }
         metadata_json = json.dumps(obj=metadata_dictionary)
+
         # Exportation des métadonnées
         path_log_file = os.path.join(path_logs, "train.jsonl")
         with open(path_log_file, "a") as file:
             file.write(metadata_json + "\n")
+
         return {"Modèle ré-entrainé et sauvegardé!"}
 
 
@@ -505,8 +507,10 @@ async def label_prediction(prediction: Prediction,
         if record_exists == "yes":
             return {"Enregistrement mis à jour. Merci pour votre retour."}
         else:
-            raise HTTPException(status_code=404,
-                                detail="Aucun enregistrement trouvé. Merci de fournir une référence (request_id) valable.")
+            raise HTTPException(
+                status_code=404,
+                detail="Aucun enregistrement trouvé."
+                       "Merci de fournir une référence (request_id) valable.")
 
 
 # -------- 8bis. Labellisation d'une prédiction from test --------
@@ -609,7 +613,7 @@ async def update_f1_score(identification=Header(None)):
             X_test_new = pd.concat([X_test_new, X_record])
             # Chargement des variables de sortie dans le df y_test_new
             y_record = pd.Series(record["verified_prediction"])
-            if y_test_new.empty is True:  # Pour éviter l'avertissement suivant : « FutureWarning: The behavior of array concatenation with empty entries is deprecated. »
+            if y_test_new.empty is True:
                 y_test_new = y_record
             else:
                 y_test_new = pd.concat([y_test_new, y_record])
@@ -662,7 +666,9 @@ async def get_f1_score(identification=Header(None)):
         path_db_f1_scores = os.path.join(path_logs, "f1_scores.jsonl")
         with open(path_db_f1_scores, "r") as file:
             f1_scores = [json.loads(line) for line in file]
+
         # Get latest f1_score:
         latest_f1 = f1_scores[-1]["f1_score_macro_average"]
+        
         # Return:
         return {latest_f1}
