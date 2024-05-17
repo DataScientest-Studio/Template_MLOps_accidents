@@ -63,11 +63,11 @@ curl.exe -X GET -i http://172.17.0.2:8000/status
 
 # --------------- Image 6. Test -----------------------------------------------
 # Création de l'image `test_api`: 
-    docker image build  -f ./src/api/test_api.Dockerfile -t alexandrewinger/shield:test_api .
+    # docker image build  -f ./src/api/test_api.Dockerfile -t alexandrewinger/shield:test_api .
 
 # Lancement depuis la racine: 
 
-    docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:test_api
+    # docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume alexandrewinger/shield:test_api
 
 # --------------- Image 7. Test Shield -----------------------------------
 # Création de l'image `test_shield`: 
@@ -79,7 +79,7 @@ docker image build  -f ./src/test/test_shield.Dockerfile -t alexandrewinger/shie
 
 
 # --------------- Image 8. Monitoring -----------------------------------------
-# Création de l'image `watch_data`: 
+# Création de l'image `monitoring`: 
 docker image build  -f ./src/monitoring/monitoring.Dockerfile -t alexandrewinger/shield:monitoring .
 
 # Lancement du conteneur à partir de l'image:
