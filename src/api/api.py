@@ -101,11 +101,13 @@ def get_latest_model(path):
     Returns:
         - latest model name as str
     """
-    model_names = os.listdir(path)[1:]
+    model_names = os.listdir(path)
+    if '.gitkeep' in model_names:
+        model_names.remove('.gitkeep')
     minor_versions = []
     for model_name in model_names:
         version = model_name.split("_")[1]
-        minor_version = version.split(".")[1]
+        minor_version = int(version.split(".")[1])
         minor_versions.append(minor_version)
     latest_minor = max(minor_versions)
     latest_version = "rdf_v1." + str(latest_minor) + "_shield.joblib"
