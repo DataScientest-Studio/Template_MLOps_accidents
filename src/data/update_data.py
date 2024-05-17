@@ -60,6 +60,10 @@ def data_update(year_list):
     """
     output_path = os.path.join(root_path, "data", "raw")
 
+    # Check if year_list is a list or contains a single element.
+    if year_list[0] == year_list[1]:
+        year_list = [year_list[0]]
+
     # download data files according to the year list
     file_list_template = ["caracteristiques", "lieux", "usagers", "vehicules"]
 
@@ -108,6 +112,10 @@ def data_update_without_saving(year_list):
 
     # download data files according to the year list
     file_list_template = ["caracteristiques", "lieux", "usagers", "vehicules"]
+
+    # Check if year_list is a list or contains a single element.
+    if year_list[0] == year_list[1]:
+        year_list = [year_list[0]]
 
     for year in year_list:
         for item in file_list_template:
