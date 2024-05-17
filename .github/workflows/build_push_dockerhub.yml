@@ -1,9 +1,9 @@
 name: Build , Test and Push images
 
 on:
-#  push:
-#    branches:
-#      - feature/test_shield
+  push:
+    branches:
+      - feature/monitoring/model
   pull_request:
     branches:
       - master
