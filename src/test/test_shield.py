@@ -144,3 +144,14 @@ def test_get_f1_score():
     assert response.status_code == 200
     message = "Test EP9: /get_f1_score: PASSED"
     print(message)
+
+
+# ---------- EP11: /evaluate_new_model ----------------------------------------
+def test_evaluate_new_model():
+    time.sleep(delay)
+    response = requests.post(url="http://api:8000/evaluate_new_model",
+                            json=year_list,
+                            headers=header_admin)
+    assert response.status_code == 200
+    message = "Test EP9: /evaluate_new_model: PASSED"
+    print(message)
