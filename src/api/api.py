@@ -698,7 +698,7 @@ async def get_f1_score(identification=Header(None)):
          tags=["MONITORING"]
          )
 async def post_new_model_score(update_data: UpdateData,
-                              identification=Header(None)):
+                               identification=Header(None)):
     """
     Triggers:
         - update data by adding a new year
@@ -720,7 +720,7 @@ async def post_new_model_score(update_data: UpdateData,
 
         # ----- Evaluate new model ----- :
 
-        # TODO : Change paths Chargement des données de test:
+        # Chargement des données de test:
         X_test = pd.read_csv(path_X_test_eval)
         y_test = pd.read_csv(path_y_test_eval)
 
