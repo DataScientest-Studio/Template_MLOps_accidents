@@ -108,7 +108,7 @@ def get_latest_model(path):
         minor_version = version.split(".")[1]
         minor_versions.append(minor_version)
     latest_minor = max(minor_versions)
-    latest_version = "rdf_v1." + str(latest_minor) + "_shield"
+    latest_version = "rdf_v1." + str(latest_minor) + "_shield.joblib"
     return latest_version
 # ---------------------------- API --------------------------------------------
 
@@ -223,7 +223,8 @@ async def get_pred_from_test(identification=Header(None)):
 
         # TODO: Load last version of model:
         model_name = get_latest_model(path_models)
-        rdf = joblib.load(model_name)
+        model_path = os.path.join(path_models, model_name)
+        rdf = joblib.load(model_path)
 
         # Load test data:
         X_test = pd.read_csv(path_X_test)
@@ -241,12 +242,13 @@ async def get_pred_from_test(identification=Header(None)):
 
         # Select next line in X_test_pool:
         path_db_preds_test = os.path.join(path_logs, "preds_test.jsonl")
-        with open(path_db_preds_test, "r") as file:
-            preds_test = [json.loads(line) for line in file]
-            if preds_test != []:
-                i = preds_test[-1]['index'] + 1
-            else:
-                i = X_test_pool.index.tolist()[0]
+
+        if os.path.isfile(path_db_preds_test):
+            with open(path_db_preds_test, "r") as file:
+                preds_test = [json.loads(line) for line in file]
+            i = preds_test[-1]['index'] + 1
+        else:
+            i = X_test_pool.index.tolist()[0]
 
         # Make prediction on selected line:
         pred_time_start = time.time()
@@ -336,7 +338,8 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
 
         # TODO: Load last version of model:
         model_name = get_latest_model(path_models)
-        rdf = joblib.load(model_name)
+        model_path = os.path.join(path_models, model_name)
+        rdf = joblib.load(model_path)
 
         # Chargement des données test:
         test = pd.DataFrame.from_dict(dict(data), orient='index').T
@@ -399,7 +402,8 @@ async def get_train(identification=Header(None)):
 
         # TODO: load latest model for metadata:
         model_name = get_latest_model(path_models)
-        rdf = joblib.load(model_name)
+        model_path = os.path.join(path_models, model_name)
+        rdf = joblib.load(model_path)
 
         # Préparation des métadonnées pour exportation
         metadata_dictionary = {
@@ -622,7 +626,8 @@ async def update_f1_score(identification=Header(None)):
 
         # TODO: Load last version of model:
         model_name = get_latest_model(path_models)
-        rdf = joblib.load(model_name)
+        model_path = os.path.join(path_models, model_name)
+        rdf = joblib.load(model_path)
 
         # Chargement des données de test
         X_test = pd.read_csv(path_X_test)
