@@ -78,9 +78,9 @@ docker image build  -f ./src/test/test_shield.Dockerfile -t alexandrewinger/shie
     docker run --rm --mount type=volume,src=shield_volume,dst=/home/volume --network=shield-network --name test_shield alexandrewinger/shield:test_shield
 
 
-# --------------- Image 8. Watch Data -----------------------------------------
+# --------------- Image 8. Monitoring -----------------------------------------
 # Création de l'image `watch_data`: 
-docker image build  -f ./src/features/watch_data/watch_data.Dockerfile -t shield_watch_data_image .
+docker image build  -f ./src/monitoring/monitoring.Dockerfile -t alexandrewinger/shield:monitoring .
 
 # Lancement du conteneur à partir de l'image:
-docker run -p 8008:8008 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ shield_watch_data_image
+docker run -p 8008:8008 --rm --mount type=volume,src=shield_volume,dst=/home/volume/ --network=shield-network --name monitoring alexandrewinger/shield:monitoring
