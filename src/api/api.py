@@ -34,6 +34,7 @@ path_logs = os.path.join(root_path, "logs")
 path_db_preds_unlabeled = os.path.join(path_logs, "preds_call.jsonl")
 path_db_preds_test_unlabeled = os.path.join(path_logs, "preds_test.jsonl")
 path_db_preds_labeled = os.path.join(path_logs, "preds_labeled.jsonl")
+path_models = os.path.join(root_path, "models")
 path_trained_model = os.path.join(root_path, "models", "trained_model.joblib")
 path_new_trained_model = os.path.join(root_path, "models",
                                       "new_trained_model.joblib")
@@ -90,6 +91,25 @@ def check_user(header, rights):
         raise HTTPException(
                 status_code=401,
                 detail="Invalid password")
+
+
+def get_latest_model(path):
+    """
+    Get latest model version.
+    Args:
+        - path: str, path to directory containing model files
+    Returns:
+        - latest model name as str
+    """
+    model_names = os.listdir(path)[1:]
+    minor_versions = []
+    for model_name in model_names:
+        version = model_name.split("_")[1]
+        minor_version = version.split(".")[1]
+        minor_versions.append(minor_version)
+    latest_minor = max(minor_versions)
+    latest_version = "rdf_v1." + str(latest_minor) + "_shield"
+    return latest_version
 # ---------------------------- API --------------------------------------------
 
 
@@ -201,8 +221,9 @@ async def get_pred_from_test(identification=Header(None)):
         # Get user:
         user = identification.split(":")[0]
 
-        # Load model:
-        rdf = joblib.load(path_trained_model)
+        # TODO: Load last version of model:
+        model_name = get_latest_model(path_models)
+        rdf = joblib.load(model_name)
 
         # Load test data:
         X_test = pd.read_csv(path_X_test)
@@ -242,6 +263,7 @@ async def get_pred_from_test(identification=Header(None)):
             "response_status_code": 200,
             "output_prediction": int(pred[0]),
             "verified_prediction": None,
+            "model version": model_name,
             "prediction_time": pred_time_end - pred_time_start,
             "input_features": X_test.iloc[[i]].to_dict(orient="records")[0]
             }
@@ -312,8 +334,9 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
         # Récupération de l'identifiant:
         user = identification.split(":")[0]
 
-        # Chargement du modèle:
-        rdf = joblib.load(path_trained_model)
+        # TODO: Load last version of model:
+        model_name = get_latest_model(path_models)
+        rdf = joblib.load(model_name)
 
         # Chargement des données test:
         test = pd.DataFrame.from_dict(dict(data), orient='index').T
@@ -331,6 +354,7 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
             "user_name": user,
             "context": "call",
             "response_status_code": 200,
+            "model version": model_name,
             "input_features": test.to_dict(orient="records")[0],
             "output_prediction": int(pred[0]),
             "verified_prediction": None,
@@ -353,15 +377,10 @@ async def post_pred_from_call(data: InputData, identification=Header(None)):
 
 # ---------- 6. Entraîner le modèle avec de nouvelles données: ----------------
 
-class UpdateModel(BaseModel):
-    name: Optional[str] = "test_trained_model"
-
-
-@api.post('/train',
-          name='Entrainement du modèle',
-          tags=['UPDATE'])
-async def post_train(new_model: UpdateModel,
-                     identification=Header(None)):
+@api.get('/train',
+         name='Entrainement du modèle',
+         tags=['UPDATE'])
+async def get_train(identification=Header(None)):
     """Fonction pour entrainer le modèle.
     """
 
@@ -375,14 +394,12 @@ async def post_train(new_model: UpdateModel,
 
         # Entrainement et sauvegarde du nouveau modèle:
         train_time_start = time.time()
-        train_and_save_model(model_name=new_model.name)
+        train_and_save_model()
         train_time_end = time.time()
 
-        # Chargement du nouveau modèle:
-        path_new_trained_model = os.path.join(root_path,
-                                              "models",
-                                              f"{new_model.name}.joblib")
-        rdf = joblib.load(path_new_trained_model)
+        # TODO: load latest model for metadata:
+        model_name = get_latest_model(path_models)
+        rdf = joblib.load(model_name)
 
         # Préparation des métadonnées pour exportation
         metadata_dictionary = {
@@ -390,6 +407,7 @@ async def post_train(new_model: UpdateModel,
             "time_stamp": str(datetime.datetime.now()),
             "user_name": user,
             "response_status_code": 200,
+            "model version": model_name,
             "estimator_type": str(type(rdf)),
             "estimator_parameters": rdf.get_params(),
             "feature_importances": dict(zip(X_train.columns.to_list(),
@@ -602,8 +620,9 @@ async def update_f1_score(identification=Header(None)):
         # Récupération de l'identifiant:
         user = identification.split(":")[0]
 
-        # Chargement du modèle
-        rdf = joblib.load(path_trained_model)
+        # TODO: Load last version of model:
+        model_name = get_latest_model(path_models)
+        rdf = joblib.load(model_name)
 
         # Chargement des données de test
         X_test = pd.read_csv(path_X_test)
@@ -648,6 +667,7 @@ async def update_f1_score(identification=Header(None)):
             "request_id": db_preds_labeled[-1]["request_id"],
             "time_stamp": str(datetime.datetime.now()),
             "user_name": user,
+            "model version": model_name,
             "f1_score_macro_average": f1_score_macro_average}
         metadata_json = json.dumps(obj=metadata_dictionary)
 
@@ -694,9 +714,9 @@ async def get_f1_score(identification=Header(None)):
 # ---------- 11. Evaluate new model -------------------------------------------
 
 @api.post("/evaluate_new_model",
-         name="Evaluate new model",
-         tags=["MONITORING"]
-         )
+          name="Evaluate new model",
+          tags=["MONITORING"]
+          )
 async def post_new_model_score(update_data: UpdateData,
                                identification=Header(None)):
     """
@@ -730,8 +750,8 @@ async def post_new_model_score(update_data: UpdateData,
 
         # Calcul du nouveau F1 score macro average
         new_f1_score_macro_average = f1_score(y_true=y_true,
-                                          y_pred=y_pred,
-                                          average="macro")
+                                              y_pred=y_pred,
+                                              average="macro")
         # TODO: Erase all eval_ files
 
         # Return:
