@@ -29,9 +29,8 @@ if f1_score < f1_threshold:
                                  headers=header_admin)
         print(response.json()[0])
 
-        response = requests.post(url=f"http://{localhost}:8000/train",
-                                 json=new_model,
-                                 headers=header_admin)
+        response = requests.get(url=f"http://{localhost}:8000/train",
+                                headers=header_admin)
         print(response.json()[0])
 # TODO: request update f1_score
     else:
