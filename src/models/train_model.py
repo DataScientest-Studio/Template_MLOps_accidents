@@ -26,15 +26,17 @@ def train_and_save_model():
     rf_classifier.fit(X_train, y_train)
 
     # Versioning:
-    if os.listdir(path_model)[1:] == []:
+    model_names = os.listdir(path_model)
+    if '.gitkeep' in model_names:
+        model_names.remove('.gitkeep')
+    if model_names == []:
         model_name = "rdf_v1.0_shield"
     else:
         # get model names:
-        model_names = os.listdir(path_model)[1:]
         minor_versions = []
         for model_name in model_names:
             version = model_name.split("_")[1]
-            minor_version = version.split(".")[1]
+            minor_version = int(version.split(".")[1])
             minor_versions.append(minor_version)
         latest_minor = max(minor_versions)
         latest_minor += 1
