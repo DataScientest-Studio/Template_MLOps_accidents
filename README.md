@@ -86,7 +86,7 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ### 4- Execute import_raw_data.py to import the 4 datasets.
 
-   `python src/data/import_raw_data.py`
+    `python src/data/import_raw_data.py`
 
 ### 5- Execute make_dataset.py 
 
