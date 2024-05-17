@@ -1,3 +1,1 @@
-{"request_id": "7929238334398751", "time_stamp": "2024-05-06 17:47:08.509138", "user_name": "admin", "f1_score_macro_average": 0.7500083165709709}
-{"request_id": "6572066966080228", "time_stamp": "2024-05-15 14:37:57.567796", "user_name": "admin", "f1_score_macro_average": 0.7439926052663113}
-{"request_id": "6695971163579184", "time_stamp": "2024-05-15 14:39:48.964887", "user_name": "admin", "f1_score_macro_average": 0.7438054989000418}
+{"request_id": "7929238334398751", "time_stamp": "2024-05-17 14:11:02.526130", "user_name": "admin", "model version": "rdf_v1.0_shield.joblib", "f1_score_macro_average": 0.7408623688637099}

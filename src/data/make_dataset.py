@@ -6,6 +6,7 @@ import logging
 from sklearn.model_selection import train_test_split
 import os
 
+
 # ---------- Functions with saves ---------------------------------------------
 def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../interim) into
@@ -279,7 +280,8 @@ def process_data_without_saving(input_filepath_users,
     # DONE: CHANGE Saving the dataframes to their respective output file paths
     for file, filename in zip([X_train, X_test, y_train, y_test],
                               ['X_train', 'X_test', 'y_train', 'y_test']):
-        output_filepath = os.path.join(output_folderpath, f'eval_{filename}.csv')
+        output_filepath = os.path.join(output_folderpath,
+                                       f'eval_{filename}.csv')
         # if check_existing_file(output_filepath):
         file.to_csv(output_filepath, index=False)
 

@@ -23,7 +23,7 @@ mkdir src/users_db ; \
 cp ../volume/src/users_db/users_db.json src/users_db ; \
 # Import model save from volume:
 mkdir models ; \
-cp ../volume/models/trained_model.joblib models ; \
+cp ../volume/models/rdf_v1.0_shield.joblib models ; \
 # Import data from volume:
 cp -r ../volume/data data ; \
 # Export api script into volume:
