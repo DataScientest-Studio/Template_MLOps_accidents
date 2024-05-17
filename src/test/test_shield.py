@@ -24,7 +24,6 @@ file = open(path_test_features, 'r')
 test_features = json.load(file)
 file.close()
 
-model_name = {"name": "test_retrained_model"}
 year_list = {"start_year": 2019, "end_year": 2020}
 prediction = {"request_id": 7929238334398751, "y_true": 0}
 # >>>>>>>>>> TESTS <<<<<<<<<<
@@ -85,8 +84,7 @@ def test_predict_from_call():
 # ---------- EP6: /train ------------------------------------------------------
 def test_train_model():
     time.sleep(delay)
-    response = requests.post(url="http://api:8000/train",
-                             json=model_name,
+    response = requests.get(url="http://api:8000/train",
                              headers=header_admin)
     assert response.status_code == 200
     message = "Test EP6: /train: PASSED"
