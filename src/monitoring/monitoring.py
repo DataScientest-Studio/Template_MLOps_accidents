@@ -5,7 +5,7 @@ import requests
 header_admin = {"identification": "admin:4dmin"}
 year_list = {"start_year": 2019, "end_year": 2019}
 new_model = {"name": "new_trained_model"}
-localhost = "127.0.0.1"  # TODO: change localhost into api for docker
+localhost = "api"  # TODO: add env variable to swith between context
 
 # ---------- Get last f1_score ---------------------------------------------- #
 response = requests.get(url=f"http://{localhost}:8000/get_f1_score",
