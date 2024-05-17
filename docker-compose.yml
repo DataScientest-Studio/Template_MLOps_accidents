@@ -93,6 +93,21 @@ services:
     networks:
       - app_network
 
+  monitoring_shield:
+    depends_on:
+      test_api_shield:
+        condition: service_completed_successfully
+    image: alexandrewinger/shield:monitoring
+    container_name: monitoring
+    ports:
+      - "8008:8008" 
+    volumes:
+      - type: volume
+        source: app_volume
+        target: /home/volume
+    networks:
+      - app_network
+
 volumes:
   app_volume:
 
