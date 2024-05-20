@@ -1,0 +1,103 @@
+services:
+  import_data:
+    image: alexandrewinger/shield:import_data
+    container_name: import_data
+    ports:
+      - "8011:8001"
+    volumes:
+      - type: volume
+        source: shield-prod-volume
+        target: /home/volume
+    networks:
+      - shield-prod-network
+
+  make_dataset:
+    depends_on:
+      import_data:
+        condition: service_completed_successfully
+    image: alexandrewinger/shield:make_dataset
+    container_name: make_dataset
+    ports:
+      - "8012:8002"
+    volumes:
+      - type: volume
+        source: shield-prod-volume
+        target: /home/volume
+    networks:
+      - shield-prod-network
+
+  create_users_db:
+    image: alexandrewinger/shield:create_users_db
+    depends_on:
+      make_dataset:
+        condition: service_completed_successfully
+    container_name: create_users
+    ports:
+      - "8013:8003"
+    volumes:
+      - type: volume
+        source: shield-prod-volume
+        target: /home/volume
+    networks:
+      - shield-prod-network
+
+  train_model:
+    image: alexandrewinger/shield:train_model
+    depends_on:
+      create_users_db:
+        condition: service_completed_successfully
+    container_name: train_model
+    ports:
+      - "8014:8004"
+    volumes:
+      - type: volume
+        source: shield-prod-volume
+        target: /home/volume
+    networks:
+      - shield-prod-network
+
+  api_shield:
+    depends_on:
+      train_model:
+        condition: service_completed_successfully
+    image: alexandrewinger/shield:api
+    container_name: api
+    ports:
+      - "8000:8000" # pour ne pas avoir à modifier nos commandes curl
+    #healthcheck:
+      #test: ["CMD", "curl", "-f", "http://127.0.0.1:8000"]
+      #interval: 1ms
+      #timeout: 10s
+      #retries: 3
+      #start_period: 20s
+      #start_interval: 5s
+    volumes:
+      - type: volume
+        source: shield-prod-volume
+        target: /home/volume
+    networks:
+      - shield-prod-network  
+
+
+  monitoring_shield:
+    depends_on:
+      test_api_shield:
+        condition: service_completed_successfully
+    image: alexandrewinger/shield:monitoring
+    container_name: monitoring
+    ports:
+      - "8008:8008" 
+    volumes:
+      - type: volume
+        source: shield-prod-volume
+        target: /home/volume
+    networks:
+      - shield-prod-network
+
+volumes:
+  shield-prod-volume:
+
+networks:
+  shield-prod-network:
+    driver: bridge
+
