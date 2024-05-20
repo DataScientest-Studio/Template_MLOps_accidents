@@ -19,6 +19,7 @@ path_test_features = os.path.join(root_path, "src", "models",
 header_admin = {"identification": "admin:4dmin"}
 new_user = {"username": "sherlock", "password": "doyle", "rights": 0}
 old_user = {"user": "sherlock"}
+log_data = {"name": "f1_scores"}
 
 file = open(path_test_features, 'r')
 test_features = json.load(file)
@@ -140,7 +141,7 @@ def test_get_f1_score():
     response = requests.get(url="http://api:8000/get_f1_score",
                             headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP9: /get_f1_score: PASSED"
+    message = "Test EP10: /get_f1_score: PASSED"
     print(message)
 
 
@@ -151,5 +152,26 @@ def test_evaluate_new_model():
                             json=year_list,
                             headers=header_admin)
     assert response.status_code == 200
-    message = "Test EP9: /evaluate_new_model: PASSED"
+    message = "Test EP11: /evaluate_new_model: PASSED"
+    print(message)
+
+
+# ---------- EP12: /get_users ----------------------------------------
+def test_get_users():
+    time.sleep(delay)
+    response = requests.get(url="http://api:8000/get_users",
+                            headers=header_admin)
+    assert response.status_code == 200
+    message = "Test EP12: /get_users: PASSED"
+    print(message)
+
+
+# ---------- EP13: /get_logs ----------------------------------------
+def test_get_logs():
+    time.sleep(delay)
+    response = requests.post(url="http://api:8000/get_logs",
+                            json=log_data,
+                            headers=header_admin)
+    assert response.status_code == 200
+    message = "Test EP13: /get_logs: PASSED"
     print(message)

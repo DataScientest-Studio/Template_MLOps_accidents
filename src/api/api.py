@@ -43,7 +43,8 @@ path_users_db = os.path.join(root_path, "src", "users_db", "users_db.json")
 # ---------------------------- HTTP Exceptions --------------------------------
 responses = {
     200: {"description": "OK"},
-    401: {"description": "Invalid username and/or password."}
+    401: {"description": "Invalid username and/or password."}, 
+    404: {"description": "File not found."}
 }
 
 # ---------------------------- Chargement base de données users ---------------
@@ -128,7 +129,11 @@ api = FastAPI(
         {'name': 'PREDICTIONS',
          'description': 'Prédictions faites par le modèle.'},
         {'name': 'UPDATE',
-         'description': 'Mises à jour du modèle et des données'}
+         'description': 'Mises à jour du modèle et des données', 
+         'name': 'MONITORING',
+         'description': 'Monitor model performances', 
+         'name': 'DATA',
+         'description': 'Extract data from logs and database'}
         ])
 
 # ---------- 1. Check status --------------------------------------------------
@@ -763,3 +768,62 @@ async def post_new_model_score(update_data: UpdateData,
 
         # Return:
         return {new_f1_score_macro_average}
+
+
+# -------------- 12. Get all users --------------------------------------------
+
+@api.get("/get_users",
+          name="Get all users",
+          tags=["DATA"]
+          )
+async def get_all_users(identification=Header(None)):
+    """
+    Endpoint to get users_db in json format.
+    Needs admin authorization.
+    """
+    if check_user(identification, 1) is True:
+        with open(path_users_db, 'r') as file:
+            users_db = json.load(file)
+        return users_db
+
+# -------------- 13. Get logs --------------------------------------------
+
+
+class LogFile(BaseModel):
+    name: str
+
+
+@api.post("/get_logs",
+          name="Get logs",
+          tags=["DATA"]
+          )
+async def get_logs(file: LogFile,
+                   identification=Header(None)):
+    """
+    Endpoint to get logs in jsonl format.
+    Needs admin authorization.
+    Args: str, one of these names:
+        - f1_score
+        - preds_call
+        - preds_labelled
+        - preds_test
+        - train
+        - update_data
+    """
+    if check_user(identification, 1) is True:
+        # Get filenames from logs folder:
+        filenames = os.listdir(path_logs)
+
+        # Check if file exists:
+        filename = f"{file.name}.jsonl"
+        if filename in filenames:
+            path_to_file = os.path.join(path_logs, filename)
+            with open(path_to_file, 'r') as file:
+                requested_file = [json.loads(line) for line in file]
+
+            return requested_file
+
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail="File doesn't exists.")

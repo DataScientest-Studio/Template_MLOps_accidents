@@ -31,7 +31,8 @@ mkdir -p ../volume/src/api ; \
 cp src/api/api.py ../volume/src/api ; \
 # Run the api:
 uvicorn --app-dir src/api api:api --reload --host=0.0.0.0\
-# TODO: Copy files modified by the api into volume:
+# Copy logs from container to volume:
+# cp -r logs ../volume/logs
 "]
 
 
