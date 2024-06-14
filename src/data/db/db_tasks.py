@@ -1,11 +1,12 @@
 """Initializing and populating the DB."""
 import os
+import time
 
 from models import *
 from models import Caracteristiques, Lieux, Vehicules, Users
 from file_tasks import main as f_main
 from sqlmodel import SQLModel, create_engine, Session
-from sqlalchemy.exc import DataError
+from sqlalchemy.exc import DataError, OperationalError
 from psycopg2.errors import InvalidTextRepresentation
 import tqdm
 import pandas as pd
@@ -19,11 +20,21 @@ password=os.getenv("POSTGRES_PASSWORD")
 port=os.getenv("POSTGRES_PORT")
 db_url = 'postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}'.format(hostname=host, user=user, password=password, database_name=database, port=5432)
 
-def init_db(db_url: str) -> None:
+def init_db(db_url: str, sleep_for: float = 30) -> None:
     """Create DB tables based on the SqlModels."""
-    print("Creating DB tables")
-    engine = create_engine(db_url)
-    SQLModel.metadata.create_all(engine)
+    while True:
+        try:
+            print("Trying to create the DB tables")
+            engine = create_engine(db_url)
+            SQLModel.metadata.create_all(engine)
+        except OperationalError:
+            print("Failed... Attempting again.")
+            time.sleep(sleep_for)
+        except Exception:
+            raise
+        else:
+            print("Tables created.")
+            break
 
 
 def _add_data_to_table(df: pd.DataFrame, table_model: SQLModel, year: int, commit_instantly: bool=False):
