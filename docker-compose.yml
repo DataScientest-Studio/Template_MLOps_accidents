@@ -1,20 +1,17 @@
 version: "3.8"
 services:
 
-  db:
+  postgres:
     image: postgres
-    container_name: postgres_container
     restart: unless-stopped
-    ports:
-      - "${POSTGRES_PORT}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - ./Volumes/db:/var/lib/postgresql/data
-    networks:
-      - my_network_from_compose
 
   pgadmin:
     image: dpage/pgadmin4
@@ -28,10 +25,18 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
       - ./Volumes/db_admin:/var/lib/pgadmin
-    networks:
-      - my_network_from_compose
     depends_on:
-      - db
+      - postgres
 
-networks:
-  my_network_from_compose:
+  add_data_to_db:
+    container_name: add_data_to_db_container
+    volumes:
+      - ./Volumes/data:/data
+    ports:
+      - "5433:${POSTGRES_PORT}"
+    environment:
+      LOG: 1
+    build:
+      dockerfile: DataIngestion.Dockerfile
+    depends_on:
+      - postgres

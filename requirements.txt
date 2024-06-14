@@ -19,3 +19,5 @@ joblib
 python-dotenv
 psycopg2-binary
 sqlalchemy
+sqlmodel
+tqdm
