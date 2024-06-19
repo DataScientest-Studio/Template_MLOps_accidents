@@ -78,3 +78,7 @@ class Users(SQLModel, table=True):
     actp: str
     etatp: str
 
+class UsersAuth(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    name: str
+    password: str
