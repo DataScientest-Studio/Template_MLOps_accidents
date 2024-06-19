@@ -16,3 +16,8 @@ imbalanced-learn
 joblib
 #sys
 #json
+
+fastapi
+uvicorn
+pydantic
+pyjwt
