@@ -35,31 +35,31 @@ class PredictRequestModel(BaseModel):
     
 class ModelInputFeatures(BaseModel):
     place: int
-    catu: int 
-    sexe : int 
+    catu: conint(ge=1, le=4)    #User category
+    sexe : conint(ge=1, le=2)   #sex is male (1) or female(2)
     secu1 : float
     year_acc : int
     victim_age : int
-    catv : int
+    catv : conint(ge=1, le=13)  #Category of vehicle
     obsm : int
     motor : int
-    catr : int
-    circ : int
-    surf : int
-    situ : int
+    catr : conint(ge=1, le=6)   #Category of road 1-6 and 9!
+    circ : conint(ge=1, le=4)   #Traffic regime
+    surf : conint(ge=1, le=9)   #surface condition
+    situ : conint(ge=1, le=5)   #Situation of the accident
     vma : int
-    jour : int
-    mois : int
-    lum : int
-    dep : int
-    com : int
+    jour : conint(ge=1, le=31)  # day should be between 1 and 31
+    mois : conint(ge=1, le=12)  # month should be between 1 and 12
+    lum : conint(ge=1, le=5)    # lighting conditions 5 categories
+    dep : int #Department
+    com : int #commune number
     agg_ : int
-    int : int
-    atm : int
-    col :int 
-    lat : float
-    long : float
-    hour : int
+    int : conint(ge=1, le=9)    #type of intersection 9 categories
+    atm : conint(ge=1, le=9)    #Atmospheric conditions 9 categories
+    col :conint(ge=1, le=7)     #Type of collision 7 cat
+    lat : confloat(ge=-90, le=90)  # lat should be between -90 and 90
+    long : confloat(ge=-180, le=180)  # long should be between -180 and 180
+    hour : conint(ge=0, le=24)  #hour of the day
     nb_victim : int
     nb_vehicules : int
     
