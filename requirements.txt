@@ -16,3 +16,9 @@ imbalanced-learn
 joblib
 #sys
 #json
+python-dotenv
+psycopg2-binary
+sqlalchemy
+sqlmodel
+tqdm
+pytest
