@@ -7,6 +7,7 @@ import numpy as np
 
 print(joblib.__version__)
 
+#execute from may24_BMLOPS_ACCIDENTS folder!
 X_train = pd.read_csv('data/preprocessed/X_train.csv')
 X_test = pd.read_csv('data/preprocessed/X_test.csv')
 y_train = pd.read_csv('data/preprocessed/y_train.csv')

@@ -1,6 +1,6 @@
 from fastapi import Request, HTTPException, Body, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, confloat, Field, field_validator
 from fastapi import FastAPI
 import pandas as pd
 import sys
@@ -22,7 +22,7 @@ ADMIN_PASSWORD = "adm1n"
 users=[]
 
 # Loading the saved model
-loaded_model = joblib.load("data/src/models/trained_model.joblib")
+loaded_model = joblib.load("src/models/trained_model.joblib")
 
 # Pydantic model for user schema
 class UserSchema(BaseModel):
@@ -41,9 +41,16 @@ class ModelInputFeatures(BaseModel):
     year_acc : int
     victim_age : int
     catv : conint(ge=1, le=13)  #Category of vehicle
-    obsm : int
+    obsm : int 
     motor : int
-    catr : conint(ge=1, le=6)   #Category of road 1-6 and 9!
+    catr: int = Field(...) #Category of road 1-6 and 9!
+    
+    @field_validator('catr')
+    def validate_catr(cls, value):
+        if value not in list(range(1, 7)) + [9]:
+            raise ValueError('catr must be between 1-6 or 9')
+        return value
+      
     circ : conint(ge=1, le=4)   #Traffic regime
     surf : conint(ge=1, le=9)   #surface condition
     situ : conint(ge=1, le=5)   #Situation of the accident
@@ -61,7 +68,7 @@ class ModelInputFeatures(BaseModel):
     long : confloat(ge=-180, le=180)  # long should be between -180 and 180
     hour : conint(ge=0, le=24)  #hour of the day
     nb_victim : int
-    nb_vehicules : int
+    nb_vehicules : int 
     
 def check_user(data: UserSchema):
     for user in users:
