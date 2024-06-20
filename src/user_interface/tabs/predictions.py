@@ -3,12 +3,19 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 import time
+from pydantic import BaseModel
+import requests
+
 
 
 title = "Make a Prediction"
 sidebar_name = "predictions"
 
+url_prediction = "http://localhost:8000/prediction"
+
+
 ## Definitions
+# the number of features required to make a prediction
 features = {
     "place": 10,
     "catu": 3,
@@ -40,17 +47,73 @@ features = {
     "nb_vehicules": 1,
 }
 
+# here we define the number of core features we want to present for prediction
+core_features = {
+    "place": 10,
+    "catu": 3,
+    "sexe": 1,
+    "secu1": 0.0,
+    "year_acc": 2021,
+    "victim_age": 60,
+    "catv": 2,
+    "obsm": 1,
+    "motor": 1,
+    "catr": 3,
+    "circ": 2,
+    "surf": 1,
+    "situ": 1,
+    "vma": 50,
+    "jour": 7,
+    "mois": 12,
+    "lum": 5,
+    "dep": 77,
+    "com": 77317,
+    "agg_": 2,
+    "int": 1,
+    "atm": 0,
+    "col": 6,
+    "lat": 48.60,
+    "long": 2.89,
+    "hour": 17,
+    "nb_victim": 2,
+    "nb_vehicules": 1,
+}
+
+
+
+def check_inputs(new_features):
+    for feature in new_features:
+        if new_features[feature] == None:
+            return False
+    return True
+
+def get_prediction(new_features):
+    response = requests.put(url_prediction, json=new_features)
+    prediction = response.json()
+    # prediction = 1
+    return prediction
 
 def input_feature(feature):
-    st.write(f"**'{feature}'**, current value: {features[feature]}")
-    value = st.number_input(feature)
+    '''
+    input a feature and return its value
+    this is required to build the three input columns with flexible number of rows
+    depending on the number of core features 
+    '''
+    st.write(f"**'{feature}'**, default value: {features[feature]}")
+    value = st.number_input(feature, label_visibility="collapsed", value = new_features[feature])
     return value
 
+# default the new features to the default features in order to have a feasible start configuration
+new_features = {}
+for key, value in features.items():
+    new_features[key] = value
 
 ## run the page
 def run():
     # settings
-
+    global new_features
+    global features
+    
     st.title(title)
 
     st.markdown(
@@ -63,50 +126,63 @@ def run():
         You now can enter new values for the features. All boxes must be filled before you can make a new prediction.
         """
     )
+    # number of rows of features when we distribute over 3 cols
+    num_core_features = len(core_features)
+    num_rows = num_core_features // 3 if num_core_features % 3 == 0 else num_core_features // 3 + 1
 
-    new_features = {}
-
-    dict_features = list(features.items())
-    len_features = len(dict_features) // 3 + 1
-
-    if st.button("Make New Prediction"):
-        st.text("New Prediction")
-
-    if st.button("Make Prediction"):
-        st.text("Prediction")
     st.write("___")
+    
     col1, col2, col3 = st.columns(3)
-    with col1:
+    with col1: 
+        if st.button("Use Default"):
+            for key, value in features.items():
+                new_features[key] = value
+    with col2: 
+        if st.button("Make Prediction"):
+            if check_inputs(new_features): 
+                prediction = get_prediction(new_features)
+                st.write(f"Prediction: {prediction}")
+            else:
+                st.write("Please fill all the boxes before making a prediction")
 
-        new_features["place"] = input_feature("place")
-        new_features["catu"] = input_feature("catu")
-        new_features["sexe"] = input_feature("sexe")
-        new_features["secu1"] = input_feature("secu1")
-        new_features["year_acc"] = input_feature("year_acc")
-        new_features["victim_age"] = input_feature("victim_age")
-        new_features["catv"] = input_feature("catv")
-        new_features["obsm"] = input_feature("obsm")
-        new_features["motor"] = input_feature("motor")
+    with col3: 
+        if st.button("Reset"):
+            for key, value in core_features.items():
+                new_features[key] = None
 
-    with col2:
+    st.write("___")
+    col4, col5, col6 = st.columns(3)
+    with col4:
+        col = 0
+        idx = 0
+        for key, value in core_features.items():
+            if (idx >= col * num_rows) & (idx < (col + 1) * num_rows):
+                # print(idx)
+                new_features[key] = input_feature(key)
+            idx+=1
 
-        new_features["catr"] = input_feature("catr")
-        new_features["circ"] = input_feature("circ")
-        new_features["surf"] = input_feature("surf")
-        new_features["situ"] = input_feature("situ")
-        new_features["vma"] = input_feature("vma")
-        new_features["jour"] = input_feature("jour")
-        new_features["mois"] = input_feature("mois")
-        new_features["lum"] = input_feature("lum")
-        new_features["dep"] = input_feature("dep")
-        new_features["com"] = input_feature("com")
-    with col3:
-        new_features["agg_"] = input_feature("agg_")
-        new_features["int"] = input_feature("int")
-        new_features["atm"] = input_feature("atm")
-        new_features["col"] = input_feature("col")
-        new_features["lat"] = input_feature("lat")
-        new_features["long"] = input_feature("long")
-        new_features["hour"] = input_feature("hour")
-        new_features["nb_victim"] = input_feature("nb_victim")
-        new_features["nb_vehicules"] = input_feature("nb_vehicules")
+            if idx == (col + 1) * num_rows :
+                break
+        # print(key)
+
+
+    with col5:
+        col = 1
+        idx = 0
+        for key, value in core_features.items():
+            if (idx >= col * num_rows) & (idx < (col + 1) * num_rows):
+                # print(idx)
+                new_features[key] = input_feature(key)
+            idx+=1
+            if idx == (col + 1) * num_rows :
+                break
+
+    with col6:
+        col = 2
+        idx = 0
+        for key, value in core_features.items():
+            if (idx >= col * num_rows) & (idx < (col + 1) * num_rows):
+                new_features[key] = input_feature(key)
+            idx+=1
+            if idx == (col + 1) * num_rows :
+                break
