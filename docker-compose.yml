@@ -40,3 +40,12 @@ services:
       dockerfile: DataIngestion.Dockerfile
     depends_on:
       - postgres
+
+
+  model_api:
+    image: model_api:latest
+    container_name: model_api_from_compose
+    ports:
+      - "8001:8000"
+    build:
+      dockerfile: api.Dockerfile
