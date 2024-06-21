@@ -59,6 +59,10 @@ def get_dataframes(caracteristiques_file:Path, lieux_file:Path, usagers_file: Pa
 
     return df_caract, df_places, df_users, df_veh
 
+def convert_object_cols_to_str(df: pd.DataFrame) -> pd.DataFrame:
+    stringcols = df.select_dtypes(include='object').columns
+    df[stringcols] = df[stringcols].fillna('').astype(str)
+    return df
 
 def main():
     path = os.getenv("RAW_FILES_ROOT_DIR")
@@ -74,7 +78,7 @@ def main():
                                                             lieux_file=lieux_file,
                                                             usagers_file=usagers_file,
                                                             vehicules_file=vehicules_file)
-    
+    df_places = convert_object_cols_to_str(df_places)
     return df_caract, df_places, df_users, df_veh, year
 
 if __name__ == "__main__":

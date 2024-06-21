@@ -37,7 +37,7 @@ def init_db(db_url: str, sleep_for: float = 30) -> None:
             break
 
 
-def _add_data_to_table(df: pd.DataFrame, table_model: SQLModel, year: int, commit_instantly: bool=False):
+def _add_data_to_table(df: pd.DataFrame, table_model: SQLModel, year: int):
     print(f"Adding data to the '{table_model.__tablename__}' table.")
     engine = create_engine(db_url)
 
@@ -45,27 +45,23 @@ def _add_data_to_table(df: pd.DataFrame, table_model: SQLModel, year: int, commi
         for _, row in tqdm.tqdm(df.iterrows(), total=len(df)):
             carac = table_model(**{**row,**{"year": year}})
             session.add(carac)
-            if commit_instantly:
-                try:
-                    session.commit()
-                except InvalidTextRepresentation:
-                    print(carac)
-                    raise
-        if not commit_instantly:
-            session.commit()
+        session.commit()
     print("Success!")
 
 
 def add_data_to_db():
     df_caract, df_places, df_users, df_veh, year = f_main()
     _add_data_to_table(df=df_caract, table_model=Caracteristiques, year=year)
-    _add_data_to_table(df=df_places, table_model=Lieux, year=year, commit_instantly=True)
+    _add_data_to_table(df=df_places, table_model=Lieux, year=year)
     _add_data_to_table(df=df_veh, table_model=Vehicules, year=year)
     _add_data_to_table(df=df_users, table_model=Users, year=year)
 
 def main():
     init_db(db_url=db_url)
     add_data_to_db()
+    print("Done populating the DB, taking a long siesta...")
+    while True:
+        time.sleep(120)
 
 
 if __name__ == "__main__":
