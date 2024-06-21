@@ -12,7 +12,7 @@ COPY . .
 #installing all necessary requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 5000
+EXPOSE 8000
 
 #run the application
 CMD ["python", "src/models/api.py"]
