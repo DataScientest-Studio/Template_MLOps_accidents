@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./Volumes/db:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - ./Volumes/db_admin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+  add_data_to_db:
+    container_name: add_data_to_db_container
+    volumes:
+      - ./Volumes/data:/data
+    ports:
+      - "5433:${POSTGRES_PORT}"
+    environment:
+      LOG: 1
+    build:
+      dockerfile: DataIngestion.Dockerfile
+    depends_on:
+      - postgres
+
+
+  model_api:
+    image: model_api:latest
+    container_name: model_api_from_compose
+    ports:
+      - "8001:8000"
+    build:
+      dockerfile: api.Dockerfile
