@@ -18,6 +18,8 @@ PASSWORD = "password"
 
 streamlit_url = "http://localhost:8501"
 
+predict_url = "http://localhost:8001/predict"
+
 def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, USERNAME)
     correct_password = secrets.compare_digest(credentials.password, PASSWORD)
@@ -93,9 +95,8 @@ async def streamlit_proxy(username: str = Depends(authenticate)):
 
 @app.put("/prediction", name="Prediction")
 async def prediction(features: Features):
-    # print(type(features), features.atm, features)
-    # print(dir(features))
-    return {"prediction": len(features.model_fields)}
+    response = requests.post(url=predict_url, json=features.model_dump())
+    return {"prediction": response.json}
 
 
 # if __name__ == "__main__":
