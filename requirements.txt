@@ -27,3 +27,8 @@ fastapi
 uvicorn
 pydantic
 pyjwt
+
+# for UI
+streamlit
+pillow
+

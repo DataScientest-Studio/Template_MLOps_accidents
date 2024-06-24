@@ -11,7 +11,7 @@ import requests
 title = "Make a Prediction"
 sidebar_name = "predictions"
 
-url_prediction = "http://localhost:8001/predict"
+url_prediction = "http://model_api_from_compose:8001/predict"
 
 
 ## Definitions

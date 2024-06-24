@@ -49,3 +49,12 @@ services:
       - "8001:8000"
     build:
       dockerfile: api.Dockerfile
+
+  UI:
+    image: model_ui:latest
+    container_name: model_ui_from_compose
+    ports:
+      - "8002:8000"
+      - "8501:8501"
+    build:
+      dockerfile: UI.Dockerfile
