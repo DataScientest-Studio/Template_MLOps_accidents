@@ -7,10 +7,10 @@ import numpy as np
 
 print(joblib.__version__)
 
-X_train = pd.read_csv('data/preprocessed/X_train.csv')
-X_test = pd.read_csv('data/preprocessed/X_test.csv')
-y_train = pd.read_csv('data/preprocessed/y_train.csv')
-y_test = pd.read_csv('data/preprocessed/y_test.csv')
+X_train = pd.read_csv('data/processed/X_train.csv')
+X_test = pd.read_csv('data/processed/X_test.csv')
+y_train = pd.read_csv('data/processed/y_train.csv')
+y_test = pd.read_csv('data/processed/y_test.csv')
 y_train = np.ravel(y_train)
 y_test = np.ravel(y_test)
 

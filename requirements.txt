@@ -16,3 +16,7 @@ imbalanced-learn
 joblib
 #sys
 #json
+fastapi==0.111.0
+pytest==8.2.2
+pydantic==2.7.3
+typing==3.7.4.3

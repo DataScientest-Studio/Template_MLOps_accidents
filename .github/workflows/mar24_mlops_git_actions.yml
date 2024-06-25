@@ -1,0 +1,101 @@
+name: Train ML Model
+
+on:
+  push:
+    branches: [ "features_FastAPI" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  train-model:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12.0'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Train model
+      run: python ./src/models/train_model.py
+        
+    - name: Upload model artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: trained-model
+        path: ./src/models/trained_model.joblib
+        retention-days: 2
+
+  test-api:
+    runs-on: ubuntu-latest
+    needs: train-model
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12.0'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt    
+    
+    - name: Download model artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: trained-model
+        path: ./src/models/
+        
+    # Étapes suivantes pour déployer/utiliser le modèle téléchargé
+    - name: lancement du serveur API
+      run: |
+        uvicorn --app-dir=./src/api api:api --host 0.0.0.0 --port 8000 &
+        sleep 10
+        
+    - name: test de l'API
+      run: |        
+        pytest ./src/api/test_api_fonction.py
+        pytest ./src/api/test_api_serveur.py
+        
+  build-docker-image:
+    runs-on: ubuntu-latest
+    needs: test-api
+    #needs: train-model
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configurer Docker
+      uses: docker-practice/actions-setup-docker@master
+      
+    - name: Download model artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: trained-model
+        path: ./src/models/      
+      
+    - name: Construire l'image Docker
+      run: docker build . -t ${{secrets.DOCKER_USERNAME}}/mar24accd:latest
+      working-directory: ./
+      
+    - name: DEBUG - Lister les images Docker
+      run: docker image ls
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{secrets.DOCKER_USERNAME}}
+        password: ${{secrets.DOCKERHUB_TOKEN}}
+      
+    # Pousser l'image vers un registre Docker
+    - name: Pousser l'image vers le registre Docker
+      run: docker push ${{secrets.DOCKER_USERNAME}}/mar24accd:latest
