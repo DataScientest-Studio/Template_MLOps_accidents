@@ -1,8 +1,23 @@
 """The DB tables described as classes using SQLModel."""
 from typing import Optional
+from datetime import datetime
 
-from sqlmodel import Field, SQLModel, BigInteger, String
+from sqlmodel import Field, SQLModel, BigInteger, String, Enum
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, MetaData
+
+from src.data.db.enum import ProcessingStatus, RawRoadAccidentCsvFileNames
+
+class RawRoadAccidentsCsvFile(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    raw_accident_file: RawRoadAccidentCsvFileNames = Field(sa_column=Column(Enum(RawRoadAccidentCsvFileNames)))
+    file_name: str
+    dir_name: str
+    md5: str
+    sha256: str
+    processing_status: ProcessingStatus = Field(sa_column=Column(Enum(ProcessingStatus), default=ProcessingStatus.processing))
+    reason: Optional[str] = None
+    created_at: datetime = Field(default=datetime.utcnow(), nullable=False)
+    last_edited: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
 class Caracteristiques(SQLModel, table=True):
     Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), primary_key=True, autoincrement=False))
@@ -25,7 +40,7 @@ class Caracteristiques(SQLModel, table=True):
 
 class Lieux(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), foreign_key="Caracteristiques.Num_Acc"))
+    Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), ForeignKey("caracteristiques.Num_Acc", onupdate="CASCADE")))
     year: int 
     catr: int
     voie: Optional[str] = Field(default=None, sa_column=Column(String()))
@@ -47,7 +62,7 @@ class Lieux(SQLModel, table=True):
 
 class Vehicules(SQLModel, table=True):
     id_vehicule: str = Field(default=None, primary_key=True)
-    Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), foreign_key="Caracteristiques.Num_Acc"))
+    Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), ForeignKey("caracteristiques.Num_Acc", onupdate="CASCADE")))
     year: int 
     num_veh: str
     senc: int
@@ -61,9 +76,9 @@ class Vehicules(SQLModel, table=True):
 
 class Users(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), foreign_key="Caracteristiques.Num_Acc"))
+    Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), ForeignKey("caracteristiques.Num_Acc", onupdate="CASCADE")))
     year: int 
-    id_vehicule: str = Field(default=None, sa_column=Column(String(), foreign_key="Vehicules.id_vehicule"))
+    id_vehicule: str = Field(default=None, sa_column=Column(String(), ForeignKey("vehicules.id_vehicule", onupdate="CASCADE")))
     num_veh: str
     place: int
     catu: int
@@ -77,8 +92,3 @@ class Users(SQLModel, table=True):
     locp: int
     actp: str
     etatp: str
-
-class UsersAuth(SQLModel, table=True):
-    id: int = Field(primary_key=True)
-    name: str
-    password: str

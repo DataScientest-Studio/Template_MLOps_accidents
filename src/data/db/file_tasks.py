@@ -1,23 +1,58 @@
 """CSV file checking utils."""
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Dict
 import os
+import hashlib
 
 import pandas as pd 
 import numpy as np
 from dotenv import load_dotenv
 
+from src.data.db.enum import RawRoadAccidentCsvFileNames
+from src.data.db.models import RawRoadAccidentsCsvFile
+
 load_dotenv()  # take environment variables from .env.
 
-def check_if_files_are_the_expected_ones(path_raw_data_dir: Path, file_pfix: str = "csv"):
+def check_if_files_are_the_expected_ones(path_raw_data_dir: Path, file_pfix: str = "csv") -> bool:
     """Checks if the raw csv files in a directory are the expected ones."""
-    expected_files = {"caracteristiques", "lieux", "usagers", "vehicules"}
+    expected_files = {RawRoadAccidentCsvFileNames.caracteristiques, 
+                      RawRoadAccidentCsvFileNames.lieux, 
+                      RawRoadAccidentCsvFileNames.usagers,
+                      RawRoadAccidentCsvFileNames.vehicules}
 
     files = list(path_raw_data_dir.glob(f"*.{file_pfix}"))
     for exp_file in expected_files:
         if any(exp_file in f.name for f in files):
             continue
         raise FileNotFoundError(f"Error: could not find file '{exp_file}' in files.")
+    return True
+
+def get_files(path_raw_data_dir: Path, file_pfix: str = "csv", f_sep: str = "-")-> Dict[RawRoadAccidentCsvFileNames, RawRoadAccidentsCsvFile]:
+    files = list(path_raw_data_dir.glob(f"*.{file_pfix}"))
+    file_stats = {}
+    for file in files:
+        raw_accident_csv_file = None
+        if RawRoadAccidentCsvFileNames.caracteristiques in file.name:
+            raw_accident_csv_file = RawRoadAccidentCsvFileNames.caracteristiques
+        if RawRoadAccidentCsvFileNames.lieux in file.name:
+            raw_accident_csv_file = RawRoadAccidentCsvFileNames.lieux
+        if RawRoadAccidentCsvFileNames.usagers in file.name:
+            raw_accident_csv_file = RawRoadAccidentCsvFileNames.usagers
+        if RawRoadAccidentCsvFileNames.vehicules in file.name:
+            raw_accident_csv_file = RawRoadAccidentCsvFileNames.vehicules
+        
+        if raw_accident_csv_file:
+            file_stats[raw_accident_csv_file]=RawRoadAccidentsCsvFile(
+                    raw_accident_file=raw_accident_csv_file,
+                    file_name=file.name,
+                    dir_name=file.parent.name,
+                    md5=hashlib.md5(open(file, 'rb').read()).hexdigest(),
+                   sha256=hashlib.sha256(open(file, 'rb').read()).hexdigest()
+                )
+            
+    return file_stats
+
+
 
 def check_if_files_are_same_year(path_raw_data_dir: Path, file_pfix: str = "csv", f_sep: str = "-") -> str:
     files = list(path_raw_data_dir.glob(f"*.{file_pfix}"))

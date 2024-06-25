@@ -43,6 +43,7 @@ x-airflow-common: &airflow-common
 services:
 
   postgres_road_accidents:
+    container_name: postgres_road_accidents
     image: postgres
     restart: unless-stopped
     environment:
@@ -67,7 +68,7 @@ services:
     volumes:
       - ./Volumes/db_admin:/var/lib/pgadmin
     depends_on:
-      - postgres
+      - postgres_road_accidents
 
   add_data_to_db:
     container_name: add_data_to_db_container
@@ -80,7 +81,7 @@ services:
     build:
       dockerfile: DataIngestion.Dockerfile
     depends_on:
-      - postgres
+      - postgres_road_accidents
 
 
   model_api:
