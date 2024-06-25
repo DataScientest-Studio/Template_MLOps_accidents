@@ -1,5 +1,15 @@
 #
 
+# Airflow
+https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html
+
+## Initialize the database
+On all operating systems, you need to run database migrations and create the first user account. To do this, run.
+
+```
+docker compose up airflow-init
+```
+
 ## Prepare the data
 
 ### Prepare the docker volumes
@@ -19,7 +29,7 @@ the `Volumes/data/raw` directory and populate the `RoadAccidents` DB.
 ### UI tool for the DB (optional)
 
 
-Navigate to this [link](http://localhost:8888/browser/), left click on the `Servers`, `Register` -> `new server`. Choose any name for the `Name` option. Then, move to the `Connection` tab and for the `Host name/address` set it to `postgres`. The remaining fields:
+Navigate to this [link](http://localhost:8888/browser/), left click on the `Servers`, `Register` -> `new server`. Choose any name for the `Name` option. Then, move to the `Connection` tab and for the `Host name/address` set it to `postgres_road_accidents`. The remaining fields:
 
 * `Maintenance database` = RoadAccidents
 * `Username` = postgres

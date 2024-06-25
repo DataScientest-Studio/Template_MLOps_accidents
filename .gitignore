@@ -1,5 +1,27 @@
-# Docker stuff
-Volumes/
+# Docker Volumes
+Volumes/db_admin/*
+!Volumes/db_admin/.gitkeep
+
+Volumes/db/*
+!Volumes/db/.gitkeep
+
+Volumes/data/*
+!Volumes/data/.gitkeep
+
+## Airflow Volumes
+Volumes/airflow/*
+!Volumes/airflow/.gitkeep
+# Volumes/airflow/config/*
+# !Volumes/airflow/config/.gitkeep
+# Volumes/airflow/dags/*
+# !Volumes/airflow/dags/.gitkeep
+# Volumes/airflow/logs/*
+# !Volumes/airflow/logs/.gitkeep
+# Volumes/airflow/plugins/*
+# !Volumes/airflow/plugins/.gitkeep
+# Volumes/airflow/postgres-db-volume/*
+# !Volumes/airflow/postgres-db-volume/.gitkeep
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
