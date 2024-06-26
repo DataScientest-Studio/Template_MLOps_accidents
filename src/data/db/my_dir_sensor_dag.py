@@ -16,11 +16,13 @@ from airflow import DAG
 from airflow.utils.dates import days_ago
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.bash import BashOperator
-from airflow.sensors.base_sensor_operator import BaseSensorOperator
+# from airflow.sensors.base_sensor_operator import BaseSensorOperator
+from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 import os
 from airflow.operators.latest_only import LatestOnlyOperator
-from airflow.operators.python_operator import PythonOperator
+# from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 
 
 class NewFolderSensor(BaseSensorOperator):
@@ -41,6 +43,12 @@ class NewFolderSensor(BaseSensorOperator):
 
             return True
         return False
+    
+# Tasks
+
+def process_init_db(**kwargs):
+    pass
+
 
 def process_new_folders(**kwargs):
     ti = kwargs['ti']
@@ -68,7 +76,7 @@ with DAG(
         directory="/opt/data/",
         poke_interval=30,
         mode='poke',
-        timeout=600,  # Adjust as needed
+        timeout=600,
     )
 
     # my_sensor = FileSensor(

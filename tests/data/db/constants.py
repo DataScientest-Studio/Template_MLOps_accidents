@@ -1,5 +1,7 @@
 from io import StringIO
-from src.data.db.file_tasks import get_dataframes
+from pathlib import Path
+
+from src.data.db.enum import RawRoadAccidentCsvFileNames
 
 caracteristiques = """"Num_Acc";"jour";"mois";"an";"hrmn";"lum";"dep";"com";"agg";"int";"atm";"col";"adr";"lat";"long"
 "202100000001";"30";"11";"2021";"07:32";"2";"30";"30319";"1";"1";"1";"1";"CD 981";"44,0389580000";"4,3480220000"
@@ -14,8 +16,18 @@ vehicules=""""Num_Acc";"id_vehicule";"num_veh";"senc";"catv";"obs";"obsm";"choc"
 "202100000001";"201Â 764";"B01";"1";"1";"0";"2";"1";"1";"5";""
 """
 
-DF_CARAC, DF_PLACES,DF_USERS, DF_VEH=get_dataframes(caracteristiques_file=StringIO(caracteristiques),
-                                                     lieux_file=StringIO(lieux),
-                                                     usagers_file=StringIO(usager),
-                                                     vehicules_file=StringIO(vehicules))
+# DF_CARAC, DF_PLACES,DF_USERS, DF_VEH=get_dataframes(caracteristiques_file=StringIO(caracteristiques),
+#                                                      lieux_file=StringIO(lieux),
+#                                                      usagers_file=StringIO(usager),
+#                                                      vehicules_file=StringIO(vehicules))
 
+
+def create_raw_road_accident_files_in_dir(path: Path, year: str="2021") -> None:
+    with open(path / f"{RawRoadAccidentCsvFileNames.caracteristiques}-{year}.csv", 'w') as f:
+        f.write(caracteristiques)
+    with open(path / f"{RawRoadAccidentCsvFileNames.lieux}-{year}.csv", 'w') as f:
+        f.write(lieux)
+    with open(path / f"{RawRoadAccidentCsvFileNames.usagers}-{year}.csv", 'w') as f:
+        f.write(usager)
+    with open(path / f"{RawRoadAccidentCsvFileNames.vehicules}-{year}.csv", 'w') as f:
+        f.write(vehicules)

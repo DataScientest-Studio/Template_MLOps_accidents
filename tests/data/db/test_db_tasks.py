@@ -1,25 +1,65 @@
+from pathlib import Path
+
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from sqlmodel import select, Session
 import pytest
-from src.data.db.db_tasks import init_db, add_data_to_db
-from unittest import mock
 
-from tests.data.db.constants import DF_CARAC, DF_PLACES, DF_USERS, DF_VEH
-SQLALCHEMY_DATABASE_URL = "sqlite://"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
+from src.data.db.db_tasks import (
+    init_db,
+    add_data_to_db,
+    update_raw_accidents_csv_files_table,
 )
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from src.data.db.models import RawRoadAccidentsCsvFile
+from src.data.db.enum import ProcessingStatus
+from src.data.db.file_tasks import get_road_accident_file2model
 
-def test_init_db():
+import tests.data.db.constants as c
+
+
+@pytest.fixture(scope="function")
+def db_session():
+
+    SQLALCHEMY_DATABASE_URL = "sqlite://"
+
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     init_db(engine)
-    df_caract, df_places, df_users, df_veh = DF_CARAC, DF_PLACES, DF_USERS, DF_VEH
-    with mock.patch('src.data.db.db_tasks.f_main', mock.MagicMock(return_value=[df_caract, df_places, df_users, df_veh, 2021])):
-        add_data_to_db(engine)
-    inspector = inspect(engine)
-    tables = inspector.get_table_names()
-    assert tables
+    with Session(engine) as session:
+        yield session
+
+
+def test_update_raw_accidents_csv_files_table(temp_dir, db_session):
+    c.create_raw_road_accident_files_in_dir(temp_dir)
+
+    file2model = get_road_accident_file2model(temp_dir)
+    update_raw_accidents_csv_files_table(db_session, files=file2model)
+    statement = select(RawRoadAccidentsCsvFile)
+    table_rows = db_session.exec(statement).all()
+    for tbr in table_rows:
+        assert file2model[tbr.raw_accident_file].md5 == tbr.md5
+        assert tbr.processing_status == ProcessingStatus.processing
+
+    update_raw_accidents_csv_files_table(db_session, files=file2model)
+    statement = select(RawRoadAccidentsCsvFile)
+    table_rows = db_session.exec(statement).all()
+    for tbr in table_rows:
+        assert file2model[tbr.raw_accident_file].md5 == tbr.md5
+        assert tbr.processing_status == ProcessingStatus.processing
+
+
+def test_add_data_to_db(temp_dir, db_session):
+    c.create_raw_road_accident_files_in_dir(temp_dir)
+
+    file2model = get_road_accident_file2model(temp_dir)
+    update_raw_accidents_csv_files_table(db_session, files=file2model)
+    add_data_to_db(db_session, files=file2model)
+    statement = select(RawRoadAccidentsCsvFile)
+    table_rows = db_session.exec(statement).all()
+    for tbr in table_rows:
+        assert file2model[tbr.raw_accident_file].md5 == tbr.md5
+        assert tbr.processing_status == ProcessingStatus.processed

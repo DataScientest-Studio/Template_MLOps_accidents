@@ -12,6 +12,7 @@ class RawRoadAccidentsCsvFile(SQLModel, table=True):
     raw_accident_file: RawRoadAccidentCsvFileNames = Field(sa_column=Column(Enum(RawRoadAccidentCsvFileNames)))
     file_name: str
     dir_name: str
+    path: str
     md5: str
     sha256: str
     processing_status: ProcessingStatus = Field(sa_column=Column(Enum(ProcessingStatus), default=ProcessingStatus.processing))
@@ -21,7 +22,6 @@ class RawRoadAccidentsCsvFile(SQLModel, table=True):
 
 class Caracteristiques(SQLModel, table=True):
     Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), primary_key=True, autoincrement=False))
-    year: int
     jour: int
     mois: int
     an: int
@@ -41,7 +41,6 @@ class Caracteristiques(SQLModel, table=True):
 class Lieux(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), ForeignKey("caracteristiques.Num_Acc", onupdate="CASCADE")))
-    year: int 
     catr: int
     voie: Optional[str] = Field(default=None, sa_column=Column(String()))
     v1: int
@@ -63,7 +62,6 @@ class Lieux(SQLModel, table=True):
 class Vehicules(SQLModel, table=True):
     id_vehicule: str = Field(default=None, primary_key=True)
     Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), ForeignKey("caracteristiques.Num_Acc", onupdate="CASCADE")))
-    year: int 
     num_veh: str
     senc: int
     catv: int
@@ -74,10 +72,10 @@ class Vehicules(SQLModel, table=True):
     motor: int
     occutc: Optional[float] = None
 
+
 class Users(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     Num_Acc: int = Field(default=None, sa_column=Column(BigInteger(), ForeignKey("caracteristiques.Num_Acc", onupdate="CASCADE")))
-    year: int 
     id_vehicule: str = Field(default=None, sa_column=Column(String(), ForeignKey("vehicules.id_vehicule", onupdate="CASCADE")))
     num_veh: str
     place: int

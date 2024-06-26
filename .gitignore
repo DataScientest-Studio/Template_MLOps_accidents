@@ -11,16 +11,6 @@ Volumes/data/*
 ## Airflow Volumes
 Volumes/airflow/*
 !Volumes/airflow/.gitkeep
-# Volumes/airflow/config/*
-# !Volumes/airflow/config/.gitkeep
-# Volumes/airflow/dags/*
-# !Volumes/airflow/dags/.gitkeep
-# Volumes/airflow/logs/*
-# !Volumes/airflow/logs/.gitkeep
-# Volumes/airflow/plugins/*
-# !Volumes/airflow/plugins/.gitkeep
-# Volumes/airflow/postgres-db-volume/*
-# !Volumes/airflow/postgres-db-volume/.gitkeep
 
 
 # Byte-compiled / optimized / DLL files

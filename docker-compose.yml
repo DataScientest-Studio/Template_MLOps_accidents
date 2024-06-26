@@ -3,7 +3,10 @@ version: "3.8"
 # downloaded from: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html
 # using command: curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.9.2/docker-compose.yaml'
 x-airflow-common: &airflow-common
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.9.2}
+  build:
+    dockerfile: airflowDb.Dockerfile
+  image: ${AIRFLOW_IMAGE_NAME:-airflowdb}
+  # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.9.2}
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -24,11 +27,16 @@ x-airflow-common: &airflow-common
     # AIRFLOW__SMTP__SMTP_USER: "de.airflow@gmail.com"
     # AIRFLOW__SMTP__SMTP_PASSWORD: "cfsrvkongsobheta"
     # AIRFLOW__SMTP__SMTP_MAIL_FROM: "de.airflow@gmail.com"
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    POSTGRES_HOST: ${POSTGRES_HOST}
+    POSTGRES_PORT: ${POSTGRES_PORT}
+    POSTGRES_DB: ${POSTGRES_DB}
 
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- scikit-learn pandas joblib}
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pandas }
   volumes:
-    - ./Volumes/airflow/dags:/opt/airflow/config
-    - ./Volumes/airflow/dags:/opt/airflow/dags
+    - ./Volumes/airflow/config:/opt/airflow/config
+    - ./src/data/db:/opt/airflow/dags
     - ./Volumes/airflow/logs:/opt/airflow/logs
     - ./Volumes/airflow/plugins:/opt/airflow/plugins
     - ./Volumes/data:/opt/data
@@ -70,18 +78,22 @@ services:
     depends_on:
       - postgres_road_accidents
 
-  add_data_to_db:
-    container_name: add_data_to_db_container
-    volumes:
-      - ./Volumes/data:/data
-    ports:
-      - "5433:${POSTGRES_PORT}"
-    environment:
-      LOG: 1
-    build:
-      dockerfile: DataIngestion.Dockerfile
-    depends_on:
-      - postgres_road_accidents
+  # add_data_to_db:
+  #   container_name: add_data_to_db_container
+  #   volumes:
+  #     - ./Volumes/data:/data
+  #   ports:
+  #     - "5433:${POSTGRES_PORT}"
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     POSTGRES_PORT: ${POSTGRES_PORT}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   build:
+  #     dockerfile: DataIngestion.Dockerfile
+  #   depends_on:
+  #     - postgres_road_accidents
 
 
   model_api:

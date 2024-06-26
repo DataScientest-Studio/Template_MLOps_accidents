@@ -45,10 +45,10 @@ def process_data(output_folderpath, users_table="users", caract_table="caracteri
     print("Fetching dataframes from the DB")
     raw_sql_query = "SELECT * FROM {table}"
     cnx = create_engine(db_url).connect()
-    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx).drop("year", axis=1, errors=False)
-    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1,errors=False)
-    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1, errors=False)
-    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx).drop("year", axis=1, errors=False)
+    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx)
+    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("id", axis=1,errors=False)
+    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("id", axis=1, errors=False)
+    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx)
 
     #--Creating new columns
     nb_victim = pd.crosstab(df_users.Num_Acc, "count").reset_index()
