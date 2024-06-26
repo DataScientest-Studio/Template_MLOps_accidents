@@ -5,13 +5,23 @@ from PIL import Image
 import time
 from pydantic import BaseModel
 import requests
+import joblib
 
+# Load your saved model
+loaded_model = joblib.load("/app/src/models/trained_model.joblib")
+
+
+def predict_model(features):
+    input_df = pd.DataFrame([features])
+    print(input_df)
+    prediction = loaded_model.predict(input_df)
+    return prediction
 
 
 title = "Make a Prediction"
 sidebar_name = "predictions"
 
-url_prediction = "http://model_api_from_compose:8001/predict"
+url_prediction = "http://model_api_from_compose:8000/predict"
 
 
 ## Definitions
@@ -88,9 +98,9 @@ def check_inputs(new_features):
     return True
 
 def get_prediction(new_features):
-    response = requests.put(url_prediction, json=new_features)
-    prediction = response.json()
-    # prediction = 1
+    # response = requests.put(url_prediction, json=new_features)
+    # prediction = response.json()
+    prediction = predict_model(new_features)
     return prediction
 
 def input_feature(feature):

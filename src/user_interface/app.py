@@ -52,6 +52,5 @@ def run():
     tab = TABS[tab_name]
     tab.run()
 
-
 if __name__ == "__main__":
     run()

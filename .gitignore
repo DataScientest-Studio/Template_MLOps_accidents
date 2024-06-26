@@ -98,3 +98,5 @@ target/
 
 # Database logs
 Volumes/*
+
+*/logs/*

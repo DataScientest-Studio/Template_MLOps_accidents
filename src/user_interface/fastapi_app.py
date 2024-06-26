@@ -18,7 +18,7 @@ PASSWORD = "password"
 
 streamlit_url = "http://localhost:8501"
 
-predict_url = "http://localhost:8001/predict"
+predict_url = "http://localhost:8000/predict"
 
 def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, USERNAME)
@@ -30,8 +30,6 @@ def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
     return credentials.username
-
-
 
 
 
