@@ -7,7 +7,7 @@ from typing import Dict
 
 from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
-from sqlalchemy import Engine
+# from sqlalchemy import create_engine
 import tqdm
 import pandas as pd
 from dotenv import load_dotenv
@@ -19,23 +19,27 @@ from src.data.db.file_tasks import get_road_accident_file2model, get_dataframe
 load_dotenv()  # take environment variables from .env.
 
 PATH_RAW_FILES_DIR = os.getenv("RAW_FILES_ROOT_DIR")
-host = os.getenv("POSTGRES_HOST")
-database = os.getenv("POSTGRES_DB")
-user = os.getenv("POSTGRES_USER")
-password = os.getenv("POSTGRES_PASSWORD")
-port = os.getenv("POSTGRES_PORT")
-db_url = (
-    "postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}".format(
-        hostname=host, user=user, password=password, database_name=database, port=5432
+
+
+def get_db_url() -> str:
+    host = os.getenv("POSTGRES_HOST")
+    database = os.getenv("POSTGRES_DB")
+    user = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    port = os.getenv("POSTGRES_PORT")
+    db_url = (
+        "postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}".format(
+            hostname=host, user=user, password=password, database_name=database, port=port
+        )
     )
-)
+    return db_url
 
 
-def create_db_engine(db_url: str) -> Engine:
+def create_db_engine(db_url: str):
     return create_engine(db_url)
 
 
-def init_db(engine: Engine, sleep_for: float = 30) -> None:
+def init_db(engine, sleep_for: float = 30) -> None:
     """Create DB tables based on the SqlModels."""
     while True:
         try:
@@ -124,6 +128,7 @@ def add_data_to_db(db_session: Session, files) -> None:
 
 
 def main():
+    db_url = get_db_url()
     engine = create_db_engine(db_url=db_url)
     init_db(engine=engine)
 

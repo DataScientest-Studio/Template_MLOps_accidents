@@ -11,6 +11,7 @@ Whenever there is a new directory in the `./Volumes/data/raw` directory:
 
 """
 import datetime
+from pathlib import Path
 
 from airflow import DAG
 from airflow.utils.dates import days_ago
@@ -23,7 +24,13 @@ import os
 from airflow.operators.latest_only import LatestOnlyOperator
 # from airflow.operators.python_operator import PythonOperator
 from airflow.operators.python import PythonOperator
+from dotenv import load_dotenv
 
+from db_tasks import get_db_url
+
+load_dotenv()  # take environment variables from .env.
+
+PATH_RAW_FILES_DIR = os.getenv("RAW_FILES_ROOT_DIR")
 
 class NewFolderSensor(BaseSensorOperator):
     @apply_defaults
@@ -57,8 +64,12 @@ def process_new_folders(**kwargs):
         for folder in new_folders:
             print(f"Processing folder: {folder}")
             # Add your processing logic here
+            new_data_dir = Path(PATH_RAW_FILES_DIR) / folder
+            print(f"Path = '{new_data_dir}'")
     else:
         print("No new folders found.")
+
+    print(f"DB url='{get_db_url()}'")
 
 with DAG(
     dag_id='sensor_dag',
