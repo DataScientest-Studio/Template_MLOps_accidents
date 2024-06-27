@@ -7,8 +7,8 @@ import hashlib
 import pandas as pd
 import numpy as np
 
-from src.data.db.enum import RawRoadAccidentCsvFileNames
-from src.data.db.models import RawRoadAccidentsCsvFile
+from road_accidents_database_ingestion.enums import RawRoadAccidentCsvFileNames
+from road_accidents_database_ingestion.models import RawRoadAccidentsCsvFile
 
 
 
@@ -18,7 +18,7 @@ def validate_road_accident_files_are_the_expected_ones(file_paths: List[Path]) -
     for exp_file in expected_files:
         if any(exp_file in f.name for f in file_paths):
             continue
-        raise FileNotFoundError(f"Error: could not find file '{exp_file}' in files.")
+        raise FileNotFoundError(f"Error: could not find file '{exp_file}' in files: {file_paths}")
     return True
 
 
@@ -56,5 +56,5 @@ def get_road_accident_file2model(
 
 def get_dataframe(path: Path) -> pd.DataFrame:
     # --Importing dataset
-    df = pd.read_csv(path, sep=";", encoding="utf-8").replace({np.NaN: None})
+    df = pd.read_csv(path, sep=";", encoding="utf-8").replace({np.nan: None})
     return df

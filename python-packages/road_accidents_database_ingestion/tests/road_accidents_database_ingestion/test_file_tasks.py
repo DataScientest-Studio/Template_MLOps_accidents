@@ -1,11 +1,11 @@
 import pytest
 
-from src.data.db.file_tasks import (
+from road_accidents_database_ingestion.file_tasks import (
     validate_road_accident_files_are_the_expected_ones,
     get_road_accident_file2model,
 )
-from src.data.db.enum import RawRoadAccidentCsvFileNames
-import tests.data.db.constants as c
+from road_accidents_database_ingestion.enums import RawRoadAccidentCsvFileNames
+import tests.road_accidents_database_ingestion.constants as c
 
 
 def test_validate_road_accident_files_are_the_expected_ones_should_pass(temp_dir):
@@ -16,6 +16,7 @@ def test_validate_road_accident_files_are_the_expected_ones_should_pass(temp_dir
 def test_check_if_files_are_the_expected_ones_should_raise_one_missing_file(temp_dir):
     """Tests that function should raise because a csv road accident file is missing."""
     c.create_raw_road_accident_files_in_dir(temp_dir)
+
     # delete one road accident file
     files = temp_dir.glob("*")
     next(files).unlink()

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlmodel import Field, SQLModel, BigInteger, String, Enum
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, MetaData
 
-from src.data.db.enum import ProcessingStatus, RawRoadAccidentCsvFileNames
+from road_accidents_database_ingestion.enums import ProcessingStatus, RawRoadAccidentCsvFileNames
 
 class RawRoadAccidentsCsvFile(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

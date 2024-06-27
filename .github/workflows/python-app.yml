@@ -21,17 +21,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         uses: actions/setup-python@v3
         with:
-          python-version: "3.8"
-      - name: Install dependencies
+          python-version: "3.12"
+
+      - name: Update pip
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
-      - name: Test with pytest
+
+      - name: Install road_accidents_database_ingestion package 
         run: |
-          pytest tests
+          python -m pip install -e python-packages/road_accidents_database_ingestion
+    
+      - name: Test road_accidents_database_ingestion package
+        run: |
+          pytest python-packages/road_accidents_database_ingestion/tests
 
   # DockerCompose:
 

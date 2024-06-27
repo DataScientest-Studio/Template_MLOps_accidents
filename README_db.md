@@ -17,10 +17,12 @@ In the root of this project add the following directories:
 - `Volumes/db`: Will be used by the Postgres db service
 - `Volumes/db_admin`: Will be used by the Postgres db UI (pgAdmin)
 - `Volumes/data/raw`: Inside this directory copy the csv files for a particular year (eg 2021)
+- `Volumes/airflow/`: Used by Airflow, the DAGs go here
 
 ### Start the docker compose
+
 ```
-docker-compose up -d
+DOCKER_BUILDKIT=1 docker-compose up
 ```
 
 It will start the Postgres DB service as well as a container that will read data from

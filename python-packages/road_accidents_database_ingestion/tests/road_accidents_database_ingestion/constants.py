@@ -1,7 +1,7 @@
 from io import StringIO
 from pathlib import Path
 
-from src.data.db.enum import RawRoadAccidentCsvFileNames
+from road_accidents_database_ingestion.enums import RawRoadAccidentCsvFileNames
 
 caracteristiques = """"Num_Acc";"jour";"mois";"an";"hrmn";"lum";"dep";"com";"agg";"int";"atm";"col";"adr";"lat";"long"
 "202100000001";"30";"11";"2021";"07:32";"2";"30";"30319";"1";"1";"1";"1";"CD 981";"44,0389580000";"4,3480220000"

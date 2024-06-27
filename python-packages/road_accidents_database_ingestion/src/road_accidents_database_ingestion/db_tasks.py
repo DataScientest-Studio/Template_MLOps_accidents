@@ -7,14 +7,13 @@ from typing import Dict
 
 from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.exc import OperationalError
-# from sqlalchemy import create_engine
 import tqdm
 import pandas as pd
 from dotenv import load_dotenv
 
-from src.data.db.models import *
-from src.data.db.models import Caracteristiques, Lieux, Vehicules, Users
-from src.data.db.file_tasks import get_road_accident_file2model, get_dataframe
+from road_accidents_database_ingestion.models import *
+from road_accidents_database_ingestion.models import Caracteristiques, Lieux, Vehicules, Users
+from road_accidents_database_ingestion.file_tasks import get_road_accident_file2model, get_dataframe
 
 load_dotenv()  # take environment variables from .env.
 
@@ -125,25 +124,3 @@ def add_data_to_db(db_session: Session, files) -> None:
             road_acc_model.reason = f"Exception raised: {e}"
         finally:
             db_session.add(road_acc_model)
-
-
-def main():
-    db_url = get_db_url()
-    engine = create_db_engine(db_url=db_url)
-    init_db(engine=engine)
-
-    file2model = get_road_accident_file2model(Path(PATH_RAW_FILES_DIR))
-    with Session(engine) as session:
-        update_raw_accidents_csv_files_table(
-            db_session=session, files=file2model
-        )
-        add_data_to_db(db_session=session, files=file2model)
-        session.commit()
-
-    print("Done populating the DB, taking a long siesta...")
-    while True:
-        time.sleep(120)
-
-
-if __name__ == "__main__":
-    main()

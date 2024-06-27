@@ -6,16 +6,16 @@ from sqlalchemy.pool import StaticPool
 from sqlmodel import select, Session
 import pytest
 
-from src.data.db.db_tasks import (
+from road_accidents_database_ingestion.db_tasks import (
     init_db,
     add_data_to_db,
     update_raw_accidents_csv_files_table,
 )
-from src.data.db.models import RawRoadAccidentsCsvFile
-from src.data.db.enum import ProcessingStatus
-from src.data.db.file_tasks import get_road_accident_file2model
+from road_accidents_database_ingestion.models import RawRoadAccidentsCsvFile
+from road_accidents_database_ingestion.enums import ProcessingStatus
+from road_accidents_database_ingestion.file_tasks import get_road_accident_file2model
 
-import tests.data.db.constants as c
+import tests.road_accidents_database_ingestion.constants as c
 
 
 @pytest.fixture(scope="function")

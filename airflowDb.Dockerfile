@@ -1,2 +1,10 @@
 FROM apache/airflow:2.9.2
-RUN pip install --upgrade pip && pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION}" sqlmodel python-dotenv pandas
+
+WORKDIR /app
+
+#copy in the needed requirements and files
+COPY --chmod=777 python-packages/road_accidents_database_ingestion .
+
+# Note: Run this first `sudo chmod -R 777 python-packages/road_accidents_database_ingestion` otherwise the `python -m pip install -e .` will fail.
+#   or run `DOCKER_BUILDKIT=1 docker-compose up`
+RUN python -m ensurepip --upgrade && python -m pip install --upgrade pip && python -m pip install -e .
