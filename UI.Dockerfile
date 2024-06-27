@@ -26,9 +26,11 @@ EXPOSE 8501
 
 
 #CMD ["streamlit", "run", "app.py"]
-# CMD ["uvicorn", "fastapi_app:app", "--host", "0.0.0.0", "--port", "8000"]
+# CMD ["uvicorn", "fastapi_app:app", "--host", "0.0.0.0", "--port", "8002"]
 # CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 WORKDIR /app/src/user_interface 
 
-CMD ["sh", "-c",  "streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]
+# CMD ["sh", "-c",  "streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]
+
+CMD ["sh", "-c", "streamlit run app.py --server.port=8501 --server.address=0.0.0.0 && uvicorn fastapi_app:app --host '0.0.0.0' --port 8000"]

@@ -6,6 +6,10 @@ import numpy as np
 import os
 from src.data.check_structure import mv_existing_file_archive
 
+
+model_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/models'
+data_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/data'
+
 def Train_Model():
     print(joblib.__version__, os.getcwd())
     #execute from may24_BMLOPS_ACCIDENTS/src/models folder!
