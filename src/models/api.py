@@ -1,3 +1,7 @@
+from pathlib import Path
+from typing import Optional
+import os
+
 from fastapi import Request, HTTPException, Body, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, conint, confloat, Field, field_validator
@@ -30,8 +34,14 @@ users_db = {
     }
 }
 
-# Loading the saved model - with a path for unittesting
-loaded_model = joblib.load("../src/models/trained_model.joblib")
+def load_model(path: Optional[Path] = None):
+    """."""
+    os_model_path = os.getenv("MODEL_PATH") 
+    model_path = os_model_path if os_model_path is not None else path 
+    # Loading the saved model - with a path for unittesting
+    return joblib.load(model_path)
+
+loaded_model = load_model(Path("./src/models/trained_model.joblib"))
 
 # Loading the saved model
 # loaded_model = joblib.load("src/models/trained_model.joblib")
