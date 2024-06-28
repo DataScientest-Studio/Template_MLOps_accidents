@@ -27,3 +27,4 @@ fastapi
 uvicorn
 pydantic
 pyjwt
+# maybe also scikit-learn==1.5.0
