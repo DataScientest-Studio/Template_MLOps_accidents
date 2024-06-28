@@ -29,12 +29,14 @@ accuracy = rf_classifier.score(X_test, y_test)
 print(f"Model accuracy: {accuracy}")
 
 # test the model on a single observation
-test_data = X_test.iloc[0]
+test_data = X_test.iloc[[0]]
+
+# save test data to a txt file
+test_data.to_csv('data/test_data.txt', sep = ',', index = False)
 # print the actual label
 print(f"Actual label: {y_test[0]}")
 # print the predicted label
-print(f"Predicted label: {rf_classifier.predict([test_data])[0]}")
-
+print(f"Predicted label: {rf_classifier.predict(test_data)[0]}")
 
 # #--Save the trained model to a file
 # model_filename = './src/models/trained_model.joblib'

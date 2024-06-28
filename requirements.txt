@@ -14,5 +14,9 @@ pathlib
 scikit-learn
 imbalanced-learn
 joblib
+bentoml
 #sys
-#json
+json
+pydantic
+requests
+pyjwt
