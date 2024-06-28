@@ -31,3 +31,6 @@ fastapi
 uvicorn
 pydantic
 pyjwt
+passlib
+bcrypt
+# maybe also scikit-learn==1.5.0
