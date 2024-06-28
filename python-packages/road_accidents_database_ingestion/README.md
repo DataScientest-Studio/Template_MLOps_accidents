@@ -24,3 +24,9 @@ Make sure to run this command first `sudo chmod -R 777 python-packages/road_acci
 
 - https://packaging.python.org/en/latest/tutorials/packaging-projects/
 - https://github.com/pypa/sampleproject
+
+
+# TODO
+
+- [sos] ignore empty dirs
+- 

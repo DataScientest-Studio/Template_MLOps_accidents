@@ -42,7 +42,7 @@ jobs:
         run: |
           python -m pip install -e python-packages/model_api
       
-      - name: Test road_accidents_database_ingestion package
+      - name: Test model_api package
         run: |
           pytest python-packages/model_api/tests
   
