@@ -8,6 +8,9 @@ Volumes/db/*
 Volumes/data/*
 !Volumes/data/.gitkeep
 
+Volumes/model/*
+!Volumes/model/.gitkeep
+
 ## Airflow Volumes
 Volumes/airflow/*
 !Volumes/airflow/.gitkeep
