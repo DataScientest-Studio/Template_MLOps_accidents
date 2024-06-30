@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+# This model was reworked by JH on 26/06/2024 and ff to fit in our GreenLightService model
 from pathlib import Path
 import os
 
@@ -8,7 +10,7 @@ from pathlib import Path
 import click
 import logging
 from sklearn.model_selection import train_test_split
-from check_structure import check_existing_file, check_existing_folder
+from check_structure import check_existing_file, check_existing_folder, mv_existing_file_archive
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
@@ -19,11 +21,11 @@ database=os.getenv("POSTGRES_DB")
 user=os.getenv("POSTGRES_USER")
 password=os.getenv("POSTGRES_PASSWORD")
 port=os.getenv("POSTGRES_PORT")
+
 db_url = 'postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}'.format(hostname=host, user=user, password=password, database_name=database, port=5432)
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=False), required=0)
-@click.argument('output_filepath', type=click.Path(exists=False), required=0)
+model_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/models'
+data_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/data'
 
 def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
@@ -33,8 +35,9 @@ def main(input_filepath, output_filepath):
     logger.info('making final data set from raw data')
 
     # Prompt the user for input file paths
-    output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., data/preprocessed)', type=click.Path())
-    
+    # output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., data/preprocessed)', type=click.Path())
+    # JH: Changed to Volume folder. 
+    output_filepath = data_base + '/preprocessed'
     # Call the main data processing function with the provided file paths
     process_data(output_filepath)
 
@@ -44,11 +47,13 @@ def process_data(output_folderpath, users_table="users", caract_table="caracteri
     #--Fetch dataframes from db
     print("Fetching dataframes from the DB")
     raw_sql_query = "SELECT * FROM {table}"
-    cnx = create_engine(db_url).connect()
-    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx)
-    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("id", axis=1,errors=False)
-    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("id", axis=1, errors=False)
-    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx)
+    # cnx = create_engine(db_url).connect()
+    # JH: changed to .raw_connection() to avoid ... no cursor.... problem 
+    cnx = create_engine(db_url).raw_connection()
+    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx).drop("year", axis=1, errors=False)
+    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1,errors=False)
+    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1, errors=False)
+    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx).drop("year", axis=1, errors=False)
 
     #--Creating new columns
     nb_victim = pd.crosstab(df_users.Num_Acc, "count").reset_index()
@@ -133,17 +138,19 @@ def process_data(output_folderpath, users_table="users", caract_table="caracteri
     # Create folder if necessary 
     output_folderpath.mkdir(parents=True, exist_ok=True)
 
+    mv_existing_file_archive(output_folderpath)
+    
     #--Saving the dataframes to their respective output file paths
     for file, filename in zip([X_train, X_test, y_train, y_test], ['X_train', 'X_test', 'y_train', 'y_test']):
         output_filepath = output_folderpath /  f'{filename}.csv'
         file.to_csv(output_filepath, index=False)
 
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
+# if __name__ == '__main__':
+#     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+#     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
+#     # not used in this stub but often useful for finding various files
+#     project_dir = Path(__file__).resolve().parents[2]
 
 
-    main()
+#     main()

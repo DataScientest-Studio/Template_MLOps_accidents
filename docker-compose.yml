@@ -82,10 +82,23 @@ services:
   model_api:
     image: model_api:latest
     container_name: model_api_from_compose
+    volumes:
+      - ./Volumes/model:${MODEL_PATH}
+    environment:
+      MODEL_PATH: ${MODEL_PATH}/${MODEL_FILENAME}
     ports:
-      - "8001:8000"
+      - ${MODEL_API_PORTS}
     build:
-      dockerfile: api.Dockerfile
+      dockerfile: ModelApi.Dockerfile
+
+  UI:
+    image: model_ui:latest
+    container_name: model_ui_from_compose
+    ports:
+      - "8002:8000"
+      - "8501:8501"
+    build:
+      dockerfile: UI.Dockerfile
 
 # Airflow
   postgres:

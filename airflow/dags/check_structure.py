@@ -1,4 +1,5 @@
 import os
+from  datetime  import datetime
 
 def check_existing_file(file_path):
     '''Check if a file already exists. If it does, ask if we want to overwrite it.'''
@@ -28,3 +29,20 @@ def check_existing_folder(folder_path):
                 print("Invalid response. Please enter 'y' or 'n'.")
     else:
         return False
+    
+def mv_existing_file_archive(mypath):
+    '''Check if a file already exists. If it does, move it to archive.'''
+    if os.path.exists(mypath) == True :
+        try: 
+            onlyfiles = [f for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
+        except FileExistsError:
+            # no files to move
+            return
+    # there are files to move. Make archive if it doesn't exist
+    archive = os.path.join(mypath,'archive')
+    if not os.path.exists(archive):
+        os.mkdir(archive)
+    for f in onlyfiles:
+        file = os.path.join(mypath, f)
+        new_file = os.path.join(mypath,'archive',f+datetime.today().strftime('%Y%m%d%H%M%S'))
+        os.rename(file, new_file)

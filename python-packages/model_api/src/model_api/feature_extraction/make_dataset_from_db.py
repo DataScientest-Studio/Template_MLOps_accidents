@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+# This model was reworked by JH on 26/06/2024 and ff to fit in our GreenLightService model
 from pathlib import Path
 import os
 
@@ -8,11 +10,26 @@ from pathlib import Path
 import click
 import logging
 from sklearn.model_selection import train_test_split
-from check_structure import check_existing_file, check_existing_folder
+<<<<<<< HEAD:python-packages/model_api/src/model_api/feature_extraction/make_dataset_from_db.py
+from model_api.feature_extraction.check_structure import check_existing_file, check_existing_folder
+=======
+from check_structure import check_existing_file, check_existing_folder, mv_existing_file_archive
+>>>>>>> UserInterface:src/data/make_dataset_from_db.py
+from sqlalchemy import create_engine
+from dotenv import load_dotenv
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=False), required=0)
-@click.argument('output_filepath', type=click.Path(exists=False), required=0)
+load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))  # take environment variables from .env.
+
+host="localhost"
+database=os.getenv("POSTGRES_DB")
+user=os.getenv("POSTGRES_USER")
+password=os.getenv("POSTGRES_PASSWORD")
+port=os.getenv("POSTGRES_PORT")
+
+db_url = 'postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}'.format(hostname=host, user=user, password=password, database_name=database, port=5432)
+
+model_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/models'
+data_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/data'
 
 def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
@@ -22,26 +39,35 @@ def main(input_filepath, output_filepath):
     logger.info('making final data set from raw data')
 
     # Prompt the user for input file paths
-    input_filepath= click.prompt('Enter the file path for the input data', type=click.Path(exists=True))
-    input_filepath_users = f"{input_filepath}/usagers-2021.csv"
-    input_filepath_caract = f"{input_filepath}/caracteristiques-2021.csv"
-    input_filepath_places = f"{input_filepath}/lieux-2021.csv"
-    input_filepath_veh = f"{input_filepath}/vehicules-2021.csv"
-    output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., output/preprocessed_data.csv)', type=click.Path())
-    
+    # output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., data/preprocessed)', type=click.Path())
+    # JH: Changed to Volume folder. 
+    output_filepath = data_base + '/preprocessed'
     # Call the main data processing function with the provided file paths
-    process_data(input_filepath_users, input_filepath_caract, input_filepath_places, input_filepath_veh, output_filepath)
+    process_data(output_filepath)
 
-def process_data(input_filepath_users, input_filepath_caract, input_filepath_places, input_filepath_veh, output_folderpath):
- 
-    #--Importing dataset
-    df_users = pd.read_csv(input_filepath_users, sep=";")
-    df_caract = pd.read_csv(input_filepath_caract, sep=";", header=0, low_memory=False)
-    df_places = pd.read_csv(input_filepath_places, sep = ";", encoding='utf-8')
-    df_veh = pd.read_csv(input_filepath_veh, sep=";")
+def process_data(output_folderpath, users_table="users", caract_table="caracteristiques", places_table="lieux", veh_table="vehicules"):
+    output_folderpath = Path(output_folderpath)
 
+    #--Fetch dataframes from db
+    print("Fetching dataframes from the DB")
+    raw_sql_query = "SELECT * FROM {table}"
+<<<<<<< HEAD:python-packages/model_api/src/model_api/feature_extraction/make_dataset_from_db.py
+    cnx = create_engine(db_url).connect()
+    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx)
+    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("id", axis=1,errors=False)
+    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("id", axis=1, errors=False)
+    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx)
+=======
+    # cnx = create_engine(db_url).connect()
+    # JH: changed to .raw_connection() to avoid ... no cursor.... problem 
+    cnx = create_engine(db_url).raw_connection()
+    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx).drop("year", axis=1, errors=False)
+    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1,errors=False)
+    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1, errors=False)
+    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx).drop("year", axis=1, errors=False)
+>>>>>>> UserInterface:src/data/make_dataset_from_db.py
 
-        #--Creating new columns
+    #--Creating new columns
     nb_victim = pd.crosstab(df_users.Num_Acc, "count").reset_index()
     nb_vehicules = pd.crosstab(df_veh.Num_Acc, "count").reset_index()
     df_users["year_acc"] = df_users["Num_Acc"].astype(str).apply(lambda x : x[:4]).astype(int)
@@ -122,21 +148,21 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     X_test[col_to_fill_na] = X_test[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
 
     # Create folder if necessary 
-    if check_existing_folder(output_folderpath) :
-        os.makedirs(output_folderpath)
+    output_folderpath.mkdir(parents=True, exist_ok=True)
 
+    mv_existing_file_archive(output_folderpath)
+    
     #--Saving the dataframes to their respective output file paths
     for file, filename in zip([X_train, X_test, y_train, y_test], ['X_train', 'X_test', 'y_train', 'y_test']):
-        output_filepath = os.path.join(output_folderpath, f'{filename}.csv')
-        if check_existing_file(output_filepath):
-            file.to_csv(output_filepath, index=False)
+        output_filepath = output_folderpath /  f'{filename}.csv'
+        file.to_csv(output_filepath, index=False)
 
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
+# if __name__ == '__main__':
+#     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+#     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
+#     # not used in this stub but often useful for finding various files
+#     project_dir = Path(__file__).resolve().parents[2]
 
 
-    main()
+#     main()
