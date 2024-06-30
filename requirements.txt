@@ -34,3 +34,7 @@ pyjwt
 passlib
 bcrypt
 # maybe also scikit-learn==1.5.0
+
+# for UI
+streamlit
+pillow

@@ -10,15 +10,11 @@ from pathlib import Path
 import click
 import logging
 from sklearn.model_selection import train_test_split
-<<<<<<< HEAD:python-packages/model_api/src/model_api/feature_extraction/make_dataset_from_db.py
-from model_api.feature_extraction.check_structure import check_existing_file, check_existing_folder
-=======
 from check_structure import check_existing_file, check_existing_folder, mv_existing_file_archive
->>>>>>> UserInterface:src/data/make_dataset_from_db.py
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path=os.getenv("DOTENV_PATH"))  # take environment variables from .env.
+load_dotenv()  # take environment variables from .env.
 
 host="localhost"
 database=os.getenv("POSTGRES_DB")
@@ -51,13 +47,6 @@ def process_data(output_folderpath, users_table="users", caract_table="caracteri
     #--Fetch dataframes from db
     print("Fetching dataframes from the DB")
     raw_sql_query = "SELECT * FROM {table}"
-<<<<<<< HEAD:python-packages/model_api/src/model_api/feature_extraction/make_dataset_from_db.py
-    cnx = create_engine(db_url).connect()
-    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx)
-    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("id", axis=1,errors=False)
-    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("id", axis=1, errors=False)
-    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx)
-=======
     # cnx = create_engine(db_url).connect()
     # JH: changed to .raw_connection() to avoid ... no cursor.... problem 
     cnx = create_engine(db_url).raw_connection()
@@ -65,7 +54,6 @@ def process_data(output_folderpath, users_table="users", caract_table="caracteri
     df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1,errors=False)
     df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1, errors=False)
     df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx).drop("year", axis=1, errors=False)
->>>>>>> UserInterface:src/data/make_dataset_from_db.py
 
     #--Creating new columns
     nb_victim = pd.crosstab(df_users.Num_Acc, "count").reset_index()

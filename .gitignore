@@ -111,3 +111,8 @@ target/
 # Mypy cache
 .mypy_cache/
 *.joblib
+
+# Database logs
+Volumes/*
+
+*/logs/*
