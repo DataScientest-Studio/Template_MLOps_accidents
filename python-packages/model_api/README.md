@@ -1,12 +1,11 @@
 # Model API
 
-A Python package to train and serve an ML model.
+A Python package to train and serve an ML model of the Road Accidents application.
 
 
 ## Building the Python package
 
 Create a new venv:
-
 ```
 python3.12 -m venv .venv
 ```
@@ -26,27 +25,27 @@ python -m pip install -e .
 ```
 pytest tests
 ```
+## Configuration
 
-## Running the Model API
+The Python scripts are configured through the following enviroment variables:
 
-### Locally (no docker)
+- `api.py`:
+    - `MODEL_PATH`: Path to the train scikit-learn model.
+    - `ADMIN_USERNAME`: The admin username used to generate an authorization token.
+    - `ADMIN_PASSWORD`: The admin password used to generate an authorization token.
+- `make_dataset_from_db.py`:
+    - `ROAD_ACCIDENTS_POSTGRES_HOST`: The Hostname of the Road Accidents database.
+    - `ROAD_ACCIDENTS_POSTGRES_DB`: The database of the Road Accidents application.
+    - `ADMIN_USERNAME`: The user name of the Road Accidents database.
+    - `ADMIN_PASSWORD`: The password of the Road Accidents database.
+    - `ROAD_ACCIDENTS_POSTGRES_PORT`: The port of the Road Accidents database.
 
-Given a saved trained model in a location (eg: `../../Volumes/model/trained_model.joblib`), the API can be started by executing:
-
-```
-MODEL_PATH=../../Volumes/model/trained_model.joblib python src/model_api/api.py
-```
-
-Then access the Swagger Docs: [localhost](http://localhost:8000/docs)
-
-### Docker
-
-#### Building the Docker Image
+## Building the Docker Image
 
 Build the docker image:
 
 ```
-DOCKER_BUILDKIT=1 docker image build --no-cache  -f ModelApi.Dockerfile . -t api:latest
+DOCKER_BUILDKIT=1 docker image build --no-cache  -f ModelApi.Dockerfile . -t model_api:latest
 ```
 
 >> If `DOCKER_BUILDKIT=1` doesn't work for you then before building the docker image run:
@@ -54,13 +53,24 @@ DOCKER_BUILDKIT=1 docker image build --no-cache  -f ModelApi.Dockerfile . -t api
 sudo chmod -R 777 python-packages/road_accidents_database_ingestion
 ```
 
-#### Running the Docker Image
+## Running the Docker Image
 
 ```
-docker container run --name model_api -p 8000:8000 -v ./Volumes/model:/model -e MODEL_PATH=/model/trained_model.joblib -d api:latest
+docker container run --name model_api -p 8001:8000 -v ./model:/model -e MODEL_PATH=/model/trained_model.joblib -e ADMIN_USERNAME=YOUR_ADMIN_USERNAME -e ADMIN_PASSWORD=YOUR_ADMIN_PASSWORD -d model_api:latest
 ```
 
 Then access the Swagger Docs: [localhost](http://localhost:8000/docs)
+
+## Running the Model API Locally (no docker)
+
+Given a saved trained model in a location (eg: `../../Volumes/model/trained_model.joblib`), the API can be started by executing:
+
+```
+MODEL_PATH=../../Volumes/model/trained_model.joblib ADMIN_USERNAME=admin ADMIN_PASSWORD=adm1n python src/model_api/api.py
+```
+
+Then access the Swagger Docs: [localhost](http://localhost:8000/docs)
+
 
 # Training a new model
 

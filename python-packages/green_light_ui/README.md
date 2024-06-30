@@ -26,20 +26,14 @@ python -m pip install -e .
 pytest tests
 ```
 
-## Running the UI
+## Configuration
 
-### Locally (no docker)
+The Python scripts are configured through the following enviroment variables:
+
+- TODO: None yet but probably the admin username & password in order to call the Model API and get the authorization token.
 
 
-```
-streamlit run src/green_light_ui/app.py --server.port=8501 --server.address=localhost
-```
-
-Then access the UI: [localhost](http://localhost:8501/)
-
-### Docker
-
-#### Building the Docker Image
+## Building the Docker Image
 
 Build the docker image:
 
@@ -51,8 +45,20 @@ DOCKER_BUILDKIT=1 docker image build --no-cache  -f UI.Dockerfile . -t accidents
 ```
 sudo chmod -R 777 python-packages/green_light_ui
 ```
+## Running the Docker Image
 
-#### Running the Docker Image
+```
+docker container run --name accidents_ui -p 8501:8501 accidents_ui:latest
+```
+
+## Running the UI Locally (no docker)
+
+
+```
+streamlit run src/green_light_ui/app.py --server.port=8501 --server.address=localhost
+```
+
+Then access the UI: [localhost](http://localhost:8501/)
 
 
 

@@ -17,15 +17,15 @@ from road_accidents_database_ingestion.file_tasks import get_road_accident_file2
 
 load_dotenv()  # take environment variables from .env.
 
-PATH_RAW_FILES_DIR = os.getenv("RAW_FILES_ROOT_DIR")
+PATH_RAW_FILES_DIR = os.getenv("ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR")
 
 
 def get_db_url() -> str:
-    host = os.getenv("POSTGRES_HOST")
-    database = os.getenv("POSTGRES_DB")
-    user = os.getenv("POSTGRES_USER")
-    password = os.getenv("POSTGRES_PASSWORD")
-    port = os.getenv("POSTGRES_PORT")
+    host = os.getenv("ROAD_ACCIDENTS_POSTGRES_HOST")
+    database = os.getenv("ROAD_ACCIDENTS_POSTGRES_DB")
+    user = os.getenv("ADMIN_USERNAME")
+    password = os.getenv("ADMIN_PASSWORD")
+    port = os.getenv("ROAD_ACCIDENTS_POSTGRES_PORT")
     db_url = (
         "postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}".format(
             hostname=host, user=user, password=password, database_name=database, port=port

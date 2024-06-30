@@ -1,4 +1,4 @@
-import pytest
+import os
 from fastapi.testclient import TestClient
 from fastapi import status
 import joblib
@@ -7,6 +7,10 @@ import numpy as np
 
 # Mocking the `joblib` module so no model needed for the unit tests
 mock_joblib_load = patch.object(joblib, "load", return_value=MagicMock()).start()
+
+os.environ['ADMIN_USERNAME'] = "the_admin_username"
+os.environ['ADMIN_PASSWORD'] = "the_admin_password"
+
 from model_api.api import api, users_db, ADMIN_USERNAME, ADMIN_PASSWORD, hash_password
 
 client = TestClient(api)

@@ -21,8 +21,8 @@ JWT_SECRET = "secret"
 JWT_ALGORITHM = "HS256"
 
 # Admin credentials
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "adm1n" 
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__default_rounds=12, deprecated="auto")
 
@@ -199,6 +199,10 @@ async def create_user(user: UserSchema = Body(...)):
 # veryfiys username and password and returns a JWT token
 @api.post("/user/login", tags=["user"])
 async def user_login(user: UserSchema = Body(...)):
+    if ADMIN_USERNAME is None or ADMIN_PASSWORD is None:
+        raise HTTPException(status_code=500,
+                            detail=f"The OS env. variables `ADMIN_USERNAME` and `ADMIN_PASSWORD` have not been set!")
+
     if user.username in users_db and verify_password(user.password, users_db[user.username]["password"]):
         return sign_jwt(user.username)
     elif user.username == ADMIN_USERNAME and user.password == ADMIN_PASSWORD:

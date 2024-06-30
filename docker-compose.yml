@@ -27,20 +27,22 @@ x-airflow-common: &airflow-common
     # AIRFLOW__SMTP__SMTP_USER: "de.airflow@gmail.com"
     # AIRFLOW__SMTP__SMTP_PASSWORD: "cfsrvkongsobheta"
     # AIRFLOW__SMTP__SMTP_MAIL_FROM: "de.airflow@gmail.com"
-    POSTGRES_USER: ${POSTGRES_USER}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    POSTGRES_HOST: ${POSTGRES_HOST}
-    POSTGRES_PORT: ${POSTGRES_PORT}
-    POSTGRES_DB: ${POSTGRES_DB}
-    RAW_FILES_ROOT_DIR: ${RAW_FILES_ROOT_DIR}
+    ADMIN_USERNAME: ${ADMIN_USERNAME}
+    ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    ROAD_ACCIDENTS_POSTGRES_HOST: ${ROAD_ACCIDENTS_POSTGRES_HOST}
+    ROAD_ACCIDENTS_POSTGRES_PORT: ${ROAD_ACCIDENTS_POSTGRES_PORT}
+    ROAD_ACCIDENTS_POSTGRES_DB: ${ROAD_ACCIDENTS_POSTGRES_DB}
+    ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR: ${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
+    _AIRFLOW_WWW_USER_USERNAME: ${ADMIN_USERNAME}
+    _AIRFLOW_WWW_USER_PASSWORD: ${ADMIN_PASSWORD}
 
     # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pandas }
   volumes:
+    - ./airflow/dags:/opt/airflow/dags
     - ./Volumes/airflow/config:/opt/airflow/config
-    - ./python-packages/road_accidents_database_ingestion/dags:/opt/airflow/dags
     - ./Volumes/airflow/logs:/opt/airflow/logs
     - ./Volumes/airflow/plugins:/opt/airflow/plugins
-    - ./Volumes/data:${RAW_FILES_ROOT_DIR}
+    - ./Volumes/data:${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     &airflow-common-depends-on
@@ -56,11 +58,11 @@ services:
     image: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${ADMIN_USERNAME}
+      POSTGRES_PASSWORD: ${ADMIN_PASSWORD}
+      POSTGRES_DB: ${ROAD_ACCIDENTS_POSTGRES_DB}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${ROAD_ACCIDENTS_POSTGRES_PORT}:5432"
     volumes:
       - ./Volumes/db:/var/lib/postgresql/data
 
@@ -72,7 +74,7 @@ services:
       - "8888:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
       - ./Volumes/db_admin:/var/lib/pgadmin
@@ -83,21 +85,26 @@ services:
     image: model_api:latest
     container_name: model_api_from_compose
     volumes:
-      - ./Volumes/model:${MODEL_PATH}
+      - ./Volumes/model:/model
     environment:
-      MODEL_PATH: ${MODEL_PATH}/${MODEL_FILENAME}
+      MODEL_PATH: /model/${MODEL_FILENAME}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     ports:
       - ${MODEL_API_PORTS}
-    build:
+    build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
       dockerfile: ModelApi.Dockerfile
 
   UI:
-    image: model_ui:latest
+    image: accidents_ui:latest
     container_name: model_ui_from_compose
     ports:
       - "8002:8000"
       - "8501:8501"
-    build:
+    environment:
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
       dockerfile: UI.Dockerfile
 
 # Airflow
@@ -261,8 +268,8 @@ services:
       <<: *airflow-common-env
       _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _AIRFLOW_WWW_USER_USERNAME: ${ADMIN_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${ADMIN_PASSWORD:-airflow}
       _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
     volumes:

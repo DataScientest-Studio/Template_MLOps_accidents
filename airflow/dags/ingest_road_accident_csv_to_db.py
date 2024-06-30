@@ -1,4 +1,8 @@
-"""Raw data (road accidents CSV files) ingestion to the DB DAG."""
+"""Raw data (road accidents CSV files) ingestion to the DB DAG.
+
+TODO:
+- The `task_process_new_road_accidents_csvs` task can be split into 4 separate tasks.
+"""
 
 import datetime
 from pathlib import Path
@@ -27,7 +31,7 @@ from road_accidents_database_ingestion.db_tasks import (
 
 logger = logging.getLogger(__name__)
 load_dotenv()
-PATH_RAW_FILES_DIR = os.getenv("RAW_FILES_ROOT_DIR")
+PATH_RAW_FILES_DIR = os.getenv("ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR")
 
 
 class NewFolderSensor(BaseSensorOperator):
@@ -58,6 +62,7 @@ def task_init_db(**kwargs):
     """This task creates the DB tables for the Road Accidents App."""
     logger.info(f"Creating the DB engine.")
     db_url = get_db_url()
+    logger.info(f"DB URL: {db_url}")
     engine = create_db_engine(db_url=db_url)
     logger.info(f"Creating the DB tables.")
     init_db(engine=engine)
