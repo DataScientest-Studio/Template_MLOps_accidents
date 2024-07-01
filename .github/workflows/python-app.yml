@@ -39,8 +39,10 @@ jobs:
           pytest python-packages/road_accidents_database_ingestion/tests
 
       - name: Build the docker image of the road_accidents_database_ingestion package
-        run: |
-          echo "TODO"
+        uses: docker/login-action@v1
+        with:
+          username: roadaccidentsmlops24
+          password: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
 
       - name: Publish the docker image of the road_accidents_database_ingestion package to DockerHub
         run: |
