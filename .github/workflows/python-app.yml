@@ -47,10 +47,10 @@ jobs:
       - name: Build the road_accidents_database_ingestion Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
         with:
-          context: ./python-packages/road_accidents_database_ingestion/
+          context: ./python-packages/
+          file: ./airflowdb.Dockerfile
           push: true
           tags: roadaccidentsmlops24/airflowdb:latest, roadaccidentsmlops24/airflowdb:${{ github.run_number }}
-          dockerfile: ./python-packages/airflowdb.Dockerfile
   
   ModelApi:
     runs-on: ubuntu-latest
