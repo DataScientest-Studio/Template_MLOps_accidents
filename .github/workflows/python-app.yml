@@ -38,15 +38,19 @@ jobs:
         run: |
           pytest python-packages/road_accidents_database_ingestion/tests
 
-      - name: Build the docker image of the road_accidents_database_ingestion package
+      - name: Login to roadaccidentsmlops24 Docker Hub
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
           password: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
 
-      - name: Publish the docker image of the road_accidents_database_ingestion package to DockerHub
-        run: |
-          echo "TODO (Part of the CD pipeline)"
+      - name: Build the road_accidents_database_ingestion Docker image and push to the roadaccidentsmlops24 DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./python-packages/road_accidents_database_ingestion/
+          push: false
+          tags: roadaccidentsmlops24/road.accidents.mlops.may.24:latest, roadaccidentsmlops24/road.accidents.mlops.may.24:${{ github.run_number }}
+          dockerfile: ./airflowBaseImageRoadAccidentsDb.Dockerfile
   
   ModelApi:
     runs-on: ubuntu-latest
