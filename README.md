@@ -1,10 +1,14 @@
-🚦 Green Lights Services
+🚦 Green Light Services
 ==============================
-# About
+
+<p align="center">
+ <img src="./python-packages/green_light_ui/src/green_light_ui/assets/GreenLights.png" alt="alt text" height="150">
+</p>
+
+
+The `Green Light Services` provide Dashboards for historic traffic situations in local municipalities and it makes predictions on the gravity of [road accidents](https://www.data.gouv.fr/en/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2019/) in selected hot spots. 
 
 This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
-
-> TODO add project description
 
 # 👨🏼‍💻👩‍💻👨🏻‍💻 Development Team
 
@@ -13,88 +17,95 @@ Green Lights Services has been developed by:
 - Paula Robina Beck
 - Evan Blablapoulos
 
-Green Lights Services represents our final project for the DataScientest MLOps Program.
+Green Light Services represents our final project for the DataScientest MLOps Program.
 
 # 🏗️ Architecture
 
-> TODO add figures and description
+The Green Light Services is a web application that uses microservices and runs on [Docker compose](https://docs.docker.com/compose/). The following figure summarizes the architecture of the Green Light Services application:
 
+![Green Light Services architecture](./python-packages/green_light_ui/src/green_light_ui/assets/ServicePlatform.png)
+<p align="center">
+    <b>Figure 1.</b> The Green Light Services architecture.
+</p>
+
+Our docker-compose application includes the following:
+- `Airflow` with a custom base docker image.
+- A dedicated `postgres` database `RoadAccidents` where the raw road accidents data are stored.
+- `pgadmin` which is a dashboard to manage the `RoadAccidents` database.
+- `model_api` which is a FastAPI application responsible for making ML predictions
+- `UI` the Green Light Services UI Dashboard
+
+The Green Light Services docker-compose application is configured through enviroment variables stored in the `.env` file.
+
+We use the Github Actions to implement the CI/CD pipelines of the Green Light Services app. More specifically:
+- CI: everytime there is a Pull Request to merge a branch to master all unit-tests need to pass
+- CD: The docker images are build and pushed to the Docker Hub [roadaccidentsmlops24]](https://hub.docker.com/repositories/roadaccidentsmlops24).
 
 # 📂 Project Organization
 The repository is structured as follows:
 
-------------
+```
     ├── .github/
     │    │
-    │    └── workflows/                     <- GitHub workflow files.
+    │    └── workflows/                     
     │
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── README.md          
     │
-    ├── Airflow                <- Airflow related files.
+    ├── Airflow                
     │   │
-    │   ├── dags           <- Airflow DAGs used in this project.
-    │   │   ├── ingest_road_accident_csv_to_db.py    <- Airflow DAG that reads road accidents CSV files and adds then to the RoadAccidents database.
-    │   │   └── 1_training_pipeline_dag.py <-
+    │   ├── dags           
+    │   │   ├── ingest_road_accident_csv_to_db.py    
+    │   │   └── 1_training_pipeline_dag.py 
     │   │
-    ├── Volumes     <- Shared directories between the host and the docker-compose application.
+    ├── Volumes     
     │   │
-    │   ├──         <- Data from third party sources.
-    │   ├──          <- Intermediate data that has been transformed.
-    │   ├──        <- The final, canonical data sets for modeling.
-    │   └──              <- The original, immutable data dump.
+    │   ├── airflow/        
+    │   ├── data/         
+    │   ├── db/       
+    │   ├── db_admin/
+    │   ├── model
+    │   │   ├── archive  
+    │   │   └── new
+    │   │
+    ├── notebooks          
     │
-    ├── notebooks               <- Logs from training and predicting
+    ├── models             
     │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
+    ├── notebooks         
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── python-packages                <- Source code for use in this project.
+    ├── python-packages                
     │   │
-    │   ├── green_light_ui    
-    │   ├── model_api 
+    │   ├── green_light_ui
+    │   ├── model_api           
     │   └── road_accidents_database_ingestion
     │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
+    ├── references         
     │
-    ├── Volumes                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   ├── check_structure.py    
-    │   │   ├── import_raw_data.py 
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   ├── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │   │   └── visualize.py
-    │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
+    ├── .env         
     │
-    ├── .env         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── docker-compose.yml         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── LICENSE
-    │
-    ├── LICENSE
-
----------
+    └── docker-compose.yml         
+```
 
 # 👩‍💻 Development
 
+Python version used 3.12.
+
 # 👟 Running the App
+
+Clone this repository and run:
+
+```
+DOCKER_BUILDKIT=1 docker-compose up -d --force-recreate
+```
+
+In case you do not want to access to the Docker Hub [roadaccidentsmlops24]](https://hub.docker.com/repositories/roadaccidentsmlops24), you will have to build the Docker Images manually:
+
 
 # 📝 TODO List / Remaining Items
 
+# 😿 Things to Improve
+
+- We couldn't use [secrets in Github Actions](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions), we guess due to user permissions on this forked repo? Unfortunatelly the Docker Hub token is pasted directly in the Github actions which is a really bad practice.
 
 
 ------------------------
