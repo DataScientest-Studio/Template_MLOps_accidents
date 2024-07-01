@@ -107,8 +107,3 @@ def test_prediction():
     prediction_response_json =  prediction_response.json()
     assert "prediction" in  prediction_response_json
 
-# def test_admin_signup(self):
-#     # Admin credentials
-#     ADMIN_USERNAME = "admin"
-#     ADMIN_PASSWORD = "adm1n"
-#     self.assertTrue(user.username == ADMIN_USERNAME and user.password == ADMIN_PASSWORD)
