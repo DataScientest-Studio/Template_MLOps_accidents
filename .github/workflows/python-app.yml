@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./python-packages/
-          file: ./airflowdb.Dockerfile
+          file: airflowdb.Dockerfile
           push: true
           tags: roadaccidentsmlops24/airflowdb:latest, roadaccidentsmlops24/airflowdb:${{ github.run_number }}
   
