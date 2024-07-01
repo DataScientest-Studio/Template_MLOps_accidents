@@ -38,7 +38,7 @@ The Python scripts are configured through the following enviroment variables:
 Build the docker image:
 
 ```
-DOCKER_BUILDKIT=1 docker image build --no-cache  -f UI.Dockerfile . -t accidents_ui:latest
+DOCKER_BUILDKIT=1 docker image build --no-cache . -t accidents_ui:latest
 ```
 
 >> If `DOCKER_BUILDKIT=1` doesn't work for you then before building the docker image run:

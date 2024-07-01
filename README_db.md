@@ -21,8 +21,14 @@ In the root of this project add the following directories:
 
 ### Start the docker compose
 
+Login to the `roadaccidentsmlops24` Docker Hub:
 ```
-DOCKER_BUILDKIT=1 docker-compose up
+docker login
+```
+
+then start docker compose:
+```
+DOCKER_BUILDKIT=1 docker-compose up -d --force-recreate
 ```
 
 It will start the Postgres DB service as well as a container that will read data from

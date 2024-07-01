@@ -37,14 +37,18 @@ The Python scripts are configured through the following enviroment variables:
 - `ADMIN_PASSWORD`: The password of the Road Accidents database.
 - `ROAD_ACCIDENTS_POSTGRES_PORT`: The port of the Road Accidents database.
 
-## Project structure
+## Building the Docker Image
 
-> TODO
+Build the docker image:
 
-### Building the Airflow docker image
+```
+DOCKER_BUILDKIT=1 docker image build --no-cache . -t airflowdb:latest
+```
 
-Make sure to run this command first `sudo chmod -R 777 python-packages/road_accidents_database_ingestion` otherwise the `python -m pip install -e .` will fail. Or you can run docker compose as `DOCKER_BUILDKIT=1 docker-compose up`.
-
+>> If `DOCKER_BUILDKIT=1` doesn't work for you then before building the docker image run:
+```
+sudo chmod -R 777 python-packages/road_accidents_database_ingestion
+```
 
 # Further reading
 

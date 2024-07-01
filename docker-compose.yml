@@ -92,11 +92,9 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     ports:
       - ${MODEL_API_PORTS}
-    # build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
-    #   dockerfile: ModelApi.Dockerfile
 
   UI:
-    image: accidents_ui:latest
+    image: roadaccidentsmlops24/accidents_ui:latest
     container_name: model_ui_from_compose
     ports:
       - "8002:8000"
@@ -104,8 +102,6 @@ services:
     environment:
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-    build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
-      dockerfile: UI.Dockerfile
 
 # Airflow
   postgres:
