@@ -50,7 +50,7 @@ jobs:
           context: ./python-packages/road_accidents_database_ingestion/
           push: false
           tags: roadaccidentsmlops24/road.accidents.mlops.may.24:latest, roadaccidentsmlops24/road.accidents.mlops.may.24:${{ github.run_number }}
-          dockerfile: ./airflowBaseImageRoadAccidentsDb.Dockerfile
+          dockerfile: ./python-packages/road_accidents_database_ingestion/airflowBaseImageRoadAccidentsDb.Dockerfile
   
   ModelApi:
     runs-on: ubuntu-latest
