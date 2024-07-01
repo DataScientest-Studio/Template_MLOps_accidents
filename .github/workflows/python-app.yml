@@ -75,14 +75,20 @@ jobs:
         run: |
           pytest python-packages/model_api/tests
   
-      - name: Build the docker image of the model_api package
-        run: |
-          echo "TODO"
-  
-      - name: Publish the docker image of the model_api package to DockerHub
-        run: |
-          echo "TODO (Part of the CD pipeline)"
+      - name: Login to model_api Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: roadaccidentsmlops24
+          password: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
 
+      - name: Build the model_api Docker image and push to the roadaccidentsmlops24 DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./python-packages/model_api/
+          push: true
+          tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ github.run_number }}
+          dockerfile: ./python-packages/model_api/Dockerfile
+  
   GreenLightUi:
     runs-on: ubuntu-latest
 

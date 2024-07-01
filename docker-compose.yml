@@ -3,9 +3,9 @@ version: "3.8"
 # downloaded from: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html
 # using command: curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.9.2/docker-compose.yaml'
 x-airflow-common: &airflow-common
-  build:
-    dockerfile: airflowDb.Dockerfile
-  image: ${AIRFLOW_IMAGE_NAME:-airflowdb}
+  # build:
+  #   dockerfile: airflowDb.Dockerfile
+  image: ${AIRFLOW_IMAGE_NAME:-roadaccidentsmlops24/airflowdb}
   # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.9.2}
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -82,7 +82,7 @@ services:
       - postgres_road_accidents
 
   model_api:
-    image: model_api:latest
+    image: roadaccidentsmlops24/model_api:latest
     container_name: model_api_from_compose
     volumes:
       - ./Volumes/model:/model
@@ -92,8 +92,8 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     ports:
       - ${MODEL_API_PORTS}
-    build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
-      dockerfile: ModelApi.Dockerfile
+    # build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
+    #   dockerfile: ModelApi.Dockerfile
 
   UI:
     image: accidents_ui:latest
