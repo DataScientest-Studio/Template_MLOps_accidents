@@ -1,9 +1,8 @@
 # local package
--e .
+# -e .
 
 # external requirements
 click
-Sphinx
 coverage
 #awscli>=1.29.0
 flake8
@@ -15,15 +14,27 @@ imbalanced-learn==0.12.3
 joblib==1.4.2
 #sys
 #json
-python-dotenv==1.0.1
-psycopg2-binary==2.9.9
-sqlalchemy==2.0.30
-sqlmodel==0.0.19
-tqdm==4.66.4
-pytest==8.2.2
 
+# Data ingestion ETL
+apache-airflow[celery]==2.9.2
+python-dotenv
+psycopg2-binary
+sqlalchemy
+# sqlalchemy==2.0.30
+# sqlmodel==0.0.19
+sqlmodel
+tqdm
+pytest
 
+# API
 fastapi
 uvicorn
 pydantic
 pyjwt
+passlib
+bcrypt
+# maybe also scikit-learn==1.5.0
+
+# for UI
+streamlit
+pillow
