@@ -5,14 +5,19 @@ from PIL import Image
 import config
 
 
-from tabs import predictions, intro, service, bugs
+from tabs import user_interface, intro, service_platform, api, updates, training, evaluation, ci_cd, monitoring
+
+
+# File locatements in Docker
+streamlit_base = '/app/src/green_light_ui'
+
 
 st.set_page_config(
     page_title=config.TITLE
     # page_icon="assets/model.png",
 )
 
-with open("src/green_light_ui/style.css", "r") as f:
+with open(streamlit_base + "/style.css", "r") as f:
     style = f.read()
 
 st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
@@ -23,19 +28,24 @@ TABS = {}
 TABS = OrderedDict(
     [
         (intro.sidebar_name, intro),
-        (predictions.sidebar_name, predictions),
-        (service.sidebar_name, service),
-        (bugs.sidebar_name, bugs),
+        (service_platform.sidebar_name, service_platform),
+        (api.sidebar_name, api),
+        (user_interface.sidebar_name, user_interface),
+        (updates.sidebar_name, updates),
+        (training.sidebar_name, training),
+        (evaluation.sidebar_name, evaluation),
+        (ci_cd.sidebar_name, ci_cd),
+        (monitoring.sidebar_name, monitoring),
     ]
 )
 
 
 def run():
 
-    image = Image.open("./src/green_light_ui/assets/GreenLights.png")
+    image = Image.open(streamlit_base+"/assets/GreenLights.png")
     st.sidebar.image(
         image,
-        width=200,
+        width=100,
     )
 
     tab_name = st.sidebar.radio("Choose Tab", list(TABS.keys()), 0)
