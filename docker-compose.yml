@@ -85,9 +85,9 @@ services:
     image: model_api:latest
     container_name: model_api_from_compose
     volumes:
-      - ./Volumes/model:/model
+      - ./Volumes/models:/models
     environment:
-      MODEL_PATH: /model/${MODEL_FILENAME}
+      MODEL_PATH: /models/${MODEL_FILENAME}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     ports:
@@ -99,8 +99,10 @@ services:
     image: accidents_ui:latest
     container_name: model_ui_from_compose
     ports:
-      - "8002:8000"
       - "8501:8501"
+    volumes:
+      - ./Volumes/models:/models
+      - ./Volumes/data:/data
     environment:
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
