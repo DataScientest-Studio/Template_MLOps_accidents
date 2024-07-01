@@ -15,24 +15,99 @@ permissions:
   contents: read
 
 jobs:
-  CodeChecks:
+  RoadAccidentsDatabaseIngestion:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.8
+      - name: Set up Python 3.12
         uses: actions/setup-python@v3
         with:
-          python-version: "3.8"
-      - name: Install dependencies
+          python-version: "3.12"
+
+      - name: Update pip
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
-      - name: Test with pytest
-        run: |
-          pytest tests
 
+      - name: Install road_accidents_database_ingestion package 
+        run: |
+          python -m pip install -e python-packages/road_accidents_database_ingestion
+    
+      - name: Test road_accidents_database_ingestion package
+        run: |
+          pytest python-packages/road_accidents_database_ingestion/tests
+
+      - name: Build the docker image of the road_accidents_database_ingestion package
+        run: |
+          echo "TODO"
+
+      - name: Publish the docker image of the road_accidents_database_ingestion package to DockerHub
+        run: |
+          echo "TODO (Part of the CD pipeline)"
+  
+  ModelApi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Update pip
+        run: |
+          python -m pip install --upgrade pip
+        
+      - name: Install model_api package 
+        run: |
+          python -m pip install -e python-packages/model_api
+      
+      - name: Test model_api package
+        run: |
+          pytest python-packages/model_api/tests
+  
+      - name: Build the docker image of the model_api package
+        run: |
+          echo "TODO"
+  
+      - name: Publish the docker image of the model_api package to DockerHub
+        run: |
+          echo "TODO (Part of the CD pipeline)"
+
+  GreenLightUi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Update pip
+        run: |
+          python -m pip install --upgrade pip
+        
+      - name: Install green_light_ui package 
+        run: |
+          python -m pip install -e python-packages/model_api
+      
+      - name: Test green_light_ui package
+        run: |
+          pytest python-packages/model_api/tests
+  
+      - name: Build the docker image of the green_light_ui package
+        run: |
+          echo "TODO"
+  
+      - name: Publish the docker image of the green_light_ui package to DockerHub
+        run: |
+          echo "TODO (Part of the CD pipeline)"
+          
   # DockerCompose:
 
   #   runs-on: ubuntu-latest
