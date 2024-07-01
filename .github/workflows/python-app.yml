@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./python-packages/road_accidents_database_ingestion/
-          push: false
+          push: true
           tags: roadaccidentsmlops24/road.accidents.mlops.may.24:latest, roadaccidentsmlops24/road.accidents.mlops.may.24:${{ github.run_number }}
           dockerfile: ./python-packages/road_accidents_database_ingestion/Dockerfile
   
