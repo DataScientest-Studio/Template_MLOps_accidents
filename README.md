@@ -1,20 +1,49 @@
-Project Name
+🚦 Green Lights Services
 ==============================
+# About
 
 This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
 
-Project Organization
-------------
+> TODO add project description
 
-    ├── LICENSE
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+# 👨🏼‍💻👩‍💻👨🏻‍💻 Development Team
+
+Green Lights Services has been developed by:
+- Josef Hartmann
+- Paula Robina Beck
+- Evan Blablapoulos
+
+Green Lights Services represents our final project for the DataScientest MLOps Program.
+
+# 🏗️ Architecture
+
+> TODO add figures and description
+
+
+# 📂 Project Organization
+The repository is structured as follows:
+
+------------
+    ├── .github/
+    │    │
+    │    └── workflows/                     <- GitHub workflow files.
     │
-    ├── logs               <- Logs from training and predicting
+    ├── README.md          <- The top-level README for developers using this project.
+    │
+    ├── Airflow                <- Airflow related files.
+    │   │
+    │   ├── dags           <- Airflow DAGs used in this project.
+    │   │   ├── ingest_road_accident_csv_to_db.py    <- Airflow DAG that reads road accidents CSV files and adds then to the RoadAccidents database.
+    │   │   └── 1_training_pipeline_dag.py <-
+    │   │
+    ├── Volumes     <- Shared directories between the host and the docker-compose application.
+    │   │
+    │   ├──         <- Data from third party sources.
+    │   ├──          <- Intermediate data that has been transformed.
+    │   ├──        <- The final, canonical data sets for modeling.
+    │   └──              <- The original, immutable data dump.
+    │
+    ├── notebooks               <- Logs from training and predicting
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -22,15 +51,15 @@ Project Organization
     │                         the creator's initials, and a short `-` delimited description, e.g.
     │                         `1.0-jqp-initial-data-exploration`.
     │
+    ├── python-packages                <- Source code for use in this project.
+    │   │
+    │   ├── green_light_ui    
+    │   ├── model_api 
+    │   └── road_accidents_database_ingestion
+    │
     ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
     │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── src                <- Source code for use in this project.
+    ├── Volumes                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
     │   │
     │   ├── data           <- Scripts to download or generate data
@@ -49,47 +78,23 @@ Project Organization
     │   ├── visualization  <- Scripts to create exploratory and results oriented visualizations
     │   │   └── visualize.py
     │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
+    │
+    ├── .env         <- Data dictionaries, manuals, and all other explanatory materials.
+    │
+    ├── docker-compose.yml         <- Data dictionaries, manuals, and all other explanatory materials.
+    │
+    ├── LICENSE
+    │
+    ├── LICENSE
 
 ---------
 
-## Steps to follow 
+# 👩‍💻 Development
 
-Convention : All python scripts must be run from the root specifying the relative file path.
+# 👟 Running the App
 
-### 1- Create a virtual environment using Virtualenv.
+# 📝 TODO List / Remaining Items
 
-    `python -m venv my_env`
-
-###   Activate it 
-
-    `./my_env/Scripts/activate`
-
-###   Install the packages from requirements.txt
-
-    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
-
-### 2- Execute import_raw_data.py to import the 4 datasets.
-
-    `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
-
-### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
-
-    `python .\src\data\make_dataset.py`
-
-### 4- Execute train_model.py to instanciate the model in joblib format
-
-    `python .\src\models\train_model.py`
-
-### 5- Finally, execute predict_model.py with respect to one of these rules :
-  
-  - Provide a json file as follow : 
-
-    
-    `python ./src/models/predict_model.py ./src/models/test_features.json`
-
-  test_features.json is an example that you can try 
-
-  - If you do not specify a json file, you will be asked to enter manually each feature. 
 
 
 ------------------------
