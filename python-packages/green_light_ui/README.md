@@ -48,7 +48,7 @@ sudo chmod -R 777 python-packages/green_light_ui
 ## Running the Docker Image
 
 ```
-docker container run --name accidents_ui -p 8501:8501 accidents_ui:latest
+docker container run --name accidents_ui -p 8501:8501 roadaccidentsmlops24/accidents_ui:latest
 ```
 
 ## Running the UI Locally (no docker)

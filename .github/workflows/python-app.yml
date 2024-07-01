@@ -50,7 +50,7 @@ jobs:
           context: ./python-packages/road_accidents_database_ingestion/
           push: true
           tags: roadaccidentsmlops24/airflowdb:latest, roadaccidentsmlops24/airflowdb:${{ github.run_number }}
-          dockerfile: ./python-packages/road_accidents_database_ingestion/Dockerfile
+          dockerfile: ./python-packages/airflowdb.Dockerfile
   
   ModelApi:
     runs-on: ubuntu-latest
