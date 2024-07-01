@@ -3,22 +3,22 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, conint, confloat, Field, field_validator
 from fastapi import FastAPI
 import pandas as pd
-import sys
-import json
 import joblib
 import uvicorn
 from typing import Dict
 import time
 import jwt
 from passlib.context import CryptContext
+from pathlib import Path
+from typing import Optional
+import os
 
 # JWT settings
 JWT_SECRET = "secret"
 JWT_ALGORITHM = "HS256"
 
-# Admin credentials
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "adm1n" 
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__default_rounds=12, deprecated="auto")
 
@@ -30,11 +30,37 @@ users_db = {
     }
 }
 
-# Loading the saved model - with a path for unittesting
-loaded_model = joblib.load("../src/models/trained_model.joblib")
+def load_model(path: Optional[Path] = None):
+    """Loads a saved ML model.
+    The path to load the model is either provided by
+        the env variable (`MODEL_PATH`). If `MODEL_PATH`
+        has not been set the `path` argument will be used. 
+    Raises:
+        RuntimeError: If both the env variable `MODEL_PATH`
+            and `path` are set to `None`.
+    Returns:
+        A trained ML model.
+    """
+    os_model_path = os.getenv("MODEL_PATH")
+    if os_model_path:
+        print(f"Path to model set by env variable 'MODEL_PATH'='{os_model_path}'")
+        model_path = os_model_path
+    elif path:
+        print(f"Path to model set by function argument 'path'='{path}'")
+    else:
+        print("No path to load model provided!")
+        raise RuntimeError("No path to load model provided!")
+
+    model_path = os_model_path if os_model_path is not None else path 
+    # Loading the saved model - with a path for unittesting
+    return joblib.load(model_path)
+
+loaded_model = load_model(Path("trained_model.joblib")) 
 
 # Loading the saved model
 # loaded_model = joblib.load("src/models/trained_model.joblib")
+
+pwd_context = CryptContext(schemes=["bcrypt"], bcrypt__default_rounds=12, deprecated="auto")
 
 # Pydantic model for user schema
 class UserSchema(BaseModel):
@@ -97,7 +123,7 @@ def token_response(token: str):
 #signing a JWT token using the provided payload and secret key
 #the token expires after 10 minutes
 def sign_jwt(user_id: str):
-    payload = {"user_id": user_id, "expires": time.time() + 600} # Token expires within 10 minutes
+    payload = {"user_id": user_id, "expires": time.time() + 1800} # Token expires within 30 minutes
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token_response(token)
 
@@ -189,6 +215,22 @@ def get_feature_values_manually(feature_names):
         features[feature_name] = feature_value
     return features
 
+# @api.post("/refresh", dependencies=[Depends(JWTBearer())], tags=["refresh"])
+# def refresh_model():
+#     try:
+#         #function will be using and modifying the global variable loaded_model, because it was defined outside this function
+#         global loaded_model
+#         # Reload the model
+#         loaded_model = load_model(Path("trained_model.joblib"))
+#         return {"message": "The Model was updated!"}
+
+#     except FileNotFoundError:
+#         raise HTTPException(status_code=500, detail="Model file not found")
+
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
+
+    
 if __name__ == "__main__":
     
      # if len(sys.argv) == 2:
