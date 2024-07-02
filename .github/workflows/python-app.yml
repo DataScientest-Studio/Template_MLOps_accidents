@@ -1,6 +1,8 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-'''
+
+# https://www.youtube.com/watch?v=R8_veQiYBjI&ab_channel=TechWorldwithNana
+
 name: Python application
 
 on:
@@ -13,28 +15,120 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  RoadAccidentsDatabaseIngestion:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest
-'''
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Update pip
+        run: |
+          python -m pip install --upgrade pip
+
+      - name: Install road_accidents_database_ingestion package 
+        run: |
+          python -m pip install -e python-packages/road_accidents_database_ingestion
+    
+      - name: Test road_accidents_database_ingestion package
+        run: |
+          pytest python-packages/road_accidents_database_ingestion/tests
+
+      - name: Build the docker image of the road_accidents_database_ingestion package
+        run: |
+          echo "TODO"
+
+      - name: Publish the docker image of the road_accidents_database_ingestion package to DockerHub
+        run: |
+          echo "TODO (Part of the CD pipeline)"
+  
+  ModelApi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Update pip
+        run: |
+          python -m pip install --upgrade pip
+        
+      - name: Install model_api package 
+        run: |
+          python -m pip install -e python-packages/model_api
+      
+      - name: Test model_api package
+        run: |
+          pytest python-packages/model_api/tests
+  
+      - name: Build the docker image of the model_api package
+        run: |
+          echo "TODO"
+  
+      - name: Publish the docker image of the model_api package to DockerHub
+        run: |
+          echo "TODO (Part of the CD pipeline)"
+
+  GreenLightUi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Update pip
+        run: |
+          python -m pip install --upgrade pip
+        
+      - name: Install green_light_ui package 
+        run: |
+          python -m pip install -e python-packages/model_api
+      
+      - name: Test green_light_ui package
+        run: |
+          pytest python-packages/model_api/tests
+  
+      - name: Build the docker image of the green_light_ui package
+        run: |
+          echo "TODO"
+  
+      - name: Publish the docker image of the green_light_ui package to DockerHub
+        run: |
+          echo "TODO (Part of the CD pipeline)"
+          
+  # DockerCompose:
+
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Check out repository
+  #       uses: actions/checkout@v4
+  
+  #     - name: Create `Postgres` directory for the `database` microservice
+  #       run: mkdir ~/Volumes/db
+
+  #     - name: Create `PgAdmin` directory for the `DB admin` microservice
+  #       run: mkdir ~/Volumes/db_admin
+
+  #     - name: Create `data` directory for ingesting the data in the DB
+  #       run: mkdir ~/Volumes/data
+  
+  #     - name: Build Docker images and run Docker containers in background
+  #       run: docker-compose up --detach
+  
+  #     - name: Run unit tests
+  #       run: docker exec testing pytest -v /home/shield/testing/testing_script.py
+
+

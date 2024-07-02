@@ -1,12 +1,41 @@
+# Docker Volumes 
+Volumes/db_admin/*
+!Volumes/db_admin/.gitkeep
+
+Volumes/db/*
+!Volumes/db/.gitkeep
+
+
+#keep the structure for Volumes/data and Volumes/models
+# Volumes/data/*
+# !Volumes/data/.gitkeep
+
+# Volumes/model/*
+# !Volumes/model/.gitkeep
+
+## Airflow Volumes
+Volumes/airflow/*
+!Volumes/airflow/.gitkeep
+
+airflow/Volumes/*
+
+*/logs/*
+
+*mlruns*
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+.pytest_cache
 
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+.venv/
 env/
 myenv/
 my_env/
@@ -90,4 +119,8 @@ target/
 
 # Mypy cache
 .mypy_cache/
-*.joblib
+*.joblib*
+
+# Database logs
+
+
