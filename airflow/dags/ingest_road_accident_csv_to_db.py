@@ -36,16 +36,17 @@ load_dotenv()
 PATH_RAW_FILES_DIR = os.getenv("ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR")
 AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME = os.getenv("AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME")
 
-
 class NewFolderSensor(BaseSensorOperator):
     @apply_defaults
     def __init__(self, directory, *args, **kwargs):
         super(NewFolderSensor, self).__init__(*args, **kwargs)
+
         self.directory = directory
         self.seen_folders = set(os.listdir(directory))
 
     def poke(self, context):
         logger.info(f"Looking if there is a new directory in '{self.directory}'.")
+        logger.info(f"Directories seen so far: {self.seen_folders}")
         current_folders = set(os.listdir(self.directory))
         new_folders = current_folders - self.seen_folders
         if new_folders:
@@ -99,7 +100,16 @@ def task_process_new_road_accidents_csvs(**kwargs):
         logger.info(f"Processing data from directory '{new_dir_full_path}'.")
         logger.info(f"{list(new_dir_full_path.glob("*"))}")
 
-        file2model = get_road_accident_file2model(new_dir_full_path)
+        try:
+            file2model = get_road_accident_file2model(new_dir_full_path)
+        except FileNotFoundError:
+            logger.error(f"Directory '{new_dir}' does not contain all 4 road accidents csv files, skipping...")
+            raise
+
+        if not file2model:
+            logger.info(f"Directory '{new_dir}' has no `csv` files, skipping...")
+            continue
+
         with Session(engine) as session:
             logger.info(f"Checking DB table 'RawRoadAccidentsCsvFile' to see if files already processed.")
             update_raw_accidents_csv_files_table(db_session=session, files=file2model)

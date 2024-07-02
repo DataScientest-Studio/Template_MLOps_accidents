@@ -51,6 +51,9 @@ def test_update_raw_accidents_csv_files_table(temp_dir, db_session):
         assert file2model[tbr.raw_accident_file].md5 == tbr.md5
         assert tbr.processing_status == ProcessingStatus.processing
 
+def test_update_raw_accidents_csv_files_table_empty_dir(temp_dir, db_session):
+    file2model = get_road_accident_file2model(temp_dir)
+    assert file2model is None
 
 def test_add_data_to_db(temp_dir, db_session):
     c.create_raw_road_accident_files_in_dir(temp_dir)

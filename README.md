@@ -41,6 +41,8 @@ We use the Github Actions to implement the CI/CD pipelines of the Green Light Se
 - CI: everytime there is a Pull Request to merge a branch to master all unit-tests need to pass
 - CD: The docker images are build and pushed to the Docker Hub [roadaccidentsmlops24]](https://hub.docker.com/repositories/roadaccidentsmlops24).
 
+TODO a few words on how we perform authorization.
+
 # 📂 Project Organization
 The repository is structured as follows:
 
@@ -95,10 +97,10 @@ Python version used 3.12.
 Clone this repository and run:
 
 ```
-DOCKER_BUILDKIT=1 docker-compose up -d --force-recreate
+DOCKER_BUILDKIT=1 docker-compose up -d
 ```
 
-In case you do not want to access to the Docker Hub [roadaccidentsmlops24]](https://hub.docker.com/repositories/roadaccidentsmlops24), you will have to build the Docker Images manually:
+In case you do not want to access to the Docker Hub [roadaccidentsmlops24]](https://hub.docker.com/repositories/roadaccidentsmlops24), you will have to build the Docker Images manually. Please refer to the individual `README.md` files of `python-packages` on how to do so.
 
 
 # 📝 TODO List / Remaining Items
