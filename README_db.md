@@ -21,6 +21,12 @@ In the root of this project add the following directories:
 
 ### Start the docker compose
 
+Login to the `roadaccidentsmlops24` Docker Hub:
+```
+docker login
+```
+
+then start docker compose:
 ```
 DOCKER_BUILDKIT=1 docker-compose up -d --force-recreate
 ```
