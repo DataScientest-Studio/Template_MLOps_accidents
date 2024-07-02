@@ -55,5 +55,6 @@ Make sure to run this command first `sudo chmod -R 777 python-packages/road_acci
 # TODO
 
 - [sos] ignore empty dirs
+- Consider using the `md5` as the primary key for the `RawRoadAccidentsCsvFile` table.
 - Remove `tqdm` from stdout because it floods the airflow logs!
 - Finish this documentation (project structure)

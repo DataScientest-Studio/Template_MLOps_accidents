@@ -58,7 +58,10 @@ def _add_data_to_table(
     db_session: Session, df: pd.DataFrame, table_model: SQLModel):
     print(f"Adding data to the '{table_model.__tablename__}' table.")
 
-    for _, row in tqdm.tqdm(df.iterrows(), total=len(df)):
+    for _, row in tqdm.tqdm(df.iterrows(), 
+                            total=len(df), 
+                            desc=f"Updating table: '{table_model.__tablename__}'",
+                            mininterval=1.0):
         carac = table_model(**row)
         db_session.add(carac)
     db_session.commit()
