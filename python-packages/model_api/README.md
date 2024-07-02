@@ -45,7 +45,7 @@ The Python scripts are configured through the following enviroment variables:
 Build the docker image:
 
 ```
-DOCKER_BUILDKIT=1 docker image build --no-cache  -f ModelApi.Dockerfile . -t model_api:latest
+DOCKER_BUILDKIT=1 docker image build --no-cache . -t roadaccidentsmlops24/model_api:latest
 ```
 
 >> If `DOCKER_BUILDKIT=1` doesn't work for you then before building the docker image run:
