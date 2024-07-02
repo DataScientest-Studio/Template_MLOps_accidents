@@ -224,6 +224,14 @@ def get_feature_values_manually(feature_names):
         features[feature_name] = feature_value
     return features
 
+@api.get("/refresh", dependencies=[Depends(JWTBearer())], tags=["refresh"])
+def refresh_model():
+    #function will be using and modifying the global variable loaded_model, because it was defined outside this function
+    global loaded_model
+    # Reload the model
+    loaded_model = load_model(Path("trained_model.joblib"))
+    return {"message": "The Model was updated!"}
+
 if __name__ == "__main__":
     
      # if len(sys.argv) == 2:
