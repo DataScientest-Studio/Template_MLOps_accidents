@@ -15,6 +15,7 @@ from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.operators.latest_only import LatestOnlyOperator
 from airflow.operators.python import PythonOperator
+from airflow.models import Variable
 
 from sqlmodel import Session
 
@@ -31,7 +32,9 @@ from road_accidents_database_ingestion.db_tasks import (
 
 logger = logging.getLogger(__name__)
 load_dotenv()
+
 PATH_RAW_FILES_DIR = os.getenv("ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR")
+AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME = os.getenv("AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME")
 
 
 class NewFolderSensor(BaseSensorOperator):
@@ -105,8 +108,14 @@ def task_process_new_road_accidents_csvs(**kwargs):
             session.commit()
             logger.info(f"Done.")
 
-# DAG
+def task_update_variable_new_road_accidents_data_timestamp(**kwargs):
+    ts = datetime.datetime.now().isoformat()
+    logger.info(f"New Road Accidents data added to the DB...")
+    logger.info(f"Setting the Airflow variable '{AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME}' with the timestamp: '{ts}'.")
+    Variable.set(AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME, ts)
+    logger.info("Done!")
 
+# Le DAG
 with DAG(
     dag_id="road_accidents_data_ingestion_dag",
     doc_md="""# Road Accidents Data Ingestion DAG
@@ -141,5 +150,12 @@ with DAG(
         trigger_rule='all_success'
     )
 
+    set_the_airflow_db_updated_variable_task = PythonOperator(
+        task_id="set_the_airflow_variable_db_updated_ts_task",
+        python_callable=task_update_variable_new_road_accidents_data_timestamp,
+        trigger_rule='all_success'
+    )
+    
 
-    latest_only >> init_db_task >> watch_task >> add_new_road_accidents_csvs_to_db_task
+
+    latest_only >> init_db_task >> watch_task >> add_new_road_accidents_csvs_to_db_task >> set_the_airflow_db_updated_variable_task

@@ -46,5 +46,6 @@ The Python scripts are configured through the following enviroment variables:
 # TODO
 
 - [sos] ignore empty dirs
+- Consider using the `md5` as the primary key for the `RawRoadAccidentsCsvFile` table.
 - Remove `tqdm` from stdout because it floods the airflow logs!
 - Finish this documentation (project structure)
