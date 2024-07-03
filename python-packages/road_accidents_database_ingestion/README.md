@@ -32,10 +32,10 @@ The Python scripts are configured through the following enviroment variables:
 
 - `ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR`: Path to the root directorty where new directories with Road Accidents CSV files will be added.
 - `ROAD_ACCIDENTS_POSTGRES_HOST`: The Hostname of the Road Accidents database.
+- `ROAD_ACCIDENTS_POSTGRES_PORT`: The port of the Road Accidents database.
 - `ROAD_ACCIDENTS_POSTGRES_DB`: The database of the Road Accidents application.
 - `ADMIN_USERNAME`: The user name of the Road Accidents database.
 - `ADMIN_PASSWORD`: The password of the Road Accidents database.
-- `ROAD_ACCIDENTS_POSTGRES_PORT`: The port of the Road Accidents database.
 
 # Further reading
 
@@ -45,7 +45,4 @@ The Python scripts are configured through the following enviroment variables:
 
 # TODO
 
-- [sos] ignore empty dirs
 - Consider using the `md5` as the primary key for the `RawRoadAccidentsCsvFile` table.
-- Remove `tqdm` from stdout because it floods the airflow logs!
-- Finish this documentation (project structure)
