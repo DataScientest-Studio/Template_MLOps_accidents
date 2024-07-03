@@ -109,9 +109,8 @@ jobs:
           python -m pip install -e python-packages/green_light_ui
       
       - name: Test green_light_ui package
-        uses: streamlit/streamlit-app-action@v0.0.3
-        with:
-          app-path: python-packages/green_light_ui/src/app.py
+        run: |
+          pytest python-packages/green_light_ui/tests
   
       - name: Login to the Docker Hub
         uses: docker/login-action@v1
