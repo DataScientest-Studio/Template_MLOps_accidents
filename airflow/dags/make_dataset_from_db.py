@@ -14,18 +14,14 @@ from check_structure import check_existing_file, check_existing_folder, mv_exist
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
+from road_accidents_database_ingestion.db_tasks import  get_db_url
+
 load_dotenv()  # take environment variables from .env.
 
-host="localhost"
-database=os.getenv("POSTGRES_DB")
-user=os.getenv("POSTGRES_USER")
-password=os.getenv("POSTGRES_PASSWORD")
-port=os.getenv("POSTGRES_PORT")
+db_url = get_db_url()
 
-db_url = 'postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}'.format(hostname=host, user=user, password=password, database_name=database, port=5432)
-
-model_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/models'
-data_base = '/Users/drjosefhartmann/Development/Accidents/may24_bmlops_accidents/airflow/Volumes/data'
+model_base = '/models'
+data_base = '/data/raw'
 
 def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
@@ -34,9 +30,7 @@ def main(input_filepath, output_filepath):
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
-    # Prompt the user for input file paths
-    # output_filepath = click.prompt('Enter the file path for the output preprocessed data (e.g., data/preprocessed)', type=click.Path())
-    # JH: Changed to Volume folder. 
+   # JH: Changed to Volume folder. 
     output_filepath = data_base + '/preprocessed'
     # Call the main data processing function with the provided file paths
     process_data(output_filepath)
@@ -50,10 +44,10 @@ def process_data(output_folderpath, users_table="users", caract_table="caracteri
     # cnx = create_engine(db_url).connect()
     # JH: changed to .raw_connection() to avoid ... no cursor.... problem 
     cnx = create_engine(db_url).raw_connection()
-    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx).drop("year", axis=1, errors=False)
-    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1,errors=False)
-    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("year", axis=1, errors=False).drop("id", axis=1, errors=False)
-    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx).drop("year", axis=1, errors=False)
+    df_caract = pd.read_sql_query(raw_sql_query.format(table=caract_table), con=cnx)
+    df_places= pd.read_sql_query(raw_sql_query.format(table=places_table), con=cnx).drop("id", axis=1,errors=False)
+    df_users= pd.read_sql_query(raw_sql_query.format(table=users_table), con=cnx).drop("id", axis=1, errors=False)
+    df_veh= pd.read_sql_query(raw_sql_query.format(table=veh_table), con=cnx)
 
     #--Creating new columns
     nb_victim = pd.crosstab(df_users.Num_Acc, "count").reset_index()
