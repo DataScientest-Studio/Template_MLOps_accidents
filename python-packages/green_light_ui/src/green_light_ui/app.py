@@ -1,3 +1,4 @@
+from pathlib import Path
 from collections import OrderedDict
 
 import streamlit as st
@@ -5,11 +6,11 @@ from PIL import Image
 import config
 
 
-from tabs import user_interface, intro, service_platform, api, updates, training, evaluation, ci_cd, monitoring
+from tabs import intro, service_platform, api, updates, training, evaluation, ci_cd, monitoring
 
 
 # File locatements in Docker
-streamlit_base = '/app/src/green_light_ui'
+app_script_base = Path(__file__).parent
 
 
 st.set_page_config(
@@ -17,7 +18,7 @@ st.set_page_config(
     # page_icon="assets/model.png",
 )
 
-with open(streamlit_base + "/style.css", "r") as f:
+with open(app_script_base / "style.css", "r") as f:
     style = f.read()
 
 st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
@@ -30,7 +31,7 @@ TABS = OrderedDict(
         (intro.sidebar_name, intro),
         (service_platform.sidebar_name, service_platform),
         (api.sidebar_name, api),
-        (user_interface.sidebar_name, user_interface),
+        # (user_interface.sidebar_name, user_interface),
         (updates.sidebar_name, updates),
         (training.sidebar_name, training),
         (evaluation.sidebar_name, evaluation),
@@ -42,7 +43,7 @@ TABS = OrderedDict(
 
 def run():
 
-    image = Image.open(streamlit_base+"/assets/GreenLights.png")
+    image = Image.open(app_script_base / "assets/GreenLights.png")
     st.sidebar.image(
         image,
         width=100,

@@ -32,13 +32,22 @@ The Python scripts are configured through the following enviroment variables:
 
 - TODO: None yet but probably the admin username & password in order to call the Model API and get the authorization token.
 
+## Running the UI Locally (no docker)
+
+Assumming you are in the root directory of the `green_light_ui` Python project, then run:
+
+```
+streamlit run src/green_light_ui/app.py --server.port=8501 --server.address=localhost
+```
+
+Then access the UI: [localhost](http://localhost:8501/)
 
 ## Building the Docker Image
 
-Build the docker image:
+Assumming you are in the root directory of the `green_light_ui` Python project, then build the docker image by:
 
 ```
-DOCKER_BUILDKIT=1 docker image build --no-cache . -t accidents_ui:latest
+DOCKER_BUILDKIT=1 docker image build --no-cache . -t roadaccidentsmlops24/accidents_ui:latest
 ```
 
 >> If `DOCKER_BUILDKIT=1` doesn't work for you then before building the docker image run:
@@ -50,17 +59,6 @@ sudo chmod -R 777 python-packages/green_light_ui
 ```
 docker container run --name accidents_ui -p 8501:8501 roadaccidentsmlops24/accidents_ui:latest
 ```
-
-## Running the UI Locally (no docker)
-
-
-```
-streamlit run src/green_light_ui/app.py --server.port=8501 --server.address=localhost
-```
-
-Then access the UI: [localhost](http://localhost:8501/)
-
-
 
 # Further reading
 
