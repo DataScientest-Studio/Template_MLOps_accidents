@@ -45,7 +45,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
-          password: $DOCKER_HUB_PASS
+          password: ${ DOCKER_HUB_PASS }
 
       - name: Build the road_accidents_database_ingestion Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
@@ -82,7 +82,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
-          password: $DOCKER_HUB_PASS
+          password: ${ DOCKER_HUB_PASS }
 
       - name: Build the model_api Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
@@ -119,7 +119,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
-          password: $DOCKER_HUB_PASS
+          password: ${ DOCKER_HUB_PASS }
 
       - name: Build the green_light_ui Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
