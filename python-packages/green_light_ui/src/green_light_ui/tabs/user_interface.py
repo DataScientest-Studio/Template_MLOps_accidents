@@ -6,29 +6,16 @@ import time
 from pydantic import BaseModel
 import requests
 
-
-# File locations in Docker
-data_base = '/data'
-
-
 # URLs  
 url_prediction = "http://model_api_from_compose:8000/predict"
 
-
 # Page settings 
-
 title = "GreenLightServices - Make a Prediction"
 sidebar_name = "User Interface"
-
-
-
-
 
 ## Definitions
 
 # Stuff for the UI-Layout to input the features
-
-X_train = pd.read_csv(data_base + '/preprocessed/X_train.csv')
 
 features = {
     "place": 10,
@@ -154,10 +141,6 @@ def input_feature(feature):
     this is required to build the three input columns with flexible number of rows
     depending on the number of core features 
     '''
-    # lookup values 
-    options = list(X_train[feature].unique())
-    options.sort()
-    idx = options.index(features[feature])
     
     st.write(f"**'{feature_en[feature]}'**, Default: {features[feature]}")
     value = st.number_input(feature_en[feature],label_visibility="collapsed", value = new_features[feature])
@@ -174,9 +157,6 @@ def run():
     # settings
     global new_features
     global features
-
-    
-    X_cols = X_train.columns.tolist()
     
     st.title(title)
 

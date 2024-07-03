@@ -6,7 +6,7 @@ from PIL import Image
 import config
 
 
-from tabs import intro, service_platform, api, updates, training, evaluation, ci_cd, monitoring
+from tabs import intro, user_interface, service_platform, api, updates, training, evaluation, ci_cd, monitoring
 
 
 # File locatements in Docker
@@ -31,7 +31,7 @@ TABS = OrderedDict(
         (intro.sidebar_name, intro),
         (service_platform.sidebar_name, service_platform),
         (api.sidebar_name, api),
-        # (user_interface.sidebar_name, user_interface),
+        (user_interface.sidebar_name, user_interface),
         (updates.sidebar_name, updates),
         (training.sidebar_name, training),
         (evaluation.sidebar_name, evaluation),
