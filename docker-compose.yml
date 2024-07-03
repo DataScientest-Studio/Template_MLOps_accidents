@@ -44,6 +44,8 @@ x-airflow-common: &airflow-common
     - ./Volumes/airflow/logs:/opt/airflow/logs
     - ./Volumes/airflow/plugins:/opt/airflow/plugins
     - ./Volumes/data:${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
+    - ./Volumes/models:/models
+    - ./Volumes/mlruns:/mlruns
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     &airflow-common-depends-on
@@ -63,7 +65,7 @@ services:
       POSTGRES_PASSWORD: ${ADMIN_PASSWORD}
       POSTGRES_DB: ${ROAD_ACCIDENTS_POSTGRES_DB}
     ports:
-      - "${ROAD_ACCIDENTS_POSTGRES_PORT}:5432"
+      - "5433:${ROAD_ACCIDENTS_POSTGRES_PORT}"
     volumes:
       - ./Volumes/db:/var/lib/postgresql/data
 
@@ -107,13 +109,18 @@ services:
     image: roadaccidentsmlops24/accidents_ui:latest
     container_name: model_ui_from_compose
     ports:
-      - "8501:8501"
+      - 8501:8501
     volumes:
       - ./Volumes/models:/models
       - ./Volumes/data:/data
     environment:
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    command: bash -c "
+       chmod -R 777 /models &&
+       chmod -R 777 /data  "
+    build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
+      dockerfile: UI.Dockerfile
 
 # Airflow
   postgres:
