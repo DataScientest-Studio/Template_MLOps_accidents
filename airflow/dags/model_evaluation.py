@@ -22,7 +22,7 @@ def evaluate_model():
     # data_base = '/data'
 
     # specifiy the location of mlruns
-    remote_server_uri = "127.0.0.1:5000"  # set to your server URI
+    remote_server_uri = "10.12.10.167:5000"  # set to your server URI
     mlflow.set_tracking_uri(remote_server_uri)
     mlflow.set_experiment("/accidents")
     mlflow.set_tracking_uri(uri=f'file:///mlflow")')
