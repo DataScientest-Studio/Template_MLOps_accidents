@@ -11,11 +11,66 @@ permissions:
   contents: read
 
 jobs:
-    if_merged:
+    RoadAccidentsDatabaseIngestion:
       if: github.event.pull_request.merged == true
       runs-on: ubuntu-latest
+
       steps:
-      - name: BuildAndPushDockerImages
-        run: |
-          echo The PR was merged
+        - uses: actions/checkout@v3
   
+        - name: Login to the Docker Hub
+          uses: docker/login-action@v1
+          with:
+            username: roadaccidentsmlops24
+            password: ${{ env.DOCKER_HUB_PASS }}
+  
+        - name: Build and push the road_accidents_database_ingestion Docker image to the roadaccidentsmlops24 DockerHub
+          uses: docker/build-push-action@v2
+          with:
+            context: ./python-packages/
+            file: ./python-packages/airflowdb.Dockerfile
+            push: true
+            tags: roadaccidentsmlops24/airflowdb:latest, roadaccidentsmlops24/airflowdb:${{ github.run_number }}
+
+    ModelApi:
+      if: github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v3
+  
+        - name: Login to the Docker Hub
+          uses: docker/login-action@v1
+          with:
+            username: roadaccidentsmlops24
+            password: ${{ env.DOCKER_HUB_PASS }}
+  
+        - name: Build and push the model_api Docker image to the roadaccidentsmlops24 DockerHub
+          uses: docker/build-push-action@v2
+          with:
+            context: ./python-packages/model_api/
+            push: true
+            tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ github.run_number }}
+            dockerfile: ./python-packages/model_api/Dockerfile
+    
+
+    GreenLightUi:
+      if: github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v3
+  
+        - name: Login to the Docker Hub
+          uses: docker/login-action@v1
+          with:
+            username: roadaccidentsmlops24
+            password: ${{ env.DOCKER_HUB_PASS }}
+  
+        - name: Build and push the green_light_ui Docker image to the roadaccidentsmlops24 DockerHub
+          uses: docker/build-push-action@v2
+          with:
+            context: ./python-packages/green_light_ui/
+            push: true
+            tags: roadaccidentsmlops24/accidents_ui:latest, roadaccidentsmlops24/accidents_ui:${{ github.run_number }}
+            dockerfile: ./python-packages/green_light_ui/Dockerfile

@@ -47,12 +47,12 @@ jobs:
           username: roadaccidentsmlops24
           password: ${{ env.DOCKER_HUB_PASS }}
 
-      - name: Build the road_accidents_database_ingestion Docker image and push to the roadaccidentsmlops24 DockerHub
+      - name: Build the road_accidents_database_ingestion Docker image
         uses: docker/build-push-action@v2
         with:
           context: ./python-packages/
           file: ./python-packages/airflowdb.Dockerfile
-          push: true
+          push: false
           tags: roadaccidentsmlops24/airflowdb:latest, roadaccidentsmlops24/airflowdb:${{ github.run_number }}
   
   ModelApi:
@@ -84,11 +84,11 @@ jobs:
           username: roadaccidentsmlops24
           password: ${{ env.DOCKER_HUB_PASS }}
 
-      - name: Build the model_api Docker image and push to the roadaccidentsmlops24 DockerHub
+      - name: Build the model_api Docker image
         uses: docker/build-push-action@v2
         with:
           context: ./python-packages/model_api/
-          push: true
+          push: false
           tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ github.run_number }}
           dockerfile: ./python-packages/model_api/Dockerfile
   
@@ -121,10 +121,10 @@ jobs:
           username: roadaccidentsmlops24
           password: ${{ env.DOCKER_HUB_PASS }}
 
-      - name: Build the green_light_ui Docker image and push to the roadaccidentsmlops24 DockerHub
+      - name: Build the green_light_ui Docker image
         uses: docker/build-push-action@v2
         with:
           context: ./python-packages/green_light_ui/
-          push: true
+          push: false
           tags: roadaccidentsmlops24/accidents_ui:latest, roadaccidentsmlops24/accidents_ui:${{ github.run_number }}
           dockerfile: ./python-packages/green_light_ui/Dockerfile
