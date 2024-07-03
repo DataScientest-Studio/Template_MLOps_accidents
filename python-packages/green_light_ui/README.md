@@ -38,7 +38,7 @@ The Python scripts are configured through the following enviroment variables:
 Build the docker image:
 
 ```
-DOCKER_BUILDKIT=1 docker image build --no-cache  -f UI.Dockerfile . -t accidents_ui:latest
+DOCKER_BUILDKIT=1 docker image build --no-cache . -t accidents_ui:latest
 ```
 
 >> If `DOCKER_BUILDKIT=1` doesn't work for you then before building the docker image run:
@@ -48,7 +48,7 @@ sudo chmod -R 777 python-packages/green_light_ui
 ## Running the Docker Image
 
 ```
-docker container run --name accidents_ui -p 8501:8501 accidents_ui:latest
+docker container run --name accidents_ui -p 8501:8501 roadaccidentsmlops24/accidents_ui:latest
 ```
 
 ## Running the UI Locally (no docker)
