@@ -1,0 +1,19 @@
+name: PR merged to master
+
+on:
+    pull_request:
+        types:
+        - closed
+
+permissions:
+  contents: read
+
+jobs:
+    if_merged:
+      if: github.event.pull_request.merged == true
+      runs-on: ubuntu-latest
+      steps:
+      - name: BuildAndPushDockerImages
+        run: |
+          echo The PR was merged
+  
