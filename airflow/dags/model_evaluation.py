@@ -17,19 +17,19 @@ import os
 def evaluate_model():
     model_base = "/models"
     data_base = "/data/raw"
-    mlruns_base = "/mlruns"
+    mlruns_base = "/mlflow"
     # model_base = '/models'
     # data_base = '/data'
 
     # specifiy the location of mlruns
-    remote_server_uri = "10.12.10.167:5000"  # set to your server URI
+    remote_server_uri = "http://host.docker.internal:5000"  # set to your server URI
     mlflow.set_tracking_uri(remote_server_uri)
-    mlflow.set_experiment("/accidents")
+    mlflow.set_experiment("accidents")
     mlflow.set_tracking_uri(uri=f'file:///mlflow")')
     exp = mlflow.get_experiment_by_name(name="accidents")
     if not exp:
         experiment_id = mlflow.create_experiment(
-            name="Emegency_landing",
+            name="accidents",
             artifact_location=f'file:///mlflow")',
         )
     else:
