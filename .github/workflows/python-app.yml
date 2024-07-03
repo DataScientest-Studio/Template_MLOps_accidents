@@ -11,6 +11,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  DOCKER_HUB_PASS: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
+
 permissions:
   contents: read
 
@@ -42,7 +45,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
-          password: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
+          password: $DOCKER_HUB_PASS
 
       - name: Build the road_accidents_database_ingestion Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
@@ -79,7 +82,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
-          password: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
+          password: $DOCKER_HUB_PASS
 
       - name: Build the model_api Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
@@ -116,7 +119,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           username: roadaccidentsmlops24
-          password: dckr_pat_c7z819p35OfFdnkGt19m0nd4clM
+          password: $DOCKER_HUB_PASS
 
       - name: Build the green_light_ui Docker image and push to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
