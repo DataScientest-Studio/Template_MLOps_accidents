@@ -3,9 +3,9 @@ version: "3.8"
 # downloaded from: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html
 # using command: curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.9.2/docker-compose.yaml'
 x-airflow-common: &airflow-common
-  build:
-    dockerfile: airflowDb.Dockerfile
-  image: ${AIRFLOW_IMAGE_NAME:-airflowdb}
+  # build:
+  #   dockerfile: airflowDb.Dockerfile
+  image: ${AIRFLOW_IMAGE_NAME:-roadaccidentsmlops24/airflowdb}
   # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.9.2}
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -33,6 +33,7 @@ x-airflow-common: &airflow-common
     ROAD_ACCIDENTS_POSTGRES_PORT: ${ROAD_ACCIDENTS_POSTGRES_PORT}
     ROAD_ACCIDENTS_POSTGRES_DB: ${ROAD_ACCIDENTS_POSTGRES_DB}
     ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR: ${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
+    AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME: ${AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME}
     _AIRFLOW_WWW_USER_USERNAME: ${ADMIN_USERNAME}
     _AIRFLOW_WWW_USER_PASSWORD: ${ADMIN_PASSWORD}
 
@@ -78,13 +79,22 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGPASSFILE: /pgpass
     volumes:
       - ./Volumes/db_admin:/var/lib/pgadmin
     depends_on:
       - postgres_road_accidents
+    entrypoint: /bin/sh -c "chown 5050:5050 /pgpass;chmod 0600 /pgpass; /entrypoint.sh;"
+    user: root
+    configs:
+      - source: pgadmin_servers_conf_json
+        target: /pgadmin4/servers.json
+      - source: pgadmin_pgpass_conf_file
+        target: /pgpass
 
   model_api:
-    image: model_api:latest
+    image: roadaccidentsmlops24/model_api:latest
     container_name: model_api_from_compose
     volumes:
       - ./Volumes/models:/models
@@ -94,11 +104,9 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     ports:
       - ${MODEL_API_PORTS}
-    build: # TODO we should remove this from here as the CI/CD pipeline will publish the docker images to docker hub
-      dockerfile: ModelApi.Dockerfile
 
   UI:
-    image: accidents_ui:latest
+    image: roadaccidentsmlops24/accidents_ui:latest
     container_name: model_ui_from_compose
     ports:
       - 8501:8501
@@ -151,10 +159,10 @@ services:
       - 8080:8080
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 60s
+      timeout: 30s
       retries: 5
-      start_period: 30s
+      start_period: 60s
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
@@ -297,3 +305,25 @@ services:
 
 volumes:
   postgres-db-volume:
+
+configs:
+  pgadmin_pgpass_conf_file:
+    content: ${ROAD_ACCIDENTS_POSTGRES_HOST}:${ROAD_ACCIDENTS_POSTGRES_PORT}:${ROAD_ACCIDENTS_POSTGRES_DB}:${ADMIN_USERNAME}:${ADMIN_PASSWORD}
+  pgadmin_servers_conf_json:
+    content: |
+      {"Servers": {"1": {
+            "Name": "RoadAccidents",
+            "Group": "Servers",
+            "Host": "${ROAD_ACCIDENTS_POSTGRES_HOST}",
+            "Port": ${ROAD_ACCIDENTS_POSTGRES_PORT},
+            "MaintenanceDB": "${ROAD_ACCIDENTS_POSTGRES_DB}",
+            "Username": "${ADMIN_USERNAME}",
+            "UseSSHTunnel": 0,
+            "TunnelPort": "22",
+            "TunnelAuthentication": 0,
+            "KerberosAuthentication": false,
+            "PassFile": "/pgpass",
+            "ConnectionParameters": {
+                "sslmode": "prefer",
+                "connect_timeout": 10  
+      }}}}

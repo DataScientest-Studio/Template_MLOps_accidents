@@ -7,11 +7,14 @@ Volumes/db/*
 
 
 #keep the structure for Volumes/data and Volumes/models
-# Volumes/data/*
-# !Volumes/data/.gitkeep
+Volumes/data/*
+!Volumes/data/.gitkeep
 
-# Volumes/model/*
-# !Volumes/model/.gitkeep
+Volumes/models/*
+!Volumes/models/.gitkeep
+
+Volumes/mlflow/*
+!Volumes/mlflow/.gitkeep
 
 ## Airflow Volumes
 Volumes/airflow/*
@@ -36,6 +39,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 .venv/
+accidents/
 env/
 myenv/
 my_env/
