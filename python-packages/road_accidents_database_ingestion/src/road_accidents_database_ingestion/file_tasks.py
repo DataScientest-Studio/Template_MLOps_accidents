@@ -87,4 +87,5 @@ def get_road_accident_file2model(
 def get_dataframe(path: Path) -> pd.DataFrame:
     # --Importing dataset
     df = pd.read_csv(path, sep=";", encoding="utf-8").replace({np.nan: None})
+    df = df.rename(columns={"Accident_Id": "Num_Acc"}) # the 2022 caracteristiques has `Accident_Id` instead of `Num_Acc`
     return df
