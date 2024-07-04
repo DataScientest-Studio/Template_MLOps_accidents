@@ -46,7 +46,7 @@ class Lieux(SQLModel, table=True):
     v1: int
     v2: Optional[str] = None
     circ: int
-    nbv: int
+    nbv: Optional[int] = None
     vosp: int
     prof: int
     pr: str

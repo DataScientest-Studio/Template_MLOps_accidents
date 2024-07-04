@@ -33,8 +33,8 @@ from road_accidents_database_ingestion.db_tasks import (
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-PATH_RAW_FILES_DIR = os.getenv("ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR")
 AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME = os.getenv("AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME")
+ROAD_ACCIDENTS_DIRS = os.getenv("ROAD_ACCIDENTS_DIRS")
 
 class NewFolderSensor(BaseSensorOperator):
     @apply_defaults
@@ -80,9 +80,9 @@ def process_new_folders(**kwargs):
         for folder in new_folders:
             print(f"Processing folder: {folder}")
             # Add your processing logic here
-            print(f"{PATH_RAW_FILES_DIR}")
+            print(f"{ROAD_ACCIDENTS_DIRS}")
             print(f"{type(new_folders)}")
-            new_data_dir = Path(PATH_RAW_FILES_DIR) / folder
+            new_data_dir = Path(ROAD_ACCIDENTS_DIRS) / folder
             print(f"Path = '{new_data_dir}'")
             print(f"DB url='{get_db_url()}'")
     else:
@@ -92,11 +92,11 @@ def process_new_folders(**kwargs):
 def task_process_new_road_accidents_csvs(**kwargs):
     ti = kwargs["ti"]
     new_folders = ti.xcom_pull(task_ids="watch_for_new_data_dirs_task", key="new_folders")
-
+    new_data_added_to_db = False
     logger.info(f"Creating the DB engine.")
     engine = create_db_engine(db_url=get_db_url())
     for new_dir in new_folders:
-        new_dir_full_path = Path(PATH_RAW_FILES_DIR) / new_dir
+        new_dir_full_path = Path(ROAD_ACCIDENTS_DIRS) / new_dir
         logger.info(f"Processing data from directory '{new_dir_full_path}'.")
         logger.info(f"{list(new_dir_full_path.glob("*"))}")
 
@@ -114,16 +114,25 @@ def task_process_new_road_accidents_csvs(**kwargs):
             logger.info(f"Checking DB table 'RawRoadAccidentsCsvFile' to see if files already processed.")
             update_raw_accidents_csv_files_table(db_session=session, files=file2model)
             logger.info(f"Adding Road Accident data to the DB.")
-            add_data_to_db(db_session=session, files=file2model)
+            logger.info(file2model)
+            new_data_added_to_db = add_data_to_db(db_session=session, files=file2model)
             session.commit()
-            logger.info(f"Done.")
+            if new_data_added_to_db:
+                logger.info(f"New data added to the DB. Updating xcom 'new_data_added_to_db'.")
+                ti.xcom_push(key="new_data_added_to_db", value=new_data_added_to_db)
 
 def task_update_variable_new_road_accidents_data_timestamp(**kwargs):
-    ts = datetime.datetime.now().isoformat()
-    logger.info(f"New Road Accidents data added to the DB...")
-    logger.info(f"Setting the Airflow variable '{AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME}' with the timestamp: '{ts}'.")
-    Variable.set(AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME, ts)
-    logger.info("Done!")
+    ti = kwargs["ti"]
+    new_data_added_to_db = ti.xcom_pull(task_ids="process_new_road_accidents_csv_task", 
+                                        key="new_data_added_to_db")
+    if new_data_added_to_db:
+        ts = datetime.datetime.now().isoformat()
+        logger.info(f"New Road Accidents data added to the DB...")
+        logger.info(f"Setting the Airflow variable '{AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME}' with the timestamp: '{ts}'.")
+        Variable.set(AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME, ts)
+        logger.info("Done!")
+    else:
+        logger.info("No new data added to the DB.")
 
 # Le DAG
 with DAG(
@@ -144,7 +153,7 @@ with DAG(
 
     watch_task = NewFolderSensor(
         task_id="watch_for_new_data_dirs_task",
-        directory=PATH_RAW_FILES_DIR,
+        directory=ROAD_ACCIDENTS_DIRS,
         mode="poke",
         poke_interval=datetime.timedelta(seconds=30),
         timeout=datetime.timedelta(hours=24),
