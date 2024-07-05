@@ -1,4 +1,6 @@
 # Docker Volumes 
+
+!Volumes/data/mlflow/run_mlfow_server.sh
 Volumes/db_admin/*
 !Volumes/db_admin/.gitkeep
 
