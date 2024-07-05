@@ -13,4 +13,4 @@ echo "Remove all Docker Images not assigned to a Docker Container"
 docker image prune -a
 
 echo "Start the Docker Compose App."
-DOCKER_BUILDKIT=1 docker-compose up -d
+DOCKER_BUILDKIT=1 docker compose up -d

@@ -61,19 +61,33 @@ The repository is structured as follows:
     │   │
     ├── Volumes     
     │   │
-    │   ├── airflow/        
-    │   ├── data/         
-    │   ├── db/       
-    │   ├── db_admin/
-    │   ├── model
-    │   │   ├── archive  
-    │   │   └── new
+    │   ├── airflow/            <- Airflow creates this       
     │   │
+    │   ├── data/         
+    │   │   ├── metrics/        <- used by TODO    
+    │   │   ├── mlflow/         <- used by TODO    
+    │   │   │   └── run_mlflow_server.sh   <- Starts the MLFlow server locally (ouside docker-compose)
+    │   │   │
+    │   │   ├── predictions/    <- used by TODO    
+    │   │   └── preprocessed/   <- used by TODO
+    │   │
+    │   ├── db/                 <- The RoadAccidents Postgres DB files       
+    │   │
+    │   ├── db_admin/           <- The PgAdmin files, used to monitor the RoadAccidents DB
+    │   │
+    │   ├── models
+    │   │   ├── archive  
+    │   │   ├── new  
+    │   │   └── trained_model.joblib <- The ML model currently used in production
+    │   │
+    │   ├── road_accidents_data_directories/      <- Clients drop here directories with Road Accidents CSV files   
+    │   │   ├── 2021/                             <- For example for the year '2021'    
+    │   │   │   ├── caracteristiques_2021.csv   
+    │   │   │   ├── lieux-2021.csv   
+    │   │   │   ├── usagers-2020.csv   
+    │   │   │   └── vehicules-2020.csv   
+    │   │   │
     ├── notebooks          
-    │
-    ├── models             
-    │
-    ├── notebooks         
     │
     ├── python-packages                
     │   │

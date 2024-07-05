@@ -6,12 +6,13 @@ import time
 from pydantic import BaseModel
 import requests
 import json
+import os
 
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 # URLs
-url_prediction = "http://model_api_from_compose:8001/predict"
+url_prediction = "http://model_api_from_compose:8000/predict"
 # url_prediction = "http://localhost:8001/predict"
 # Page settings
 title = "GreenLightServices - Make a Prediction"
@@ -119,7 +120,7 @@ core_features = {
 
 def get_jwt_token():
     # url = "http://localhost:8001/user/login"
-    url = "http://model_api_from_compose:8001/user/login"
+    url = "http://model_api_from_compose:8000/user/login"
     response = requests.post(
         url, json={"username": ADMIN_USERNAME, "password": ADMIN_PASSWORD}
     )

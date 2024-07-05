@@ -22,10 +22,10 @@ def evaluate():
 
     y_test = y_test.values.ravel()
 
-    if not os.path.exists(metrics_base):
-        subprocess.call(["sudo mkdir", "-m", "777", "metrics_base"])
-    if not os.path.exists(predictions_base):
-        subprocess.call(["sudo mkdir", "-m", "777", "predictions_base"])
+    # if not os.path.exists(metrics_base):
+    #     subprocess.call(["sudo mkdir", "-m", "777", "metrics_base"])
+    # if not os.path.exists(predictions_base):
+    #     subprocess.call(["sudo mkdir", "-m", "777", "predictions_base"])
     # subprocess.call(['chmod', '-R', '777', 'metrics_base'])
     # subprocess.call(['chmod', '-R', '777', 'prediction_base'])
 

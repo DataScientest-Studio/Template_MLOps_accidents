@@ -46,6 +46,7 @@ x-airflow-common:
     - ./Volumes/airflow/plugins:/opt/airflow/plugins
     - ./Volumes/models:/models
     - ./Volumes/mlflow:/mlflow
+    - ./Volumes/data:/data
     - ./Volumes/road_accidents_data_directories:${ROAD_ACCIDENTS_DATA_DIRECTORIES}
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on: &airflow-common-depends-on

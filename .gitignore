@@ -1,22 +1,37 @@
 # Docker Volumes 
-
-!Volumes/data/mlflow/run_mlfow_server.sh
 Volumes/db_admin/*
 !Volumes/db_admin/.gitkeep
 
 Volumes/db/*
 !Volumes/db/.gitkeep
 
+Volumes/road_accidents_data_directories/*
+!Volumes/road_accidents_data_directories/.gitkeep
 
 #keep the structure for Volumes/data and Volumes/models
 Volumes/data/*
 !Volumes/data/.gitkeep
 
+Volumes/data/metrics/*
+!Volumes/data/metrics/.gitkeep
+
+Volumes/data/predictions/*
+!Volumes/data/predictions/.gitkeep
+
+Volumes/data/preprocessed/*
+!Volumes/data/preprocessed/.gitkeep
+
+Volumes/data/mlflow/*
+!Volumes/data/mlflow/run_mlfow_server.sh
+
 Volumes/models/*
 !Volumes/models/.gitkeep
 
-Volumes/mlflow/*
-!Volumes/mlflow/.gitkeep
+Volumes/models/archive/*
+!Volumes/models/archive/.gitkeep
+
+Volumes/models/new/*
+!Volumes/models/new/.gitkeep
 
 ## Airflow Volumes
 Volumes/airflow/*
