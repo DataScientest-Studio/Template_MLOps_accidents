@@ -26,6 +26,8 @@ from model_evaluation import evaluate_model
 
 import sys
 
+import requests
+
 # the path to our source code directories - docker version
 
 model_base = "/models"
@@ -45,10 +47,32 @@ _model_name = "accidents_model"
 ### SET A UNIQUE EXPERIMENT NAME (e.g. "experiment_<YOUR NAME>"):
 _mlflow_experiment_name = "accidents_experiment"
 
+### manage authorization
+
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
+
+# this is run from a worker
+
+url_refresh = "http://model_api_from_compose:8000/refresh"
+
+
+def get_jwt_token():
+    # url = "http://localhost:8001/user/login"
+    url = "http://model_api_from_compose:8000/user/login"
+    response = requests.post(
+        url, json={"username": ADMIN_USERNAME, "password": ADMIN_PASSWORD}
+    )
+    token = response.json()["access_token"]
+    print("token = ", token)
+    return token
+
 
 def refresh_api():
-    # get token
-    # trigger refresh
+    token = get_jwt_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    refresh = requests.get(url_refresh, headers=headers)
     print("refreshed model in api")
     return 1
 
