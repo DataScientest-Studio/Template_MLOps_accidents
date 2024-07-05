@@ -9,8 +9,6 @@ Volumes/road_accidents_data_directories/*
 !Volumes/road_accidents_data_directories/.gitkeep
 
 #keep the structure for Volumes/data and Volumes/models
-Volumes/data/*
-!Volumes/data/.gitkeep
 
 Volumes/data/metrics/*
 !Volumes/data/metrics/.gitkeep
