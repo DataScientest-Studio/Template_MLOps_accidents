@@ -1,6 +1,10 @@
 """Run this script outside of docker-compose."""
 from pathlib import Path
 import time
+import os
+import dotenv
+
+from dotenv import load_dotenv
 
 from road_accidents_database_ingestion.db_tasks import (
     create_db_engine,
@@ -11,15 +15,19 @@ from road_accidents_database_ingestion.db_tasks import (
     Session,
 )
 
-PATH_RAW_FILES_DIR = "/Users/evan/Documents/Courses/Datascientest/FinalProject/git/may24_bmlops_accidents/Volumes/data/raw_full_2021"
+PATH_ROOT_PROJECT_DIR = Path.cwd().parent.parent
+
+load_dotenv(PATH_ROOT_PROJECT_DIR)
+
+PATH_RAW_FILES_DIR = PATH_ROOT_PROJECT_DIR / "Volumes" / "data" / "raw" / "2020"
 
 
 def get_db_url() -> str:
     host = "127.0.0.1"
-    database = "RoadAccidents"
-    user = "postgres"
-    password = "changeme"
-    port = "5432"
+    database = os.getenv("ROAD_ACCIDENTS_POSTGRES_DB")
+    user = os.getenv("ADMIN_USERNAME")
+    password = os.getenv("ADMIN_PASSWORD")
+    port = 5433
     db_url = "postgresql+psycopg2://{user}:{password}@{hostname}:{port}/{database_name}".format(
         hostname=host, user=user, password=password, database_name=database, port=port
     )

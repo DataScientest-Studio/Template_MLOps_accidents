@@ -6,6 +6,9 @@ import time
 from pydantic import BaseModel
 import requests
 
+ADMIN_USERNAME = 'admin'
+ADMIN_PASSWORD = 'adm1n'
+
 # URLs  
 url_prediction = "http://model_api_from_compose:8000/predict"
 
@@ -112,13 +115,19 @@ core_features = {
     # "nb_vehicules": 1,
 }
 
-
+def get_jwt_token():
+    url = "http://localhost:8000/user/login"
+    response = requests.post(url, json={"username": ADMIN_USERNAME, "password": ADMIN_PASSWORD})
+    token = response. 
 
 # functions needed in the UI 
 def predict_model(features):
     input_df = pd.DataFrame([features])
     print(input_df)
     # prediction = loaded_model.predict(input_df)
+    # get the token
+    # make the request 
+
     prediction = 1
     return prediction
 
