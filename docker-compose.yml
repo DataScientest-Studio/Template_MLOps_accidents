@@ -43,9 +43,10 @@ x-airflow-common:
     - ./Volumes/airflow/config:/opt/airflow/config
     - ./Volumes/airflow/logs:/opt/airflow/logs
     - ./Volumes/airflow/plugins:/opt/airflow/plugins
-    - ./Volumes/data:${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
+    - ./Volumes/data/raw_db:${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
     - ./Volumes/models:/models
-    - ./Volumes/mlruns:/mlruns
+    - ./Volumes/mlflow:/mlflow
+    - ./Volumes/data:/data
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on: &airflow-common-depends-on
     redis:
@@ -105,8 +106,8 @@ services:
       - ${MODEL_API_PORTS}
 
   UI:
-    # image: roadaccidentsmlops24/accidents_ui:latest
-    image: accidents_ui:latest
+    image: roadaccidentsmlops24/accidents_ui:latest
+    # image: accidents_ui:latest
     container_name: model_ui_from_compose
     ports:
       - 8501:8501
@@ -114,7 +115,7 @@ services:
       - ./Volumes/models:/models
       - ./Volumes/data:/data
       - ./Volumes/mlflow:/mlflow
-    command: bash -c " chmod -R 777 /models && chmod -R 777 /data  && chmod -R 777 /mlflow "
+    # command: bash -c " chmod -R 777 /models && chmod -R 777 /data  && chmod -R 777 /mlflow "
     environment:
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
@@ -196,11 +197,12 @@ services:
 
   airflow-worker:
     <<: *airflow-common
-    volumes:
-      - ./Volumes/models:/models
-      - ./Volumes/data:/data
-      - ./Volumes/mlflow:/mlflow
+    # volumes:
+    # - ./Volumes/models:/models
+    # - ./Volumes/data:/data
+    # - ./Volumes/mlflow:/mlflow
     # command: bash -c "chmod -R 777 /models && chmod -R 777 /data  && chmod -R 777 /mlflow  &&  celery worker"
+
     command: celery worker
 
     healthcheck:

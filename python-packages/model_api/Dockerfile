@@ -3,7 +3,7 @@
 #   or run `DOCKER_BUILDKIT=1 docker-compose up`
 FROM python:3.12-slim
 
-RUN apt-get update && apt-get install python3-pip -y
+RUN apt-get update && apt-get install python3-pip -y && pip  install xgboost
 
 #set up a Working directory in the container
 WORKDIR /app
