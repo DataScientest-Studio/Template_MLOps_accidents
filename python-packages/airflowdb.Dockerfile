@@ -12,5 +12,5 @@ EXPOSE 8080
 #   or run `DOCKER_BUILDKIT=1 docker-compose up`
 RUN python -m ensurepip --upgrade && \
     python -m pip install --upgrade pip && python -m pip install -e road_accidents_database_ingestion && \
-    python -m pip install -e model_api && python -m pip install mlflow  && python -m pip install shap && python -m pip install xgboost && \
+    python -m pip install -e model_api && python -m pip install mlflow  && python -m pip install shap && \
     python -m pip install gitpython
