@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME = os.getenv("AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME")
-ROAD_ACCIDENTS_DIRS = os.getenv("ROAD_ACCIDENTS_DIRS")
+ROAD_ACCIDENTS_DIRS = os.getenv("ROAD_ACCIDENTS_DATA_DIRECTORIES")
 
 class NewFolderSensor(BaseSensorOperator):
     @apply_defaults

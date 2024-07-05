@@ -18,14 +18,9 @@ from road_accidents_database_ingestion.models import (
     Vehicules,
     Users,
 )
-from road_accidents_database_ingestion.file_tasks import (
-    get_road_accident_file2model,
-    get_dataframe,
-)
+from road_accidents_database_ingestion.file_tasks import get_dataframe
 
 load_dotenv()  # take environment variables from .env.
-
-PATH_RAW_FILES_DIR = os.getenv("ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR")
 
 
 def get_db_url() -> str:
