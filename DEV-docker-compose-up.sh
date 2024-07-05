@@ -26,4 +26,4 @@ DOCKER_BUILDKIT=1 docker image build --no-cache . -t roadaccidentsmlops24/accide
 
 echo "Start the Docker Compose App."
 cd ../../
-DOCKER_BUILDKIT=1 docker-compose up -d
+DOCKER_BUILDKIT=1 docker compose up -d

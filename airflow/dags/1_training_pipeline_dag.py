@@ -8,15 +8,16 @@ from airflow.operators.python_operator import PythonOperator, BranchPythonOperat
 from airflow.operators.dummy import DummyOperator
 from airflow.utils.dates import days_ago
 from airflow.utils.timezone import datetime
-
 from airflow.operators.latest_only import LatestOnlyOperator
+from airflow.decorators import task
+from airflow.operators.email import EmailOperator
+from airflow.models import Variable
+from airflow.exceptions import AirflowException
+from evaluate import evaluate
 
 import sys
 
-from airflow.decorators import task
-from airflow.operators.email import EmailOperator
-
-from evaluate import evaluate
+from datetime import timedelta
 
 from train_model import Train_Model, push_to_production
 
@@ -77,6 +78,20 @@ def refresh_api():
     return 1
 
 
+def check_for_new_data():
+    try:
+        # Attempt to get the variable, if it doesn't exist, this will raise an AirflowException
+        variable_name = os.getenv("AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME")
+        variable_value = Variable.get(variable_name)
+        print(f"Variable '{variable_name}' exists with value: {variable_value}")
+        Variable.delete(variable_name)
+        print("deleted variable:", variable_name)
+        return True
+    except:  # AirflowException:
+        print("Variable does not exist in 'check_for_nerw_data'")
+        return False
+
+
 default_args = {
     "owner": "ssime",
     "depends_on_past": False,
@@ -90,8 +105,9 @@ dag = DAG(
     "train_pipeline",
     default_args=default_args,
     description="Training  Pipeline",
-    # schedule_interval="0 */1 * * * ",
-    schedule_interval=None,
+    schedule_interval=timedelta(seconds=300),
+    # schedule_interval="*/1 */1 * * * ",
+    # schedule_interval=None,
     concurrency=1,  # Ensure only one instance of the DAG runs at a time
     max_active_runs=1,
     catchup=False,
@@ -120,6 +136,14 @@ with dag:
     # to Volume/data/preprocessed
 
     # latest_only = LatestOnlyOperator(task_id="latest_only")
+
+    @task.branch(task_id="new_data")
+    def new_data_branch(ti=None):
+        validation = check_for_new_data()
+        if not validation:
+            return "stop_task"
+        else:
+            return "data_transformation"
 
     data_transformation = PythonOperator(
         task_id="data_transformation",
@@ -164,6 +188,8 @@ with dag:
         task_id="refresh_api",
         python_callable=refresh_api,
     )
+
+    new_data_branch() >> [data_transformation, stop_task]
 
     (
         data_transformation
