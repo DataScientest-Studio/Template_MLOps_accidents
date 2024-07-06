@@ -28,5 +28,5 @@ jobs:
         with:
           context: ./python-packages/model_api/
           push: true
-          tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ github.run_number }}
+          tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ env.RELEASE_VERSION }}
           dockerfile: ./python-packages/model_api/Dockerfile
