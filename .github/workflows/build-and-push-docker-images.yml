@@ -1,4 +1,4 @@
-name: PR merged to master
+name: Continuous Delivery when a PR is merged to master
 
 on:
     pull_request:

@@ -3,7 +3,7 @@
 
 # https://www.youtube.com/watch?v=R8_veQiYBjI&ab_channel=TechWorldwithNana
 
-name: Python application
+name: Continuous Integration
 
 on:
   push:
