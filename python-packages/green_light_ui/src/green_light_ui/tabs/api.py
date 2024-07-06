@@ -60,5 +60,5 @@ def run():
     ):
 
         st.write(
-            "Link to GitHub Actions testing the API [link](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/2dc72e54da7e0bc3ba113eca3f884179af56af54/.github/workflows/python-app.yml#L41)"
+            "Link to GitHub Actions testing the API [link](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/2dc72e54da7e0bc3ba113eca3f884179af56af54/.github/workflows/python-app.yml#L57)"
         )
