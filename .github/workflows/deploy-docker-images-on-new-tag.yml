@@ -5,14 +5,14 @@ on:
     tags:
       - 'v*.*.*'
 jobs:
-  test:
+  DeployRoadAccidentsDatabaseIngestionDockerImage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
-      - name: Test
+      - name: GetTagVersion
         run: |
           echo $RELEASE_VERSION
           echo ${{ env.RELEASE_VERSION }}
@@ -30,3 +30,55 @@ jobs:
           push: true
           tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ env.RELEASE_VERSION }}
           dockerfile: ./python-packages/model_api/Dockerfile
+
+  DeployModelApiDockerImage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: GetTagVersion
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
+
+      - name: Login to the Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: roadaccidentsmlops24
+          password: ${{ secrets.DOCKER_HUB_PASS }}
+  
+      - name: Build and push the model_api Docker image to the roadaccidentsmlops24 DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./python-packages/model_api/
+          push: true
+          tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ env.RELEASE_VERSION }}
+          dockerfile: ./python-packages/model_api/Dockerfile
+
+  DeployGreenLightUiImage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: GetTagVersion
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
+
+      - name: Login to the Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: roadaccidentsmlops24
+          password: ${{ secrets.DOCKER_HUB_PASS }}
+
+      - name: Build and push the green_light_ui Docker image to the roadaccidentsmlops24 DockerHub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./python-packages/green_light_ui/
+          push: true
+          tags: roadaccidentsmlops24/accidents_ui:latest, roadaccidentsmlops24/accidents_ui:${{ env.RELEASE_VERSION }}
+          dockerfile: ./python-packages/green_light_ui/Dockerfile      
