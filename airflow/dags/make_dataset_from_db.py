@@ -89,7 +89,11 @@ def process_data(
     df_caract["com"] = df_caract["com"].str.replace("2B", "202")
 
     # --Converting columns types
-    df_caract[["dep", "com", "hour"]] = df_caract[["dep", "com", "hour"]].astype(int)
+    df_caract["dep"] = pd.to_numeric(df_caract["dep"], errors="coerce").notnull().astype(int)
+    df_caract["com"] = pd.to_numeric(df_caract["com"], errors="coerce").notnull().astype(int)
+    df_caract["hour"] = pd.to_numeric(df_caract["hour"], errors="coerce").notnull().astype(int)
+    
+    # df_caract[["dep", "com", "hour"]] = df_caract[["dep", "com", "hour"]].astype(int)
 
     dico_to_float = {"lat": float, "long": float}
     df_caract["lat"] = df_caract["lat"].str.replace(",", ".")

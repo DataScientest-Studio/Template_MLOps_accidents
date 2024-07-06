@@ -33,9 +33,9 @@ x-airflow-common:
     ROAD_ACCIDENTS_POSTGRES_HOST: ${ROAD_ACCIDENTS_POSTGRES_HOST}
     ROAD_ACCIDENTS_POSTGRES_PORT: ${ROAD_ACCIDENTS_POSTGRES_PORT}
     ROAD_ACCIDENTS_POSTGRES_DB: ${ROAD_ACCIDENTS_POSTGRES_DB}
-    ROAD_ACCIDENTS_DIRS: ${ROAD_ACCIDENTS_DIRS}
-    ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR: ${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
+    ROAD_ACCIDENTS_DATA_DIRECTORIES: ${ROAD_ACCIDENTS_DATA_DIRECTORIES}
     AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME: ${AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME}
+
     _AIRFLOW_WWW_USER_USERNAME: ${ADMIN_USERNAME}
     _AIRFLOW_WWW_USER_PASSWORD: ${ADMIN_PASSWORD}
     # _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pandas }
@@ -44,10 +44,10 @@ x-airflow-common:
     - ./Volumes/airflow/config:/opt/airflow/config
     - ./Volumes/airflow/logs:/opt/airflow/logs
     - ./Volumes/airflow/plugins:/opt/airflow/plugins
-    - ./Volumes/data/raw_db:${ROAD_ACCIDENTS_RAW_CSV_FILES_ROOT_DIR}
     - ./Volumes/models:/models
     - ./Volumes/mlflow:/mlflow
     - ./Volumes/data:/data
+    - ./Volumes/road_accidents_data_directories:${ROAD_ACCIDENTS_DATA_DIRECTORIES}
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on: &airflow-common-depends-on
     redis:
