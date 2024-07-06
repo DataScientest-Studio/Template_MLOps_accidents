@@ -23,13 +23,13 @@ jobs:
           username: roadaccidentsmlops24
           password: ${{ secrets.DOCKER_HUB_PASS }}
   
-      - name: Build and push the model_api Docker image to the roadaccidentsmlops24 DockerHub
+      - name: Build and push the road_accidents_database_ingestion Docker image to the roadaccidentsmlops24 DockerHub
         uses: docker/build-push-action@v2
         with:
-          context: ./python-packages/model_api/
+          context: ./python-packages/
+          file: ./python-packages/airflowdb.Dockerfile
           push: true
-          tags: roadaccidentsmlops24/model_api:latest, roadaccidentsmlops24/model_api:${{ env.RELEASE_VERSION }}
-          dockerfile: ./python-packages/model_api/Dockerfile
+          tags: roadaccidentsmlops24/airflowdb:latest, roadaccidentsmlops24/airflowdb:${{ env.RELEASE_VERSION }}
 
   DeployModelApiDockerImage:
     runs-on: ubuntu-latest
