@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-title = "CI/CD using GitHub and GitHub Actions"
+title = "CI/CD using GitHub Actions"
 sidebar_name = "CI/CD"
 
 
@@ -30,11 +30,19 @@ def run():
 
     More specifically we created a Docker Hub repository named [`roadaccidentsmlops24`](https://hub.docker.com/u/roadaccidentsmlops24) and we used Github Actions to build and push our application's Docker images.
     
-    There are 3 Dockerfiles:  
+    There are 3 Dockerfiles used by this application:  
 
     * [`roadaccidentsmlops24/airflowdb`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/python-packages/airflowdb.Dockerfile) which is used as the base image of [Airflow running in docker compose](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html).
     * [`roadaccidentsmlops24/model_api`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/python-packages/model_api/Dockerfile) which is used for serving a trained ML model and user authorization purposes.
     * [`roadaccidentsmlops24/accidents_ui`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/python-packages/green_light_ui/Dockerfile) which is used to provide a UI for our project.
+    
+    
+    When the user starts the application in `production` mode using the [`PROD-docker-compose-up.sh`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/PROD-docker-compose-up.sh) 
+    script, the aforementioned Docker images will be pulled from the [`roadaccidentsmlops24`](https://hub.docker.com/u/roadaccidentsmlops24) Docker Hub repo.
+    
+    > Note: There is also the possibility to run the application in `development` mode using the [`DEV-docker-compose-up.sh`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/DEV-docker-compose-up.sh)
+    script. In this case the aforementioned Docker images will not be pulled from the `roadaccidentsmlops24` Docker hub repo but instead the local Dockerfiles will used
+    to build the Docker images prior to running `docker compose up -d`.
     """)
 
     with st.expander(
@@ -98,7 +106,11 @@ def run():
 
     ---
    
-    > A specific release (`tag`) version can be used when starting the Docker Compose app in `production` mode, by setting the environment variable `GLS_TAG` (`GLS` is an abbrv. of Green Light Services):
+    > A specific release (`tag`) version can be used when starting the Docker Compose app in `production` mode, by setting the environment variable `GLS_TAG` 
+    (`GLS` is an abbrv. of Green Light Services). 
+    
+    > If a specific release version is requested then Docker compose will pull the images from Docker hub that correspond
+    the specified tag. For example if one would like to start the application using the release version `v0.0.4`:
 
         * GLS_TAG="v0.0.4" DOCKER_BUILDKIT=1 docker compose up -d # OR
         * GLS_TAG="v0.0.4" ./PROD-docker-compose-up.sh
