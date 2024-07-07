@@ -29,10 +29,14 @@ import sys
 
 import requests
 
+import os.path
+
 # the path to our source code directories - docker version
 
 model_base = "/models"
 data_base = "/data"
+
+model_file = model_base + "/trained_model.joblib"
 
 sys.path.append(data_base)
 sys.path.append(model_base)
@@ -58,7 +62,6 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 url_refresh = "http://model_api_from_compose:8000/refresh"
 
-
 def get_jwt_token():
     # url = "http://localhost:8001/user/login"
     url = "http://model_api_from_compose:8000/user/login"
@@ -68,7 +71,6 @@ def get_jwt_token():
     token = response.json()["access_token"]
     print("token = ", token)
     return token
-
 
 def refresh_api():
     token = get_jwt_token()
@@ -88,7 +90,7 @@ def check_for_new_data():
         print("deleted variable:", variable_name)
         return True
     except:  # AirflowException:
-        print("Variable does not exist in 'check_for_nerw_data'")
+        print("Variable does not exist in 'check_for_new_data'")
         return False
 
 
@@ -137,10 +139,12 @@ with dag:
 
     # latest_only = LatestOnlyOperator(task_id="latest_only")
 
-    @task.branch(task_id="new_data")
-    def new_data_branch(ti=None):
-        validation = check_for_new_data()
-        if not validation:
+    @task.branch(task_id="initiate")
+    def initiate_branch(ti=None):
+        new_data = check_for_new_data()
+        model_there = os.path.isfile(model_file)
+        print("model_there", model_there)
+        if not new_data and model_there:
             return "stop_task"
         else:
             return "data_transformation"
@@ -164,8 +168,8 @@ with dag:
     )
     # 4. Validate model
 
-    @task.branch(task_id="branch_task")
-    def branch_func(ti=None):
+    @task.branch(task_id="validate_push")
+    def validate_push(ti=None):
         validation = evaluate_model()
         if not validation:
             return "stop_task"
@@ -189,13 +193,13 @@ with dag:
         python_callable=refresh_api,
     )
 
-    new_data_branch() >> [data_transformation, stop_task]
+    initiate_branch() >> [data_transformation, stop_task]
 
     (
         data_transformation
         >> model_training
         >> model_metrics
-        >> branch_func()
+        >> validate_push()
         >> [stop_task, push_production]
     )
     push_production >> refresh_api

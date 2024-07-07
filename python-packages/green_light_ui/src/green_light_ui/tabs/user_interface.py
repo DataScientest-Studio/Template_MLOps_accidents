@@ -187,6 +187,7 @@ def run():
     global features
 
     st.title(title)
+
     st.subheader(subtitle)
 
     st.markdown(
@@ -266,7 +267,7 @@ def run():
             if idx == (col + 1) * num_rows:
                 break
     st.write("___")
-    st.subheader("Technical Details to the UI")
+    st.subheader("Technical Details of the UI")
     with st.expander("**This UI was build using the Streamlit package**"):
         st.write(
             """
@@ -274,6 +275,9 @@ def run():
         * The actual customer page is **this** page. Here you can make the prediction, which is currently the only service we offer
         * All other pages serve to demonstrate the project
         * This page was put behind a very rudimentarty securization using the JTW-Bearer from the FastAPI. 
+        * The UI below aquires for a selected set of the model features input data. 
+          * The input data are captured in a dict and sent as payload via a put request to the `/predict` endpoint of our API. 
+          * The api call is secured by means of a JWT-token previously acquired and submitted as a header to the api.
         * Checkout the code [here]:(https://github.com/DataScientest-Studio/may24_bmlops_accidents/tree/master/python-packages/green_light_ui/src/green_light_ui)
   
         """
