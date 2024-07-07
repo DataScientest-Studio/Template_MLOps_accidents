@@ -9,6 +9,9 @@
 #   ./DEV-docker-compose-up.sh                                                       #
 ######################################################################################
 
+# For the DEV the docker images are build locally and the 'latest' tag is used
+export GLS_TAG="latest"
+
 echo "Remove all Docker Images not assigned to a Docker Container"
 docker image prune -a
 
@@ -27,3 +30,8 @@ DOCKER_BUILDKIT=1 docker image build --no-cache . -t roadaccidentsmlops24/accide
 echo "Start the Docker Compose App."
 cd ../../
 DOCKER_BUILDKIT=1 docker compose up -d
+
+echo "Starting MLFlow server"
+cd Volumes/data/mlflow
+./run_mlfow_server.sh
+cd ../../../
