@@ -4,10 +4,32 @@ from collections import OrderedDict
 import streamlit as st
 from PIL import Image
 import config
+import requests
+from config import token
+
+from tabs import (
+    intro,
+    user_interface,
+    service_platform,
+    api,
+    updates,
+    training,
+    evaluation,
+    ci_cd,
+    monitoring,
+)
 
 
-from tabs import intro, user_interface, service_platform, api, updates, training, evaluation, ci_cd, monitoring
+# Handle login prerequisites
 
+api_url = "http://localhost:8001/user/login/"
+
+# api_url = "http://localhost:8000/user/login/"
+
+# Initialization
+
+if "token" not in st.session_state:
+    st.session_state["token"] = "0"
 
 # File locatements in Docker
 app_script_base = Path(__file__).parent
@@ -41,6 +63,29 @@ TABS = OrderedDict(
 )
 
 
+def get_login(username, password):
+    url = "http://localhost:8001/user/login"
+    # url = "http://model_api_from_compose:8000/user/login"
+    response = requests.post(url, json={"username": username, "password": password})
+    token = response.json()["access_token"]
+    # print("token = ", token)
+    return token
+
+
+def token_valid(token):
+    url = "http://localhost:8001/secured"
+    # url = "http://model_api_from_compose:8000/user/login"
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(url, headers=headers).json()
+    # print("response = ", response)
+    try:
+        if response["message"] == "Hello World! but secured":
+            return True
+    except KeyError:
+        print("response = ", KeyError)
+        return False
+
+
 def run():
 
     image = Image.open(app_script_base / "assets/GreenLights.png")
@@ -63,5 +108,15 @@ def run():
     tab = TABS[tab_name]
     tab.run()
 
+
 if __name__ == "__main__":
-    run()
+
+    if not token_valid(st.session_state.token):
+        username = st.text_input(label="username", value="admin")
+        password = st.text_input(label="password", value="adm1n")
+        if st.button(label="Login"):
+            token = get_login(username, password)
+            st.session_state.token = token
+    # print(st.session_state.token)
+    if token_valid(st.session_state.token):
+        run()

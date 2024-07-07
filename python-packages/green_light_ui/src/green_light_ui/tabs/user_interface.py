@@ -14,9 +14,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 # URLs
 url_prediction = "http://model_api_from_compose:8000/predict"
 # url_prediction = "http://localhost:8001/predict"
-# Page settings
-title = "GreenLightServices - Make a Prediction"
-sidebar_name = "User Interface"
+
 
 ## Definitions
 
@@ -176,6 +174,11 @@ new_features = {}
 for key, value in features.items():
     new_features[key] = value
 
+# Page settings
+title = "GreenLightServices"
+subtitle = " Custom UI to make a prediction"
+sidebar_name = "User Interface"
+
 
 ## run the page
 def run():
@@ -184,6 +187,7 @@ def run():
     global features
 
     st.title(title)
+    st.subheader(subtitle)
 
     st.markdown(
         """
@@ -261,3 +265,16 @@ def run():
             idx += 1
             if idx == (col + 1) * num_rows:
                 break
+    st.write("___")
+    st.subheader("Technical Details to the UI")
+    with st.expander("**This UI was build using the Streamlit package**"):
+        st.write(
+            """
+        We used the streamlit package to build a very simple customer UI. 
+        * The actual customer page is **this** page. Here you can make the prediction, which is currently the only service we offer
+        * All other pages serve to demonstrate the project
+        * This page was put behind a very rudimentarty securization using the JTW-Bearer from the FastAPI. 
+        * Checkout the code [here]:(https://github.com/DataScientest-Studio/may24_bmlops_accidents/tree/master/python-packages/green_light_ui/src/green_light_ui)
+  
+        """
+        )
