@@ -11,16 +11,20 @@ import os
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
+DOCKERIZED = True
+
 # URLs
-url_prediction = "http://model_api_from_compose:8000/predict"
-# url_prediction = "http://localhost:8001/predict"
+if DOCKERIZED:
+    url_prediction = "http://model_api_from_compose:8000/predict"
+else:
+    url_prediction = "http://localhost:8001/predict"
 
 
 ## Definitions
 
 # Stuff for the UI-Layout to input the features
-
-features = {
+# heavy accifdent
+features_heavy = {
     "place": 10,
     "catu": 3,
     "sexe": 1,
@@ -49,6 +53,37 @@ features = {
     "hour": 17,
     "nb_victim": 2,
     "nb_vehicules": 1,
+}
+# light accident
+features = {
+    "place": 1,
+    "catu": 1,
+    "sexe": 2,
+    "secu1": 1.0,
+    "year_acc": 2021,
+    "victim_age": 22,
+    "catv": 2,
+    "obsm": 2,
+    "motor": 1,
+    "catr": 4,
+    "circ": 2,
+    "surf": 1,
+    "situ": 1,
+    "vma": 50,
+    "jour": 10,
+    "mois": 12,
+    "lum": 1,
+    "dep": 76,
+    "com": 76351,
+    "agg_": 2,
+    "int": 2,
+    "atm": 1.0,
+    "col": 3,
+    "lat": 49.505400,
+    "long": 0.114600,
+    "hour": 13,
+    "nb_victim": 2,
+    "nb_vehicules": 2,
 }
 
 feature_en = {
@@ -117,8 +152,12 @@ core_features = {
 
 
 def get_jwt_token():
-    # url = "http://localhost:8001/user/login"
-    url = "http://model_api_from_compose:8000/user/login"
+
+    if DOCKERIZED:
+        url = "http://model_api_from_compose:8000/user/login"
+    else:
+        url = "http://localhost:8001/user/login"
+
     response = requests.post(
         url, json={"username": ADMIN_USERNAME, "password": ADMIN_PASSWORD}
     )
@@ -212,20 +251,22 @@ def run():
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("Use Default"):
+        if st.button("Use heavy acc"):
+            for key, value in features_heavy.items():
+                new_features[key] = value
+        if st.button("Use light acc"):
             for key, value in features.items():
                 new_features[key] = value
-        st.write("Default:")
     with col2:
         if st.button("Make Prediction"):
             if check_inputs(new_features):
-                # prediction = get_prediction(new_features)
-                prediction = get_prediction(features)
-                # prediction = get_jwt_token()
+                # st.write(f"new_features {new_features}")
+                prediction = get_prediction(new_features)
+                # st.write(f"new_features {new_features}")
                 st.write(f"Prediction: {prediction}")
             else:
                 st.write("Please fill all the boxes before making a prediction")
-
+        st.write
     with col3:
         if st.button("Reset"):
             for key, value in core_features.items():
@@ -267,6 +308,7 @@ def run():
             if idx == (col + 1) * num_rows:
                 break
     st.write("___")
+    # st.write(f"new_features, {new_features}")
     st.subheader("Technical Details of the UI")
     with st.expander("**This UI was build using the Streamlit package**"):
         st.write(
