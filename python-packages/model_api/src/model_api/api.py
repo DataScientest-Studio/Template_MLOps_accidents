@@ -242,7 +242,7 @@ async def user_login(user: UserSchema = Body(...)):
 @api.post("/predict", dependencies=[Depends(JWTBearer())], tags=["prediction"])
 def predict_model(features: ModelInputFeatures):
     input_df = pd.DataFrame([features.model_dump()])
-    print(input_df)
+    # print(input_df)
     prediction = loaded_model.predict(input_df)
     return {"prediction": prediction.tolist()}
 
