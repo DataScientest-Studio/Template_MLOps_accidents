@@ -65,11 +65,10 @@ def load_model(path: Optional[Path] = None):
     return joblib.load(model_path)
 
 
-# loaded_model = load_model(Path("trained_model.joblib"))
+loaded_model = load_model(Path("trained_model.joblib"))
 
-# Loading the saved model
-# loaded_model = joblib.load("src/models/trained_model.joblib")
-loaded_model = joblib.load("Volumes/models/trained_model.joblib")
+# Loading the saved model locally
+# loaded_model = joblib.load("Volumes/models/trained_model.joblib")
 
 # Pydantic model for user schema
 class UserSchema(BaseModel):
@@ -136,12 +135,12 @@ def token_response(token: str):
 
 
 # signing a JWT token using the provided payload and secret key
-# the token expires after 10 minutes
+# the token expires after 100 minutes
 def sign_jwt(user_id: str):
     payload = {
         "user_id": user_id,
         "expires": time.time() + 6000,
-    }  # Token expires within 10 minutes
+    }  # Token expires within 100 minutes
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token_response(token)
 
@@ -261,7 +260,7 @@ def refresh_model():
     # function will be using and modifying the global variable loaded_model, because it was defined outside this function
     global loaded_model
     # Reload the model
-    loaded_model = load_model("Volumes/models/trained_model.joblib")
+    loaded_model = load_model()
     return {"message": "The Model was updated!"}
 
 

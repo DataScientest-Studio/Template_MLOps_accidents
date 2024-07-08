@@ -32,30 +32,31 @@ def run():
     )
 
     with st.expander(
-        "**The API is based on FastAPI. Authentication uses the HTTPBearer, HTTPAuthorizationCredentials classes/methods**"
+        "**We used JSON Web Token (JWT)-Bearer authentication and authorization from FastAPI**"
     ):
         st.image(str(green_light_ui_base / "assets" / "API.png"))
         st.write(
             """
-    * We implemented a FastAPI with several endpoints
-      * `/` 
+    * We implemented a FastAPI with the following endpoints
+      * `/`
       * `/user/login`
       * `/user/signup`
       * `/refresh`
       * `/predict`
-    * The authentization scheme asks for a username and password. After testing for existence, a token with  a lifetime of 6000 secs is returned from the API
-    * The token is needed to access any other endpoint, except `/` 
-    * After expiry of the token, the  user needs to login again.
-    * The token lifetime is set to 6000 secs
-    * The API gets tested in the development phase against a test script using pytest. It also gets tested after pushing in master by means of GitHub Actions 
-
+    * Authentication requires a username and password. When veryfiying as admin or signed-up user, the API issues a JWT Bearer access token.
+    * The /predict and /refresh endpoints demand authorization with this access token.
+    * The token issued has a lifetime of 6000 seconds (100 minutes).
+    * Once it has expired, users must obtain a new token to continue on the protected endpoints.
+    * During development, the API is tested using pytest scripts.
+    * Additionally, after every push to the master branch, the application undergoes automated testing with GitHub Actions.
+    
             """
         )
 
     with st.expander("**Take a look at the API in action using FastAPI /docs**"):
         st.write("Check out this [link](http://localhost:8001/docs)")
 
-    with st.expander("**Take a look at the code in the GitHub**"):
+    with st.expander("**Take a look at the code in GitHub**"):
 
         st.write(
             "Link to API [link](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/python-packages/model_api/src/model_api/api.py)"
