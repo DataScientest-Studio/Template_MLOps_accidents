@@ -20,12 +20,14 @@ from tabs import (
 )
 
 
+DOCKERIZED = False
+
 # Handle login prerequisites
 
-api_url = "http://localhost:8001/user/login/"
-
-# api_url = "http://model_api_from_compose:8000/user/login"
-
+if DOCKERIZED:
+    api_url = "http://model_api_from_compose:8000/user/login"
+else:
+    api_url = "http://localhost:8001/user/login/"
 
 # Initialization
 
@@ -65,8 +67,11 @@ TABS = OrderedDict(
 
 
 def get_login(username, password):
-    url = "http://localhost:8001/user/login"
-    # url = "http://model_api_from_compose:8000/user/login"
+    if DOCKERIZED:
+        url = "http://model_api_from_compose:8000/user/login"
+    else:
+        url = "http://localhost:8001/user/login"
+
     response = requests.post(url, json={"username": username, "password": password})
     token = response.json()["access_token"]
     print("token = ", token)
@@ -74,8 +79,11 @@ def get_login(username, password):
 
 
 def token_valid(token):
-    url = "http://localhost:8001/secured"
-    # url = "http://model_api_from_compose:8000/secured"
+    if DOCKERIZED:
+        url = "http://model_api_from_compose:8000/secured"
+    else:
+        url = "http://localhost:8001/secured"
+
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(url, headers=headers).json()
     # print("response = ", response)
