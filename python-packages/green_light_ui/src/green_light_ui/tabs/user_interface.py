@@ -11,7 +11,7 @@ import os
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
-DOCKERIZED = False
+DOCKERIZED = True
 
 # URLs
 if DOCKERIZED:
