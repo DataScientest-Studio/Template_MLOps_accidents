@@ -20,7 +20,7 @@ from tabs import (
 )
 
 
-DOCKERIZED = False
+DOCKERIZED = True
 
 # Handle login prerequisites
 
