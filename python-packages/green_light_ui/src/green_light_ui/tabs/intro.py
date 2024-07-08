@@ -16,23 +16,20 @@ def run():
     st.markdown(
         """
         ### Project Description
-        In this project we intend to demonstrate core MLOPS approaches, processes and tools.
+        In this project we intend to demonstrate our core MLOps approaches, processes and tools.
         
-        We demonstrate this by using a given model, treating 
-        the datascience part as solved,  focusing on the MLOPS part of providing a service based on an ML-Model. 
-        
-        As scenario we use a hypothetical service provider 'GreenLightService' that offers the service of predicting 
-        the gravity of an accident in France. 
+       We used a pre-existing model, prioritizing the MLOps aspect of deploying a service based on an ML model 
+       rather than enhancing the model's performance. 
         
         The core components of this service are:
        
         - **Service Platform** to provide the service based on a Docker environment
-        - **Secured API** with unit testing
-        - **User Interface** to make predictions based on the ML Model
-        - **Supervised Folders for Data Intake** to catch new data coming in 
-        - **Automated Training** of the model to include the new data in the predictions
-        - **Automated Model Evaluation** to ensure performance of the model
-        - **Automated CI/CD processes** to ensure consistent development quality of software components
+        - **Secured API** using user authentication and authorisation to predict (with unit testing)
+        - **User Interface** for Predictions with streamlit using the /predict- endpoint
+        - **Supervised Folders for Data Intake** for new data intake (4 CSV files per year)
+        - **Automated Training** integrating new data via Airflow
+        - **Automated Model Evaluation** to ensure good performance via MLFlow
+        - **Automated CI/CD processes** to maintain software quality in Docker Hub and Github Actions
         - **Service Monitoring** to monitor the service availability
         ...
         """

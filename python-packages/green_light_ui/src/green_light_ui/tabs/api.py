@@ -38,17 +38,18 @@ def run():
         st.write(
             """
     * We implemented a FastAPI with several endpoints
-      * `/` 
+      * `/`
+      * `/secured`
       * `/user/login`
       * `/user/signup`
       * `/refresh`
       * `/predict`
     * The authentization scheme asks for a username and password. After testing for existence, a token with  a lifetime of 6000 secs is returned from the API
-    * The token is needed to access any other endpoint, except `/` 
-    * After expiry of the token, the  user needs to login again.
-    * The token lifetime is set to 6000 secs
-    * The API gets tested in the development phase against a test script using pytest. It also gets tested after pushing in master by means of GitHub Actions 
-
+    * This JWT Bearer access token is needed to access the endpoints `/secured`, `/predict` and `/refresh`.
+    * After expiring, the token must be renewed.
+    * The tokens lifetime is set to 6000 secs (100 mins).
+    * The API is tested in the development phase against a test script using pytest. 
+    * It also gets tested after pushing in master by means of GitHub Actions.
             """
         )
 
