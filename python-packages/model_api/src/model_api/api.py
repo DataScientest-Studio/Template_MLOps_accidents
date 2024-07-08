@@ -65,11 +65,11 @@ def load_model(path: Optional[Path] = None):
     return joblib.load(model_path)
 
 
-loaded_model = load_model(Path("trained_model.joblib"))
+# loaded_model = load_model(Path("trained_model.joblib"))
 
 # Loading the saved model
 # loaded_model = joblib.load("src/models/trained_model.joblib")
-
+loaded_model = joblib.load("Volumes/models/trained_model.joblib")
 
 # Pydantic model for user schema
 class UserSchema(BaseModel):
@@ -261,7 +261,7 @@ def refresh_model():
     # function will be using and modifying the global variable loaded_model, because it was defined outside this function
     global loaded_model
     # Reload the model
-    loaded_model = load_model()
+    loaded_model = load_model("Volumes/models/trained_model.joblib")
     return {"message": "The Model was updated!"}
 
 

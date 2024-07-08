@@ -43,7 +43,7 @@ def run():
       * `/user/signup`
       * `/refresh`
       * `/predict`
-    * The authentization scheme asks for a username and password. After testing for existence, a token with defined lifetime is returned from the API
+    * The authentization scheme asks for a username and password. After testing for existence, a token with  a lifetime of 6000 secs is returned from the API
     * The token is needed to access any other endpoint, except `/` 
     * After expiry of the token, the  user needs to login again.
     * The token lifetime is set to 6000 secs
