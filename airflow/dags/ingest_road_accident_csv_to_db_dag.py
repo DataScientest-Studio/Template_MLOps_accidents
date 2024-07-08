@@ -37,6 +37,17 @@ load_dotenv()
 AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME = os.getenv("AIRFLOW_NEW_DATA_IN_ROAD_ACCIDENTS_DB_VARNAME")
 ROAD_ACCIDENTS_DIRS = os.getenv("ROAD_ACCIDENTS_DATA_DIRECTORIES")
 
+
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'email': [Variable.get("alert_email", "")],
+    'email_on_failure': True,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': datetime.timedelta(seconds=30),
+}
+
 class NewFolderSensor(BaseSensorOperator):
     @apply_defaults
     def __init__(self, directory, *args, **kwargs):
@@ -149,6 +160,8 @@ with DAG(
     concurrency=1,  # Ensure only one instance of the DAG runs at a time
     max_active_runs=1,
     catchup=False,
+    default_args=default_args
+    
 ) as dag:
     latest_only = LatestOnlyOperator(task_id="latest_only")
 

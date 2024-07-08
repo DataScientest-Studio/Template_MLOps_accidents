@@ -23,11 +23,14 @@ x-airflow-common:
     # yamllint enable rule:line-length
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
 
-    # AIRFLOW__SMTP__SMTP_HOST: "smtp.gmail.com"
-    # AIRFLOW__SMTP__SMTP_PORT: 587
-    # AIRFLOW__SMTP__SMTP_USER: "de.airflow@gmail.com"
-    # AIRFLOW__SMTP__SMTP_PASSWORD: "cfsrvkongsobheta"
-    # AIRFLOW__SMTP__SMTP_MAIL_FROM: "de.airflow@gmail.com"
+    AIRFLOW__SMTP__SMTP_HOST: "smtp.gmail.com"
+    AIRFLOW__SMTP__SMTP_STARTTLS: "True"
+    AIRFLOW__SMTP__SMTP_SSL: "False"
+    AIRFLOW__SMTP__SMTP_USER: "road.accidents.mlops.may24@gmail.com"
+    AIRFLOW__SMTP__SMTP_PASSWORD: "zdfe xsig vpfb dezv"
+    AIRFLOW__SMTP__SMTP_PORT: 587
+    AIRFLOW__SMTP__SMTP_MAIL_FROM: "road.accidents.mlops.may24@gmail.com"
+
     ADMIN_USERNAME: ${ADMIN_USERNAME}
     ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     ROAD_ACCIDENTS_POSTGRES_HOST: ${ROAD_ACCIDENTS_POSTGRES_HOST}
@@ -151,7 +154,7 @@ services:
     # https://redis.io/blog/redis-adopts-dual-source-available-licensing/
     image: redis:7.2-bookworm
     ports:
-      - 6379:6379
+      - 6397:6379
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
