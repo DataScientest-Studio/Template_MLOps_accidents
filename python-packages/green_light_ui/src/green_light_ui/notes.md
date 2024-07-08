@@ -4,6 +4,9 @@ build docker image
 
 ```python
 docker image build . -t accidents_ui:latest 
+
+docker build  -t roadaccidentsmlops24/airflowdb:latest -f airflowdb.Dockerfile  .  --load
+
 ```
 Run Streamlit directly 
 

@@ -1,4 +1,5 @@
 from sklearn import ensemble
+import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 import mlflow
@@ -13,27 +14,40 @@ import joblib
 import numpy as np
 import os
 
+DOCKERIZED = True
+# DOCKERIZED = False
+
 
 def evaluate_model():
-    model_base = "/models"
-    data_base = "/data/raw"
-    mlruns_base = "/mlruns"
-    # model_base = '/models'
-    # data_base = '/data'
+    if DOCKERIZED:
+        model_base = "/models"
+        data_base = "/data"
+        mlruns_base = "/data/mlflow/mlruns"
 
-    # specifiy the location of mlruns
-    remote_server_uri = "127.0.0.1:5000"  # set to your server URI
+    else:
+        model_base = (
+            "/home/ubuntu/Documents/Developoment/may24_bmlops_accidents/Volumes/models"
+        )
+        data_base = (
+            "/home/ubuntu/Documents/Developoment/may24_bmlops_accidents/Volumes/data"
+        )
+        mlruns_base = "/home/ubuntu/Documents/Developoment/may24_bmlops_accidents/Volumes/data/mlflow/mlruns"
+
+    if DOCKERIZED:
+        remote_server_uri = "http://host.docker.internal:5000"  # set to your server URI
+    else:
+        remote_server_uri = "http://localhost:5000"  # set to your server URI
     mlflow.set_tracking_uri(remote_server_uri)
-    mlflow.set_experiment("/accidents")
-    mlflow.set_tracking_uri(uri=f'file:///mlflow")')
     exp = mlflow.get_experiment_by_name(name="accidents")
     if not exp:
         experiment_id = mlflow.create_experiment(
-            name="Emegency_landing",
-            artifact_location=f'file:///mlflow")',
+            name="accidents"
+            # artifact_location=f"file://{mlruns_base}",
         )
     else:
         experiment_id = exp.experiment_id
+
+    print("exp.id===============================", experiment_id)
 
     # LOAD DATA
     X_train = pd.read_csv(data_base + "/preprocessed/X_train.csv")
@@ -44,7 +58,12 @@ def evaluate_model():
     y_test = np.ravel(y_test)
 
     # candidate_model = ensemble.RandomForestClassifier(n_jobs=-1).fit(X_train, y_train)
-    candidate_model = xgboost.XGBClassifier().fit(X_train, y_train)
+
+    model_filename = model_base + "/new/trained_model.joblib"
+    model = joblib.load(model_filename)
+    candidate_model = model
+
+    # candidate_model = xgboost.XGBClassifier().fit(X_train, y_train)
     # train a baseline dummy model
     baseline_model = DummyClassifier(strategy="uniform").fit(X_train, y_train)
 
@@ -64,36 +83,44 @@ def evaluate_model():
             greater_is_better=True,
         ),
     }
-    with mlflow.start_run() as run:
+    with mlflow.start_run(experiment_id=experiment_id) as run:
         candidate_model_uri = mlflow.sklearn.log_model(
             candidate_model, "candidate_model", signature=signature
         ).model_uri
         baseline_model_uri = mlflow.sklearn.log_model(
             baseline_model, "baseline_model", signature=signature
         ).model_uri
-        # try:
-        #     mlflow.evaluate(
-        #         candidate_model_uri,
-        #         eval_data,
-        #         targets="label",
-        #         model_type="classifier",
-        #         # evaluators="accuracy",
-        #         validation_thresholds=thresholds,
-        #         baseline_model=baseline_model_uri,
-        #     )
-        #     return 1
-        # except :
-        #     print("Model validation failed")
-        #     return 0
-        mlflow.evaluate(
-            candidate_model_uri,
-            eval_data,
-            targets="label",
-            model_type="classifier",
-            # evaluators="accuracy",
-            validation_thresholds=thresholds,
-            baseline_model=baseline_model_uri,
-        )
+        try:
+            exp = mlflow.get_experiment_by_name(name="accidents")
+            print("In try: exp.###################################", exp)
+            result = mlflow.evaluate(
+                candidate_model_uri,
+                eval_data,
+                targets="label",
+                model_type="classifier",
+                # evaluators="accuracy",
+                validation_thresholds=thresholds,
+                baseline_model=baseline_model_uri,
+            )
+            print("Model validation successful")
+            print(f"See aggregated evaluation results below: \n{result.metrics}")
+            return True
+        except:
+            print("Model validation failed")
+            # print(f"See aggregated evaluation results below: \n{result.metrics}")
+            return False
+
+        # result = mlflow.evaluate(
+        #     candidate_model_uri,
+        #     eval_data,
+        #     targets="label",
+        #     model_type="classifier",
+        #     # evaluators="accuracy",
+        #     validation_thresholds=thresholds,
+        #     baseline_model=baseline_model_uri,
+        # )
+
+    return result
 
 
 # evaluate_model()

@@ -64,3 +64,5 @@ docker container run --name accidents_ui -p 8501:8501 roadaccidentsmlops24/accid
 
 - https://packaging.python.org/en/latest/tutorials/packaging-projects/
 - https://github.com/pypa/sampleproject
+
+
