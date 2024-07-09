@@ -31,7 +31,7 @@ def run():
           * /Volumes/data/mlflow/mlarfifacts
         * The performance of trainings run sofar can thus be inspected
         * We used the `mlflow.evaluate()` standard settings and artifacts for the model type `classifier`. 
-        * Check the MLflow UI [here](http://localhost:5000)
+        * Check the MLflow UI [here](http://127.0.0.1:5000)
         * Check the model_evaluation code [here](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/airflow/dags/model_evaluation.py)
 """
         )

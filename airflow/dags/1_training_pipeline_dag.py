@@ -62,6 +62,7 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 url_refresh = "http://model_api_from_compose:8000/refresh"
 
+
 def get_jwt_token():
     # url = "http://localhost:8001/user/login"
     url = "http://model_api_from_compose:8000/user/login"
@@ -71,6 +72,7 @@ def get_jwt_token():
     token = response.json()["access_token"]
     print("token = ", token)
     return token
+
 
 def refresh_api():
     token = get_jwt_token()
@@ -168,8 +170,8 @@ with dag:
     )
     # 4. Validate model
 
-    @task.branch(task_id="validate_push")
-    def validate_push(ti=None):
+    @task.branch(task_id="model_evaluation")
+    def model_evaluation(ti=None):
         validation = evaluate_model()
         if not validation:
             return "stop_task"
@@ -199,7 +201,7 @@ with dag:
         data_transformation
         >> model_training
         >> model_metrics
-        >> validate_push()
+        >> model_evaluation()
         >> [stop_task, push_production]
     )
     push_production >> refresh_api
