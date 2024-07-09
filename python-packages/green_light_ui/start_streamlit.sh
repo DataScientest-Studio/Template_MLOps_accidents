@@ -1,0 +1,1 @@
+streamlit run src/green_light_ui/app.py --server.port=8502 --server.address=localhost
