@@ -198,6 +198,30 @@ And/or the project's Docker Hub repo:
 
 [https://hub.docker.com/u/roadaccidentsmlops24](https://hub.docker.com/u/roadaccidentsmlops24)
 
+# 👀 Monitoring the App
+
+## Airflow
+
+The Airflow UI can be accessed through this [link](http://localhost:8080/).
+
+
+In order to receive emails when an Airflow DAG fails, the user needs to add a variable `alert_email` with its value set to the email that would like to receive the alerts.
+
+> To login to the Airflow Web UI use the `Green Light Services` admin credentials (`ADMIN_USERNAME`, `ADMIN_PASSWORD`) which are 
+defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.             
+
+
+## Road Accidents Database
+
+The `Road Accidents` database can be monitored through this [link](http://localhost:8888/browser/).
+                
+> For accessing the `Road Accident` database use the `Green Light Services` admin password (`ADMIN_PASSWORD`) which is defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.
+
+To see or query the `Road Accidents` tables navigate to: 
+
+`Servers` -> `RoadAccidents` -> `Databases` -> `Schemas` -> `Tables`
+
+
 
 # 📝 TODO List / Remaining Items
 
