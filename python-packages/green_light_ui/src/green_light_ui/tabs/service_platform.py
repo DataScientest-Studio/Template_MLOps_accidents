@@ -19,7 +19,12 @@ def run():
     st.title(title)
 
     st.markdown("Description of the GreenLightServices Platform ")
-
+    
+    with st.expander(
+        "**We implemented a hybrid architecture, with the customer service components on Docker and some MLOPS components in local infrastructure**"
+    ):
+        st.image(str(green_light_ui_base / "assets" / "Architecture_MVP.png"))
+        
     with st.expander(
         "**We implemented a hybrid architecture, with the customer service components on Docker and some MLOPS components in local infrastructure**"
     ):
