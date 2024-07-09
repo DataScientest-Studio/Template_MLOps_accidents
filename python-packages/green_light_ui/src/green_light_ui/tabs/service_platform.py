@@ -17,6 +17,11 @@ sidebar_name = "Service Platform"
 def run():
 
     st.title(title)
+    
+    with st.expander(
+        "**We can demonstrate some core MLOPS processes. However, limited time left some features for future development**"
+    ):
+        st.image(str(green_light_ui_base / "assets" / "SLC.png"))
 
     st.markdown("Description of the GreenLightServices Platform ")
 
