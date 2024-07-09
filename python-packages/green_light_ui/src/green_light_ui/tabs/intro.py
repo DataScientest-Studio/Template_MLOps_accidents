@@ -30,7 +30,8 @@ def run():
         - **Automated Training** integrating new data via Airflow
         - **Automated Model Evaluation** to ensure good performance via MLFlow
         - **Automated CI/CD processes** to maintain software quality in Github Actions and Docker Hub
-        ...
+        - **Future Developements** if we had additional time
+    
         """
         
     )
