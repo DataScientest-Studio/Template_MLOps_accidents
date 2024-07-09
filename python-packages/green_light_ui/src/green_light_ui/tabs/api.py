@@ -43,7 +43,9 @@ def run():
       * `/user/signup`
       * `/refresh`
       * `/predict`
-    * Authentication requires a username and password. When veryfiying as admin or signed-up user, the API issues a JWT Bearer access token.
+    * Authentication requires a username and password. 
+    * Admin credentials (ADMIN_USERNAME, ADMIN_PASSWORD) are defined in the ./.env file.
+    * When veryfiying as admin or signed-up user, the API issues a JWT Bearer access token.
     * The /predict and /refresh endpoints demand authorization with this access token.
     * The token issued has a lifetime of 6000 seconds (100 minutes).
     * Once it has expired, users must obtain a new token to continue on the protected endpoints.
