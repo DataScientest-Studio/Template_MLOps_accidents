@@ -75,7 +75,7 @@ def run():
         * If the model was successfully validated, `push_production` moves the current model to a folder `/archive` with a time stamp on it and moves the new model to `/models`
         as the new current model. Model evaluation is discussed in detail in tab __Model Evaluation__
         * `refresh_api` calls the `refresh` endpoint of our API to trigger a reload of the model, thus concluding the training cycle. 
-        * in case the validation fails, nothing changes. The current model stays put. MISSING FEATURE: We did not implement an email alert yet to inform the sysadmins 
+        * in case the validation fails, nothing changes. The current model stays put. We implemented an email alert to inform the sysadmins 
         an a failed DAG
         * If there are no new data and the model exists, nothing happens and after 5 minutes, the DAG looks again
         

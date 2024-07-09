@@ -9,17 +9,33 @@ sidebar_name = "Future Developments"
 def run():
 
     st.title(title)
-    st.write(''' 
+    st.write(
+        """ 
     
-    Limited time and ongoing learnings left several items for future development
+    Limited time left several items for future development
 
-    * Full dockerization of all components
+    * Full dockerization of all components (MLFLOW)
     * Backup strategy for customer data in the docker environment
     * Full and integrated monitoring strategy for all system components
-      * Data quality
+      * Data quality 
       * Model performance
       * System health 
-      * 
+      * Security situation
+    * Systematic monitoring of data drift and model rot
+      * Define criteria for data drift & model rot
+      * Implement sensors and mesurement
+      * Implement dashboards and 'actions'
+    * System health
+      * Availability measurement
+      * Alerts 
+      * Load supervision and capacity management 
+    * Security hardening 
+      * Put all Docker exposed ports under authorization 
+      * Restrict IP-domains for access
+      * Alerts for spurious access attempts
+      ...
+      
 
-    '''
+
+    """
     )
