@@ -43,14 +43,13 @@ def run():
       * `/user/signup`
       * `/refresh`
       * `/predict`
-    * Authentication requires a username and password. 
-    * Admin credentials (ADMIN_USERNAME, ADMIN_PASSWORD) are defined in the ./.env file.
-    * When veryfiying as admin or signed-up user, the API issues a JWT Bearer access token.
-    * The /predict and /refresh endpoints demand authorization with this access token.
-    * The token issued has a lifetime of 6000 seconds (100 minutes).
-    * Once it has expired, users must obtain a new token to continue on the protected endpoints.
-    * During development, the API is tested using pytest scripts.
-    * Additionally, after every push to the master branch, the application undergoes automated testing with GitHub Actions.
+    * Authentication requires a username and password
+    * Admin credentials (ADMIN_USERNAME, ADMIN_PASSWORD) are defined in the ./.env file
+    * When veryfiying as admin or signed-up user, the API issues a JWT Bearer access token
+    * The /predict and /refresh endpoints demand authorization with this token
+    * The token issued has a lifetime of 6000 seconds (100 minutes)
+    * Once it has expired, users must obtain a new token to continue on the protected endpoints
+    * Additionally the application undergoes automated testing with GitHub Actions
     
             """
         )

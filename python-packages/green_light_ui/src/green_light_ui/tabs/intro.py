@@ -24,13 +24,12 @@ def run():
         The core components of this service are:
        
         - **Service Platform** to provide the service based on a Docker environment
-        - **Secured API** using user authentication and authorisation to predict (with unit testing)
+        - **Secured API** using user authentication and authorisation to predict
         - **User Interface** for Predictions with streamlit using the /predict- endpoint
-        - **Supervised Folders for Data Intake** for new data intake (4 CSV files per year)
+        - **Supervised Folders** for new data intake
         - **Automated Training** integrating new data via Airflow
         - **Automated Model Evaluation** to ensure good performance via MLFlow
-        - **Automated CI/CD processes** to maintain software quality in Docker Hub and Github Actions
-        - **Service Monitoring** to monitor the service availability
+        - **Automated CI/CD processes** to maintain software quality in Github Actions and Docker Hub
         ...
         """
         
