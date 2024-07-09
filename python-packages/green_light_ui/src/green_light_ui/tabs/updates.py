@@ -26,7 +26,7 @@ def run():
         unsafe_allow_html=True,
     )
 
-    with st.expander("**Introduction**"):
+    with st.expander("**The Customer Provides 4 CSV Files of Road Accidents on a Yearly Basis**"):
         st.write("""
     
     For this project (`Green Light Services` application) we made the assumption that [Road Accident data](https://www.data.gouv.fr/en/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2022/) are collected by French officials on a yearly basis.
@@ -45,7 +45,7 @@ def run():
 
     """)
 
-    with st.expander("**The `road_accidents_database_ingestion` Python package**"):
+    with st.expander("**A Python Package That Deals With Road Accidents Data And Database Operations**"):
         st.write("""
 
     The [`road_accidents_database_ingestion`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/tree/master/python-packages/road_accidents_database_ingestion) Python package contains the following functionality:
@@ -62,7 +62,7 @@ def run():
 
     """)
 
-    with st.expander("**The `airflowdb.Dockerfile` Airflow base Docker Image**"):
+    with st.expander("**Airflow running in Docker and the the `airflowdb.Dockerfile` Base Docker Image**"):
         st.write("""
 
     Airflow runs in [`docker compose`](https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html). 
@@ -81,17 +81,7 @@ def run():
         
     """)
 
-    with st.expander("**Take a look at the Airflow Web UI in action**"):
-        st.write("""
-    
-    Check out this [link](http://localhost:8080/)
-
-    > To login to the Airflow Web UI use the `Green Light Services` admin credentials (`ADMIN_USERNAME`, `ADMIN_PASSWORD`) which are 
-    defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.             
-                 
-    """)
-
-    with st.expander("**The `road_accidents_data_ingestion_dag` Airflow DAG**"):
+    with st.expander("**The Airflow DAG to Ingest Customer Provided Road Accident Directories to The `Road Accidents` Database**"):
 
         st.image(str(green_light_ui_base / "assets" / "road_accidents_data_ingestion_dag.png"))
 
@@ -123,16 +113,6 @@ def run():
 
     """)
 
-    with st.expander("**Take a look at the `road_accidents_data_ingestion_dag` Airflow DAG in action**"):
-        st.write("""
-    
-    Check out this [link](http://localhost:8080/dags/road_accidents_data_ingestion_dag/grid?tab=graph)
-
-    > To login to the Airflow Web UI use the `Green Light Services` admin credentials (`ADMIN_USERNAME`, `ADMIN_PASSWORD`) which are 
-    defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.             
-                 
-    """)
-
 
     with st.expander("**The `Road Accidents` Database**"):
         st.write("""
@@ -141,6 +121,28 @@ def run():
                  
     The [`pgAdmin`](https://www.pgadmin.org/) tool is used to monitor and view the `Road Accidents` database tables.
     
+    """)
+
+    st.markdown("---")
+
+    with st.expander("**Take a look at the Airflow Web UI in action**"):
+        st.write("""
+    
+    Check out this [link](http://localhost:8080/)
+
+    > To login to the Airflow Web UI use the `Green Light Services` admin credentials (`ADMIN_USERNAME`, `ADMIN_PASSWORD`) which are 
+    defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.             
+                 
+    """)
+
+    with st.expander("**Take a look at the `road_accidents_data_ingestion_dag` Airflow DAG in action**"):
+        st.write("""
+    
+    Check out this [link](http://localhost:8080/dags/road_accidents_data_ingestion_dag/grid?tab=graph)
+
+    > To login to the Airflow Web UI use the `Green Light Services` admin credentials (`ADMIN_USERNAME`, `ADMIN_PASSWORD`) which are 
+    defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.             
+                 
     """)
 
     with st.expander("**Take a look at the `Road Accidents` database in action using the `pgAdmin` Tool**"):
@@ -155,6 +157,3 @@ def run():
     `Servers` -> `RoadAccidents` -> `Databases` -> `Schemas` -> `Tables`
     
     """)
-
-    with st.expander("**Improvements**"):
-        st.write("""""")
