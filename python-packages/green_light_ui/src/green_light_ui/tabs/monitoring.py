@@ -15,6 +15,7 @@ def run():
     Limited time left several items for future development
 
     * Full dockerization of all components (MLFLOW)
+    * Add logs to our Python packages
     * Backup strategy for customer data in the docker environment
     * Full and integrated monitoring strategy for all system components
       * Data quality 
@@ -23,7 +24,7 @@ def run():
       * Security situation
     * Systematic monitoring of data drift and model rot
       * Define criteria for data drift & model rot
-      * Implement sensors and mesurement
+      * Implement sensors and measurement
       * Implement dashboards and 'actions'
     * System health
       * Availability measurement

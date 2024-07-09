@@ -22,13 +22,13 @@ def run():
     )
 
     with st.expander(
-        "**Introduction**"
+        "**CI/CD With a Docker Compose Application**"
     ):
         st.write(
             """
-    Since our project is a docker compose application that runs locally, in order to be able to use a form of Continuous Integration and Continuous Delivery (CI/CD) we decided to take advantage of Docker Hub and [Github Actions](https://docs.github.com/en/actions). 
+    Since our project is a **docker compose application** that runs **locally**, in order to be able to use a form of Continuous Integration and Continuous Delivery **(CI/CD)** we decided to take advantage of **Docker Hub** and **[Github Actions](https://docs.github.com/en/actions)**. 
 
-    More specifically we created a Docker Hub repository named [`roadaccidentsmlops24`](https://hub.docker.com/u/roadaccidentsmlops24) and we used Github Actions to build and push our application's Docker images.
+    More specifically we created a **Docker Hub** repository named **[`roadaccidentsmlops24`](https://hub.docker.com/u/roadaccidentsmlops24)** and we used **Github Actions** to **build and push** our application's Docker images.
     
     There are 3 Dockerfiles used by this application:  
 
@@ -37,11 +37,11 @@ def run():
     * [`roadaccidentsmlops24/accidents_ui`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/python-packages/green_light_ui/Dockerfile) which is used to provide a UI for our project.
     
     
-    When the user starts the application in `production` mode using the [`PROD-docker-compose-up.sh`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/PROD-docker-compose-up.sh) 
-    script, the aforementioned Docker images will be pulled from the [`roadaccidentsmlops24`](https://hub.docker.com/u/roadaccidentsmlops24) Docker Hub repo.
+    When the user starts the application in **`production` mode** using the **[`PROD-docker-compose-up.sh`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/PROD-docker-compose-up.sh)** 
+    script, the aforementioned **Docker images will be pulled** from the [`roadaccidentsmlops24`](https://hub.docker.com/u/roadaccidentsmlops24) Docker Hub repo.
     
-    > Note: There is also the possibility to run the application in `development` mode using the [`DEV-docker-compose-up.sh`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/DEV-docker-compose-up.sh)
-    script. In this case the aforementioned Docker images will not be pulled from the `roadaccidentsmlops24` Docker hub repo but instead the local Dockerfiles will used
+    > Note: There is also the possibility to run the application in **`development` mode** using the **[`DEV-docker-compose-up.sh`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/DEV-docker-compose-up.sh)
+    script**. In this case the aforementioned Docker images **will not be pulled** from the `roadaccidentsmlops24` Docker hub repo but **instead the local Dockerfiles will used**
     to build the Docker images prior to running `docker compose up -d`.
     """)
 
@@ -54,13 +54,13 @@ def run():
     
     More specifically:  
 
-    * Every time a developer wants to merge their development branch to `Master` they start a new Pull Request (PR).
+    * Every time a developer wants to **merge their development branch to `Master`** they start a **new Pull Request (PR)**.
     * Then the [`python-app.yml`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.github/workflows/python-app.yml) workflow is executed, which for each of the [Python packages](https://github.com/DataScientest-Studio/may24_bmlops_accidents/tree/master/python-packages) of this project will run the following steps:
         1. Checkout the repository.
         2. Install the Python package.
-        3. Run the `pytest` tests of the Python package (typically found under a `tests/` directory).
+        3. Run the **`pytest` tests** of the Python package (typically found under a `tests/` directory).
         4. Build the `Dockerfile` successfully.
-    * Every time the developer pushes new code to a PR branch, the CI pipeline starts again.""")
+    * **Every time the developer pushes new code to a PR branch, the CI pipeline starts again.** """)
 
 
 
@@ -73,25 +73,25 @@ def run():
     
     More specifically:  
 
-    * Every time a PR is merged to `Master` the CD pipeline runs ([example](https://github.com/DataScientest-Studio/may24_bmlops_accidents/actions/runs/9808426042)).
+    * Every time a **PR is merged to `Master`** the CD pipeline runs ([example](https://github.com/DataScientest-Studio/may24_bmlops_accidents/actions/runs/9808426042)).
     * Then the [`build-and-push-docker-images.yml`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.github/workflows/build-and-push-docker-images.yml) workflow is executed, which for each of the [Python packages](https://github.com/DataScientest-Studio/may24_bmlops_accidents/tree/master/python-packages) of this project will run the following steps:
         1. Checkout the repository.
         2. Login to Docker Hub using a Github [Secret](https://github.com/DataScientest-Studio/may24_bmlops_accidents/settings/secrets/actions) to store the password.
-        3. Build the `Dockerfile` using two `tags` for each image: 
+        3. Build the `Dockerfile` **using two `tags`** for each image: 
             * `latest`
             * Github action run number ([example](https://hub.docker.com/r/roadaccidentsmlops24/model_api/tags))
-        4. Push the Docker built image to the [`roadaccidentsmlops24` Docker Repo](https://hub.docker.com/u/roadaccidentsmlops24).""")
+        4. **Push the Docker built image** to the [`roadaccidentsmlops24` Docker Repo](https://hub.docker.com/u/roadaccidentsmlops24).""")
 
 
 
     with st.expander("**The Release Pipeline**"):
         st.write(
             """
-    Releasing the application using specific versions makes it possible to roll-back to a working version if/when something breaks.
+    Releasing the application using specific versions makes it possible to **roll-back to a working version** if/when something breaks.
 
-    To enable versioned releases we use git's `tag` feature, more specifically:  
+    To enable **versioned releases** we use git's `tag` feature, more specifically:  
 
-    * Every time a developer wants to create a new release of the application from the `master` branch, they would have to take the following steps:
+    * Every time a developer wants to **create a new release** of the application from the `master` branch, they would have to take the following steps:
         * `git checkout master`
         * `git pull origin master`
         * `git tag v{x}.{y}.{z}`, where the `v{x}.{y}.{z}` defines the [Semantic Versioning](https://semver.org/) of the release (eg: `v0.1.0`).
@@ -101,8 +101,8 @@ def run():
         2. Login to Docker Hub using a Github [Secret](https://github.com/DataScientest-Studio/may24_bmlops_accidents/settings/secrets/actions) to store the password.
         3. Build the `Dockerfile` successfully using two `tags` for each image: 
             * `latest`
-            * The specified tag version ([example `roadaccidentsmlops24/model_api:v0.0.4`](https://hub.docker.com/layers/roadaccidentsmlops24/model_api/v0.0.4/images/sha256-7aecabc78a37a5318910f6d892b386aefb52bfbd6b39f3af8294f897a2ed9535?context=explore))
-        4. Push the Docker built image to the [`roadaccidentsmlops24` Docker Repo](https://hub.docker.com/u/roadaccidentsmlops24).
+            * **The specified tag version** ([example `roadaccidentsmlops24/model_api:v0.0.4`](https://hub.docker.com/layers/roadaccidentsmlops24/model_api/v0.0.4/images/sha256-7aecabc78a37a5318910f6d892b386aefb52bfbd6b39f3af8294f897a2ed9535?context=explore))
+        4. **Push the Docker built image** to the [`roadaccidentsmlops24` Docker Repo](https://hub.docker.com/u/roadaccidentsmlops24).
 
     ---
    
@@ -119,6 +119,15 @@ def run():
     
     > When running the application in the `development` mode using the `DEV-docker-compose-up.sh`, the environment variable `GLS_TAG` has no effect. In `development` mode, the Docker images are build using the local `Dockerfiles` instead of being pulled from the Docker Hub.""")
 
-    with st.expander("**Improvements**"):
 
-        st.write("TODO")
+    st.markdown("---")
+
+    with st.expander("**Take a look at the Github Actions**"):
+        st.write("""
+    
+    Check out this [link](https://github.com/DataScientest-Studio/may24_bmlops_accidents/actions)""")
+
+    with st.expander("**Take a look at the `roadaccidentsmlops24` Docker Hub Repo**"):
+        st.write("""
+    
+    Check out this [link](https://hub.docker.com/u/roadaccidentsmlops24)""")

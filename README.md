@@ -15,9 +15,9 @@ This project is a starting Pack for MLOps projects based on the subject "road ac
 Green Lights Services has been developed by:
 - Josef Hartmann
 - Paula Robina Beck
-- Evan Blablapoulos
+- Evan Stromatias
 
-Green Light Services represents our final project for the DataScientest MLOps Program.
+Green Light Services represents our final project for the DataScientest MLOps Program, May 2024.
 
 # 🏗️ Architecture
 
@@ -38,10 +38,9 @@ Our docker-compose application includes the following:
 The Green Light Services docker-compose application is configured through enviroment variables stored in the `.env` file.
 
 We use the Github Actions to implement the CI/CD pipelines of the Green Light Services app. More specifically:
-- CI: everytime there is a Pull Request to merge a branch to master all unit-tests need to pass
+- CI: every time there is a Pull Request to merge a branch to master all unit-tests need to pass
 - CD: The docker images are build and pushed to the Docker Hub [roadaccidentsmlops24]](https://hub.docker.com/repositories/roadaccidentsmlops24).
 
-TODO a few words on how we perform authorization.
 
 # 📂 Project Organization
 The repository is structured as follows:
@@ -80,7 +79,7 @@ The repository is structured as follows:
     │   │   ├── new  
     │   │   └── trained_model.joblib <- The ML model currently used in production
     │   │
-    │   ├── road_accidents_data_directories/      <- Clients drop here directories with Road Accidents CSV files   
+    │   ├── road_accidents_data_directories/      <- Clients Add Road Accidents CSV Directories   
     │   │   ├── 2021/                             <- For example for the year '2021'    
     │   │   │   ├── caracteristiques_2021.csv   
     │   │   │   ├── lieux-2021.csv   
@@ -211,6 +210,10 @@ In order to receive emails when an Airflow DAG fails, the user needs to add a va
 defined in the [`./.env`](https://github.com/DataScientest-Studio/may24_bmlops_accidents/blob/master/.env) file.             
 
 
+## MLFlow For ML Models
+
+When the `Green Light Services` application has been been started in `production` mode (`PROD-docker-compose-up.sh`) or in `development` mode (`DEV-docker-compose-up.sh`) then the `MLFlow` server can be accessed through this [link](http://127.0.0.1:5000).
+
 ## Road Accidents Database
 
 The `Road Accidents` database can be monitored through this [link](http://localhost:8888/browser/).
@@ -220,13 +223,6 @@ The `Road Accidents` database can be monitored through this [link](http://localh
 To see or query the `Road Accidents` tables navigate to: 
 
 `Servers` -> `RoadAccidents` -> `Databases` -> `Schemas` -> `Tables`
-
-
-
-# 📝 TODO List / Remaining Items
-
-# 😿 Things to Improve
-
 
 
 ------------------------
