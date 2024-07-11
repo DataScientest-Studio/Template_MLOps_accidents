@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import sklearn
 import pandas as pd 
 from sklearn import ensemble
@@ -6,6 +7,7 @@ import joblib
 import numpy as np
 from pydantic import BaseModel
 import os
+import json
 
 
 g_rf_classifier = None
@@ -14,8 +16,53 @@ g_model_filename = './src/models/trained_model.joblib'
 #g_model_filename = '../models/trained_model.joblib'
 
 
-api = FastAPI()
+####  Gestion des utilisateurs et des droits (admin) #####
 
+security = HTTPBasic()
+
+class User(BaseModel):
+    name: str
+    password: str
+
+# initialise users and admins
+users = {
+  "alice": "wonderland",
+  "bob": "builder",
+  "clementine": "mandarine",
+  "admin1": "admin1" 
+}
+admins = {
+  "admin1": "admin1" 
+}
+
+# Vérification user
+def verif_user(creds: HTTPBasicCredentials = Depends(security)):
+    username = creds.username
+    password = creds.password
+    if username in users and password == users[username]:
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+# Vérification admin
+def verif_admin(creds: HTTPBasicCredentials = Depends(security)):
+    username = creds.username
+    password = creds.password
+    if username in admins and password == admins[username]:
+        print("Admin Validated")
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password for admin",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+####  Gestion des prédictions #####
 
 class Prediction(BaseModel):
     place:int
@@ -93,21 +140,84 @@ def predict(features: dict) -> int:
     return int(prediction[0])   # convert np.int64 to int to avoid json exception
 
 
+############# Endpoints des API ###################################
+
+api = FastAPI()
+
 @api.get('/status')
 def get_status():
     return {'status': 'ok'}
 
 
-@api.post('/prediction')
-def post_prediction(prediction: Prediction):
+@api.post('/prediction', tags = ['user'])
+def post_prediction(prediction: Prediction, Verification = Depends(verif_user)):
     """
     Exemple test avec curl
     curl -X 'POST' 'http://127.0.0.1:8000/prediction' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"place": 0, "catu": 0, "sexe": 0, "secu1": 0, "year_acc": 0, "victim_age": 0, "catv": 0, "obsm": 0, "motor": 0, "catr": 0,  "circ": 0,  "surf": 0,  "situ": 0,  "vma": 0,  "jour": 0, "mois": 0, "lum": 0, "dep": 0, "com": 0, "agg_": 0, "int": 0, "atm": 0, "col": 0, "lat": 0, "long": 0, "hour": 0, "nb_victim": 0, "nb_vehicules": 0}'
     """    
     l_prediction = predict(prediction.dict())
     return {'prediction':l_prediction}
-    
 
+
+@api.post("/new_user", tags = ['admin'])
+def create_user(new_user : User, Verifcation = Depends(verif_admin)):
+    """
+    Permet de poster une nouvel usager (necessite les droits admin), sous la forme suivante: 
+    curl -X 'POST' 'http://localhost:8000/new_user' \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{
+        "name": "string",
+        "password": "string"
+        }'
+    """
+    global users
+
+    # Si name déja présent, ne pas rajouter
+    if new_user.name in users:
+        raise HTTPException(
+            status_code=405, 
+            detail= f"name already present, choose another name")
+
+    # Ajout du new_user dans users, renvoyer "succes"
+    users.update({new_user.name : new_user.password})
+    return {"user créé avec succès" : new_user}
+
+
+@api.post("/new_admin", tags = ['admin'])
+def create_admin(new_admin : User, Verifcation = Depends(verif_admin)):
+    """
+    Permet de poster une nouvel admin, sous la forme suivante: 
+    curl -X 'POST' 'http://localhost:8000/new_admin' \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{
+        "name": "string",
+        "password": "string"
+        }'
+    """
+    global users, admins
+
+    # Si name déja présent dans users, ne pas rajouter
+    if new_admin.name in users:
+        raise HTTPException(
+            status_code=405, 
+            detail= f"name already present, choose another name")
+
+    # Ajout du new_admin dans "admins" et "users", renvoyer "succes"
+
+    users.update({new_admin.name : new_admin.password})
+    admins.update({new_admin.name : new_admin.password})   
+
+    return {"new admin créee avec succes" : new_admin}
+
+@api.get('test/users and admin list', tags = ['test'])
+def get_users_list():
+    return {'users': users , 'admins': admins}
+
+@api.get("/test/verify_user", dependencies=[Depends(verif_user)], tags = ['test'])
+def verify_user_authorisation():
+    return {"message": "User verified"}
 
 if __name__ == '__main__':
     #

@@ -65,6 +65,7 @@ jobs:
       run: |        
         pytest ./src/api/test_api_fonction.py
         pytest ./src/api/test_api_serveur.py
+        pytest ./src/api/test_api_authentification.py
         
   build-docker-image:
     runs-on: ubuntu-latest
