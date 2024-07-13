@@ -11,13 +11,13 @@ on:
     push:
         branches:
             - "**"  # Ceci déclenche le workflow pour tous les pushes sur toutes les branches
-    workflow_run:
-        workflows: 
-            - Train_ML_Model
-        types:
-            - success
-        branches:
-            - "**"        
+#    workflow_run:
+#        workflows: 
+#            - Train_ML_Model
+#        types:
+#            - success
+#        branches:
+#            - "**"        
 
 jobs:
 
