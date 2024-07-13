@@ -2,7 +2,8 @@ name: Train ML Model
 
 on:
   push:
-    branches: [ "features_FastAPI" ]
+    branches:
+      - "**"  # Ceci déclenche le workflow pour tous les pushes sur toutes les branches
   pull_request:
     branches: [ "master" ]
 
