@@ -1,4 +1,4 @@
-name: Model deployment
+name: Model_Deployment
 
 #on:
 #  push:
@@ -10,7 +10,7 @@ name: Model deployment
 on:
     workflow_run:
         workflows: 
-            - "Train ML Model"
+            - Train_ML_Model
         types:
             - success
         branches:
