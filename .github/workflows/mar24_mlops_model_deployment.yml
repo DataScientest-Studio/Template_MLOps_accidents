@@ -10,7 +10,7 @@ name: Model deployment
 on:
     workflow_run:
         workflows: 
-            - mar24_mlops_git_actions
+            - "Train ML Model"
         types:
             - completed
         branches:
