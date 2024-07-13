@@ -11,7 +11,8 @@ on:
     workflows: ["Train ML Model"]
     types:
       - completed
-
+    branches:
+      - "**"        
 
 jobs:
 
