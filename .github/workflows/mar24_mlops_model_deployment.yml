@@ -12,7 +12,7 @@ on:
         workflows: 
             - "Train ML Model"
         types:
-            - completed
+            - success
         branches:
             - "**"        
 
