@@ -1,10 +1,17 @@
 name: Model deployment
 
-on:   
-    push:
-        branches: [ "model_deployment" ]
-    pull_request:
-        branches: [ "master" ]
+#on:
+#    push:
+#        branches: [ "model_deployment" ]
+#    pull_request:
+#        branches: [ "master" ]
+
+on:
+  workflow_run:
+    workflows: ["Train ML Model"]
+    types:
+      - completed
+
 
 jobs:
 
