@@ -15,18 +15,25 @@ on:
         workflows: 
             - Train_ML_Model
         types:
-            - success
-        branches:
-            - "**"        
+            - completed       
 
 permissions:
     actions: read
 
-
 jobs:
 
+  test-job:
+    name: Test Step
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+      - run: git branch
+      - run: env
+
     test-dep:
-        runs-on: ubuntu-latest
+        #runs-on: ubuntu-latest
         
         steps:
         - uses: actions/checkout@v4
