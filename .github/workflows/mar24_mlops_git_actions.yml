@@ -100,5 +100,7 @@ jobs:
       
     # Pousser l'image vers un registre Docker
     - name: Pousser l'image vers le registre Docker
-      run: docker push ${{secrets.DOCKER_USERNAME}}/mar24accd:latest
+      run: |
+        docker push ${{secrets.DOCKER_USERNAME}}/mar24accd:latest
+        exit 0
 
