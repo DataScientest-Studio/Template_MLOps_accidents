@@ -1,1 +1,1 @@
-web: uvicorn --app-dir=./src/api api:api
+web: gunicorn --chdir ./src/api api:api
