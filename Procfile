@@ -1,1 +1,1 @@
-web: uvicorn src.api:api
+web: uvicorn --app-dir=./src/api api:api
