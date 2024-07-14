@@ -144,7 +144,7 @@ def predict(features: dict) -> int:
 
 api = FastAPI()
 
-@app.get("/")
+@api.get("/")
 def read_root():
     return {"message": "Hello, Heroku!"}
 
