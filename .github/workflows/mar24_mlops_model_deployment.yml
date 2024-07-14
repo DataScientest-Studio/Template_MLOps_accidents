@@ -33,7 +33,7 @@ jobs:
       - run: env
 
     test-dep:
-        #runs-on: ubuntu-latest
+        runs-on: ubuntu-latest
         
         steps:
         - uses: actions/checkout@v4
