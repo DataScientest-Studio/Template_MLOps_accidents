@@ -1,1 +1,1 @@
-web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker src.api:api
+web: gunicorn --chdir ./src/api -w 4 -k uvicorn.workers.UvicornWorker api:api
