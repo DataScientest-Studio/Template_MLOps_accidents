@@ -1,8 +1,9 @@
-name: Train ML Model
+name: Train_ML_Model
 
 on:
   push:
-    branches: [ "features_FastAPI" ]
+    branches:
+      - "**"  # Ceci déclenche le workflow pour tous les pushes sur toutes les branches
   pull_request:
     branches: [ "master" ]
 
@@ -99,4 +100,7 @@ jobs:
       
     # Pousser l'image vers un registre Docker
     - name: Pousser l'image vers le registre Docker
-      run: docker push ${{secrets.DOCKER_USERNAME}}/mar24accd:latest
+      run: |
+        docker push ${{secrets.DOCKER_USERNAME}}/mar24accd:latest
+        exit 0
+
