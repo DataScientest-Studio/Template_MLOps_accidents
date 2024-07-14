@@ -1,1 +1,1 @@
-web: gunicorn ./src/api/api:api
+web: gunicorn --app-dir=./src/api api:api
