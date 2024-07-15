@@ -1,16 +1,6 @@
 name: Model_Deployment
 
-#on:
-#  push:
-#    branches:
-#      - "**"  # Ceci déclenche le workflow pour tous les pushes sur toutes les branches
-#    pull_request:
-#        branches: [ "master" ]
-
 on:
-#    push:
-#        branches:
-#            - "**"  # Ceci déclenche le workflow pour tous les pushes sur toutes les branches 
     workflow_run:
         workflows: 
             - Train_ML_Model
@@ -43,8 +33,8 @@ jobs:
           if: ${{ github.event.workflow_run.conclusion == 'success' }}
           run: echo "Previous workflow completed successfully, running dependent job."
           uses: akhileshns/heroku-deploy@v3.12.14
-              with:
-                heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-                heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-                heroku_email: ${{ secrets.HEROKU_EMAIL }}          
+          with:
+            heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+            heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+            heroku_email: ${{ secrets.HEROKU_EMAIL }}
           
