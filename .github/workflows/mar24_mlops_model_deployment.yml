@@ -38,3 +38,7 @@ jobs:
           run: |
             ls ${{ github.workspace }}
         - run: echo "🍏 This job's status is ${{ job.status }}."
+
+        - name: Check previous workflow status
+          if: ${{ github.event.workflow_run.conclusion == 'success' }}
+          run: echo "Previous workflow completed successfully, running dependent job."
