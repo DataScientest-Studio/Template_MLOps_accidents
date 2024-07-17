@@ -12,11 +12,15 @@ import json
 
 g_rf_classifier = None
 g_model_filename = './src/models/trained_model.joblib'
+g_model_filename = './src/models/trained_model.joblib'
+users_directory = "./data/user_db"
+users_filename = os.path.join(users_directory, "users.json")
+admins_filename = os.path.join(users_directory, "admins.json")
 #g_model_filename = 'D:/Development/Python/mar24_cmlops_accidents/src/models/trained_model.joblib'
 #g_model_filename = '../models/trained_model.joblib'
 
 
-####  Gestion des utilisateurs et des droits (admin) #####
+######  Gestion des utilisateurs et des droits (admin) ######
 
 security = HTTPBasic()
 
@@ -24,16 +28,37 @@ class User(BaseModel):
     name: str
     password: str
 
-# initialise users and admins
-users = {
-  "alice": "wonderland",
-  "bob": "builder",
-  "clementine": "mandarine",
-  "admin1": "admin1" 
-}
-admins = {
-  "admin1": "admin1" 
-}
+# initialise users_file and admins_file si absents
+
+if not os.path.exists(users_directory):
+    os.makedirs(users_directory)
+    print("repertoire cree")
+
+if not os.path.isfile(users_filename):
+    users = {
+    "alice": "wonderland",
+    "bob": "builder",
+    "clementine": "mandarine",
+    "admin1": "admin1" 
+    }
+    with open(users_filename, 'w', encoding='utf8') as f:
+        json.dump(users,f )
+    print("user_json créé")
+
+if not os.path.isfile(admins_filename):
+    admins = {
+    "admin1": "admin1" 
+    }
+    with open(admins_filename, 'w', encoding='utf8') as f:
+        json.dump(admins,f )
+    print("admin_json créé")
+
+# load users and admins_file
+with open(users_filename, "r") as f:
+    users = json.load(f)
+
+with open(admins_filename, "r") as f:
+    admins = json.load(f)
 
 # Vérification user
 def verif_user(creds: HTTPBasicCredentials = Depends(security)):
@@ -53,7 +78,6 @@ def verif_admin(creds: HTTPBasicCredentials = Depends(security)):
     username = creds.username
     password = creds.password
     if username in admins and password == admins[username]:
-        print("Admin Validated")
         return True
     else:
         raise HTTPException(
@@ -62,7 +86,7 @@ def verif_admin(creds: HTTPBasicCredentials = Depends(security)):
             headers={"WWW-Authenticate": "Basic"},
         )
 
-####  Gestion des prédictions #####
+#####  Gestion des prédictions #####
 
 class Prediction(BaseModel):
     place:int
@@ -185,6 +209,8 @@ def create_user(new_user : User, Verifcation = Depends(verif_admin)):
 
     # Ajout du new_user dans users, renvoyer "succes"
     users.update({new_user.name : new_user.password})
+    with open(users_filename, 'w', encoding='utf8') as f:
+        json.dump(users,f)
     return {"user créé avec succès" : new_user}
 
 
@@ -213,9 +239,16 @@ def create_admin(new_admin : User, Verifcation = Depends(verif_admin)):
     users.update({new_admin.name : new_admin.password})
     admins.update({new_admin.name : new_admin.password})   
 
+    with open(admins_filename, 'w', encoding='utf8') as f:
+        json.dump(admins,f)
+        print("ok", new_admin.name)
+
+    with open(users_filename, 'w', encoding='utf8') as f:
+        json.dump(users,f)
+
     return {"new admin créee avec succes" : new_admin}
 
-@api.get('test/users and admin list', tags = ['test'])
+@api.get("/test/users and admin list", tags = ['test'])
 def get_users_list():
     return {'users': users , 'admins': admins}
 
