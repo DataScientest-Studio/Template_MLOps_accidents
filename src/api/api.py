@@ -36,10 +36,11 @@ if not os.path.exists(users_directory):
 
 if not os.path.isfile(users_filename):
     users = {
+    "admin1": "admin1" ,
     "alice": "wonderland",
     "bob": "builder",
-    "clementine": "mandarine",
-    "admin1": "admin1" 
+    "clementine": "mandarine"
+
     }
     with open(users_filename, 'w', encoding='utf8') as f:
         json.dump(users,f )
@@ -47,7 +48,8 @@ if not os.path.isfile(users_filename):
 
 if not os.path.isfile(admins_filename):
     admins = {
-    "admin1": "admin1" 
+    "admin1": "admin1",
+    "alice": "wonderland"
     }
     with open(admins_filename, 'w', encoding='utf8') as f:
         json.dump(admins,f )
@@ -199,7 +201,6 @@ def create_user(new_user : User, Verifcation = Depends(verif_admin)):
         "password": "string"
         }'
     """
-    global users
 
     # Si name déja présent, ne pas rajouter
     if new_user.name in users:
@@ -226,7 +227,6 @@ def create_admin(new_admin : User, Verifcation = Depends(verif_admin)):
         "password": "string"
         }'
     """
-    global users, admins
 
     # Si name déja présent dans users, ne pas rajouter
     if new_admin.name in users:
@@ -235,18 +235,81 @@ def create_admin(new_admin : User, Verifcation = Depends(verif_admin)):
             detail= f"name already present, choose another name")
 
     # Ajout du new_admin dans "admins" et "users", renvoyer "succes"
-
     users.update({new_admin.name : new_admin.password})
     admins.update({new_admin.name : new_admin.password})   
 
     with open(admins_filename, 'w', encoding='utf8') as f:
         json.dump(admins,f)
-        print("ok", new_admin.name)
 
     with open(users_filename, 'w', encoding='utf8') as f:
         json.dump(users,f)
 
     return {"new admin créee avec succes" : new_admin}
+
+
+# Route pour supprimer un administrateur (administrateurs seulement)
+@api.delete("/delete_admin/{username}", tags=["admin"])
+def remove_admin(username: str, Verification = Depends(verif_admin)):
+    """
+    Permet aux administrateurs de retirer les droits administrateur d'un utilisateur.
+    Attention: Ne supprime pas l'utilisateur.
+    Exemple de requête: 
+        curl -X 'PUT' 'http://localhost:8000/remove_admin/admin_name' \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{
+        "admin_username": "admin1",
+        "admin_password": "admin1"
+        }'
+    """
+    if username not in admins:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cet utilisateur {username} n'est pas administrateur."
+        )
+    
+    del admins[username]
+    with open(admins_filename, 'w', encoding='utf8') as f:
+        json.dump(admins,f)
+    
+    return {"message": f"Les droits administrateur de {username} ont été retirés avec succès."}
+
+# Route pour supprimer un utilisateur (administrateurs seulement)
+@api.delete("/delete_user/{username}", tags=["admin"])
+def delete_user(username: str, Verification = Depends(verif_admin)):
+    """
+    Permet aux administrateurs de retirer un utilisateur.
+    Message d'erreur si cet utilisateur est administrateur
+    Exemple de requête: 
+        curl -X 'PUT' 'http://localhost:8000/remove_admin/username2' \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{
+        "admin_username": "admin1",
+        "admin_password": "admin1"
+        }'
+    """
+    if username not in users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Utilisateur non trouvé."
+        )
+    
+    if username in admins:
+         raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Impossible de supprimer un administrateur. Utiliser /delete_admin"
+        )
+    del users[username]
+    with open(users_filename, 'w', encoding='utf8') as f:
+        json.dump(users,f)
+    return {"user supprimé avec succès" : username}
+
+
+
+
+
+##### Endpoints de Test ###########
 
 @api.get("/test/users and admin list", tags = ['test'])
 def get_users_list():

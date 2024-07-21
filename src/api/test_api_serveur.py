@@ -12,10 +12,8 @@ def test_status():
         print(f"Erreur : {response.status_code}")
         assert False
 
-
 def test_create_user_success():
     url = "http://127.0.0.1:8000/new_user"
-    users = {"alice": "wonderland"}    
     response = requests.post(
         url,
         json={"name": "testuser", "password": "testpass"}, 
@@ -26,7 +24,6 @@ def test_create_user_success():
 
 def test_create_user_already_exists():
     url = "http://127.0.0.1:8000/new_user"
-    users = {"alice": "wonderland"}    
     response = requests.post(
         url,
         json={"name": "testuser", "password": "testpass"}, 
@@ -37,7 +34,6 @@ def test_create_user_already_exists():
 
 def test_create_admin_success():
     url = "http://127.0.0.1:8000/new_admin"
-    admin = {"admin1": "admin1"}    
     response = requests.post(
         url,
         json={"name": "testadmin", "password": "testadminpass"}, 
@@ -49,8 +45,6 @@ def test_create_admin_success():
 def test_create_admin_already_exists():
     """ Si le name est déja dans users, le refuser """
     url = "http://127.0.0.1:8000/new_admin"
-    admin = {"admin1": "admin1"} 
-    users = {"alice": "wonderland", "admin1": "admin1"}     
     response = requests.post(
         url,
         json={"name": "admin1", "password": "testadminpass"}, 
@@ -58,6 +52,47 @@ def test_create_admin_already_exists():
     )
     assert response.status_code == 405, response.text
     assert response.json() == {"detail": "name already present, choose another name"}
+
+def test_delete_user_ok():
+    url = "http://127.0.0.1:8000/delete_user/testuser" 
+    response = requests.delete(
+        url,
+        auth = ('admin1', 'admin1')
+    )
+    assert response.status_code == 200, response.text
+
+def test_delete_user_is_admin():
+    url = "http://127.0.0.1:8000/delete_user/testadmin" 
+    response = requests.delete(
+        url,
+        auth = ('admin1', 'admin1')
+    )
+    assert response.status_code == 403, response.text
+
+def test_delete_user_not_exist():
+    url = "http://127.0.0.1:8000/delete_user/wronguser" 
+    response = requests.delete(
+        url,
+        auth = ('admin1', 'admin1')
+    )
+    assert response.status_code == 404, response.text
+    assert response.json() == {"detail":"Utilisateur non trouvé."}
+
+def test_delete_admin_ok():
+    url = "http://127.0.0.1:8000/delete_admin/testadmin"  
+    response = requests.delete(
+        url,
+        auth = ('admin1', 'admin1')
+    )
+    assert response.status_code == 200, response.text
+
+def test_delete_admin_not_exist():
+    url = "http://127.0.0.1:8000/delete_admin/clementine"
+    response = requests.delete(
+        url,
+        auth = ('admin1', 'admin1')
+    )
+    assert response.status_code == 404, response.text 
 
 def test_prediction():
     url = "http://127.0.0.1:8000/prediction"
