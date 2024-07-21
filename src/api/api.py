@@ -36,10 +36,11 @@ if not os.path.exists(users_directory):
 
 if not os.path.isfile(users_filename):
     users = {
+    "admin1": "admin1" ,
     "alice": "wonderland",
     "bob": "builder",
-    "clementine": "mandarine",
-    "admin1": "admin1" 
+    "clementine": "mandarine"
+
     }
     with open(users_filename, 'w', encoding='utf8') as f:
         json.dump(users,f )
@@ -47,7 +48,8 @@ if not os.path.isfile(users_filename):
 
 if not os.path.isfile(admins_filename):
     admins = {
-    "admin1": "admin1" 
+    "admin1": "admin1",
+    "alice": "wonderland"
     }
     with open(admins_filename, 'w', encoding='utf8') as f:
         json.dump(admins,f )
@@ -199,7 +201,6 @@ def create_user(new_user : User, Verifcation = Depends(verif_admin)):
         "password": "string"
         }'
     """
-    global users
 
     # Si name déja présent, ne pas rajouter
     if new_user.name in users:
@@ -264,7 +265,7 @@ def remove_admin(username: str, Verification = Depends(verif_admin)):
     if username not in admins:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cet utilisateur n'est pas administrateur."
+            detail=f"Cet utilisateur {username} n'est pas administrateur."
         )
     
     del admins[username]
@@ -308,9 +309,7 @@ def delete_user(username: str, Verification = Depends(verif_admin)):
 
 
 
-
-
-
+##### Endpoints de Test ###########
 
 @api.get("/test/users and admin list", tags = ['test'])
 def get_users_list():
