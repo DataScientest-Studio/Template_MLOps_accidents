@@ -2,7 +2,8 @@ import streamlit as st
 import requests
 
 # Definition des chemins, url et noms 
-from streamlit.pages.p1_user import api_url
+from pages.p1_user import api_url
+
 
 
 ###  LES FONCTIONS  ####################################################
