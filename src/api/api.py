@@ -7,6 +7,7 @@ import joblib
 import numpy as np
 from pydantic import BaseModel
 import os
+import io
 import json
 import boto3
 import base64
