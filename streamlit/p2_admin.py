@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Definition des chemins, url et noms 
-from pages.p1_user import api_url
+from p1_user import api_url
 
 
 
@@ -42,12 +42,13 @@ def new_user(name, password):
             url,
             headers=headers,
             json={"name": name, "password": password}, 
-            auth = ('admin1', 'admin1')
+            auth = (st.session_state["name_log"], st.session_state["password_log"])
         ) 
         if response.status_code == 200: 
             st.success("L'utilisateur a été créé", icon="✅")        
         else:
-            st.error("Ce nom existe deja, choisissez en un autre")
+            # st.error("Ce nom existe deja, choisissez en un autre")    # N'integre pas tous les cas
+            st.error(response.json()["detail"])
         st.write(response.json())
 
     except requests.exceptions.RequestException as e:
@@ -62,12 +63,13 @@ def new_admin(name, password):
             url,
             headers=headers,
             json={"name": name, "password": password}, 
-            auth = ('admin1', 'admin1')
+            auth = (st.session_state["name_log"], st.session_state["password_log"])
         )     
         if response.status_code == 200: 
             st.success("L'admin et l'utilisateur ont été créés", icon="✅")        
         else:
-            st.error("Ce nom existe deja, choisissez en un autre")
+            # st.error("Ce nom existe deja, choisissez en un autre")    # N'integre pas tous les cas
+            st.error(response.json()["detail"])
         st.write(response.json())
 
     except requests.exceptions.RequestException as e:
@@ -79,12 +81,13 @@ def delete_user(name):
         headers = {'accept': 'application/json'}    # inutile ?
         response = requests.delete(
             url,
-            auth = ('admin1', 'admin1')
+            auth = (st.session_state["name_log"], st.session_state["password_log"])
             )      
         if response.status_code == 200: 
             st.success("Utilisateur supprimé", icon="✅")        
         else:
             st.error("Problème: ")
+            st.error(response.json()["detail"])
         st.write(response.json())
 
     except requests.exceptions.RequestException as e:
@@ -96,12 +99,13 @@ def delete_admin(name):
         headers = {'accept': 'application/json'}    # inutile ?
         response = requests.delete(
             url,
-            auth = ('admin1', 'admin1')
+            auth = (st.session_state["name_log"], st.session_state["password_log"])
             )      
         if response.status_code == 200: 
             st.success("Droits Admin supprimé", icon="✅")        
         else:
             st.error("Problème: ")
+            st.error(response.json()["detail"])
         st.write(response.json())
 
     except requests.exceptions.RequestException as e:
@@ -115,8 +119,9 @@ def get_lists():
         if response.status_code == 200:
             st.success("Listes récupérées.", icon="✅")        
         else:
-            return f"Erreur lors de la vérification de l'API. Code de statut : {response.status_code}"
-        st.write(response.json())
+            st.error(f"Erreur lors de la vérification de l'API. Code de statut : {response.status_code}")           
+            st.write(response.json())
+            return f"Erreur lors de la vérification de l'API. Code de statut : {response.status_code}"    
 
     except requests.exceptions.RequestException as e:
         return f"Erreur lors de la requête GET : {str(e)}"
@@ -132,8 +137,8 @@ def app():
 
     # Afficher le formulaire de connexion si l'utilisateur n'est pas authentifié
     if not st.session_state.authenticated:
-        username = st.text_input("Nom d'utilisateur")
-        password = st.text_input("Mot de passe", type="password")
+        username = st.text_input("Nom d'utilisateur","admin1")
+        password = st.text_input("Mot de passe","admin1", type="password")
 
         if st.button("Se connecter"):
             if authenticate(username, password):
@@ -145,7 +150,7 @@ def app():
             st.write("nom: admin1, password: admin1")
     
     else:
-        st.success("Vous êtes connecté !")
+        st.success(f"Vous êtes connecté !")
 
     if st.session_state.authenticated == True:
         with st.container():
@@ -194,26 +199,38 @@ def app():
                 delete_admin(name)
 
             #-------------------
-            st.write("# Users and Admins list")
+            st.write("# Get lists")
             if st.button("Users and Admins list"):
                 get_lists()
-            
 
+            #-----------------
+            st.write("# Authentication Test")
+            st.write("To test different logins in order to evaluate the API's behavior with incorrect credentials")
+            custom=st.toggle("custom login")
+            if custom == True:
+                with st.form("login form"):
+                    name_log = st.text_input("Name")
+                    password_log = st.text_input("Password")
+                    submit_button5 = st.form_submit_button("valid")
+
+                if submit_button5:
+                    st.session_state["name_log"]=name_log                       
+                    st.session_state["password_log"]=password_log   
+                    st.error(f"##### request to the API with: name = {st.session_state['name_log']} et password = {st.session_state['password_log']} ") 
+            else:              
+                st.session_state["name_log"]="admin1"                     
+                st.session_state["password_log"]="admin1"    
+            
+            
 
 # TODO:
+
 # Fenetre d'authentification doit disparaitre
-
-            
-
-        
-        
-                
-            
-
-        # Fonction pour l'authentification de l'utilisateur
-        # def authenticate(username, password):
-        #     valid_username = os.getenv("STREAMLIT_USERNAME")
-        #     valid_password = os.getenv("STREAMLIT_PASSWORD")
+# Améliorer authentification
+    # Fonction pour l'authentification de l'utilisateur
+    # def authenticate(username, password):
+    #     valid_username = os.getenv("STREAMLIT_USERNAME")
+    #     valid_password = os.getenv("STREAMLIT_PASSWORD")
 
 
 

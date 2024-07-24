@@ -52,6 +52,8 @@ Project Organization
 
 ---------
 
+# To install the main application
+
 ## Steps to follow 
 
 Convention : All python scripts must be run from the root specifying the relative file path.
@@ -91,7 +93,15 @@ Convention : All python scripts must be run from the root specifying the relativ
 
   - If you do not specify a json file, you will be asked to enter manually each feature. 
 
+# To run the API locally  :
 
+1/ It is necessary to have installed the main application
+
+2/ Be sure to have the environment activated
+
+3/ In the prompt :
+   a) use an environment with uvicorn or install it with `pip install uvicornt`
+   b) uvicorn src.api.api:api       # starts the api on : http://localhost:8000
 ------------------------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
