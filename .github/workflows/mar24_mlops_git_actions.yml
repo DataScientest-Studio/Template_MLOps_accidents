@@ -34,9 +34,41 @@ jobs:
         path: ./src/models/trained_model.joblib
         retention-days: 2
 
+
+  push-aws-s3:
+    runs-on: ubuntu-latest
+    #needs: test-api
+    needs: train-model
+    
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Download model artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: trained-model
+        path: ./src/models/          
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-3
+
+    - name: Upload to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        SOURCE_DIR: ./src/models/
+
+
   test-api:
     runs-on: ubuntu-latest
-    needs: train-model
+    #needs: train-model
+    needs: push-aws-s3
     
     steps:
     - uses: actions/checkout@v4
@@ -67,11 +99,11 @@ jobs:
         pytest ./src/api/test_api_fonction.py
         pytest ./src/api/test_api_serveur.py
         pytest ./src/api/test_api_authentification.py
-        
-  build-docker-image:
+
+
+  build-and-push-docker-image:
     runs-on: ubuntu-latest
     needs: test-api
-    #needs: train-model
     
     steps:
     - uses: actions/checkout@v4
