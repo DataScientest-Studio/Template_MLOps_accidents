@@ -117,7 +117,8 @@ def get_lists():
         url = f"{api_url}/test/users and admin list"
         response = requests.get(url)
         if response.status_code == 200:
-            st.success("Listes récupérées.", icon="✅")        
+            st.success("Listes récupérées.", icon="✅")  
+            st.write(response.json())
         else:
             st.error(f"Erreur lors de la vérification de l'API. Code de statut : {response.status_code}")           
             st.write(response.json())
