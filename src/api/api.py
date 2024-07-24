@@ -224,9 +224,12 @@ def predict(features: dict) -> int:
         model_file = 'trained_model.joblib' 
 
         s3 = boto3.client('s3', region_name='eu-west-3', aws_access_key_id = KEY_ID_MSG, aws_secret_access_key = SECRET_ID_MSG)
-        s3.download_file(bucket_name, 'trained_model.joblib', './src/models/trained_model.joblib')
-
-        g_rf_classifier = joblib.load(g_model_filename)
+        #s3.download_file(bucket_name, 'trained_model.joblib', './src/models/trained_model.joblib'
+        #g_rf_classifier = joblib.load(g_model_filename)
+        
+        response = s3.get_object(Bucket=bucket_name, Key='trained_model.joblib')
+        body = response['Body'].read()
+        g_rf_classifier = joblib.load(io.BytesIO(body))
        
     prediction = g_rf_classifier.predict(input_df)    
     return int(prediction[0])   # convert np.int64 to int to avoid json exception    
