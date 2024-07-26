@@ -1,9 +1,44 @@
 # **mar24_mlops_accidents**
-==============================
-"Ce projet développe un modèle prédictif pour évaluer la gravité des accidents de la route à partir des premières observations sur place, aidant à déterminer les ressources nécessaires et améliorer l'anticipation des secours. Il intègre également des pratiques de MLOps et CI/CD pour assurer un déploiement automatisé, une surveillance continue et des mises à jour régulières du modèle, garantissant ainsi sa performance et son actualisation constante.".
+=================================  
+Ce projet développe un modèle prédictif pour évaluer la gravité des accidents de la route à partir des premières observations sur place, aidant à déterminer les ressources nécessaires et améliorer l'anticipation des secours.  
+Il intègre également des pratiques de MLOps et CI/CD pour assurer un déploiement automatisé, une surveillance continue et des mises à jour régulières du modèle, garantissant ainsi sa performance et son actualisation constante.
 
-Project Organization
+
+
+ Project Organization
 ------------
+**Parties modifiées**  
+La strucure des repertoires reprends celle deja fournie pour la création du modèle. Les fichiers importants ajoutées ou modifiées dans le cadre de ce projet sont: 
+
+    ├── .github/workflows          <- GitHub Actions workflows for CI/CD
+    │   ├── git_action.yml         <- Workflow to run unit tests and build and push Docker images
+    │   └── model_deployment.yml   <- Workflow to deploy the model
+    │
+    ├── requirements.txt           <- The full list of libraries installed on the Python env used for development
+    │                              <- Generated with `pip freeze > requirements.txt`
+    ├── data
+    │   └── user_db                <- Data of the users and admins
+    │
+    ├── Dockerfile                 <- The app's image builder, allows running the app in a container without needing any configuration
+    │
+    ├── logs                      <- Logs from training and predicting
+    │
+    ├── reports
+    │   └── cahier_des_charges     <- Project specifications document
+    │
+    ├── src                        <- Source code for use in this project
+    │   └── api                    <- Scripts for the API
+    │       ├── api.py
+    │       ├── test_api_authentification.py    
+    │       ├── test_api_fonction.py    
+    │       └── test_api_serveur.py
+    │
+    └── streamlit                  <- Source code for a Streamlit interface to access the API
+        ├── README.md              <- The README for developers using this Streamlit
+        └── images                 <- Source images for the Streamlit interface
+
+
+**Structure complète**
 
     ├── LICENSE
     ├── README.md          <- The top-level README for developers using this project.
@@ -61,14 +96,14 @@ Project Organization
     │   ├── README.md      <- The README for developers using this streamlit.
     │   └── images         <- Source images 
     │  
-    ├── Dockerfile         <- The app's image builder, allows to run the app in a container without needing any condfiguration.
+    ├── **Dockerfile**     <- The app's image builder, allows to run the app in a container without needing any condfiguration.
     │  
-    ├── .github\workflows       <- GitHub Actions workflows for CI/CD
-        ├── git_action.yml      <- Workflow for running unit tests and building and pushing Docker images
-        └── model_deployment.yml<- Workflow for deploying the model
----------
+    ├── .github\workflows          <- GitHub Actions workflows for CI/CD
+        ├── git_action.yml         <- Workflow to run unit tests and build and push Docker images
+        └── model_deployment.yml   <- Workflow to deploy the model
 
-# **To install the applications**
+
+## **To Install the Applications**
 
 ## Steps to follow for the main application (predict model)
 
@@ -78,11 +113,11 @@ Convention : All python scripts must be run from the root specifying the relativ
 
     `python -m venv my_env`
 
-###   Activate it 
+####   Activate it 
 
     `./my_env/Scripts/activate`
 
-###   Install the packages from requirements.txt
+####   Install the packages from requirements.txt
 
     `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
 
@@ -107,20 +142,21 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ## Steps to follow To run the API locally  :
 
-1/ It is necessary to have installed the main application
+#### 1- It is necessary to have installed the main application  
+#### 2- Be sure to have the environment activated
 
-2/ Be sure to have the environment activated
-
-3/ In the prompt :
-   a) use an environment with uvicorn or install it with `pip install uvicornt`
-   b) uvicorn src.api.api:api       # starts the api on : http://localhost:8000
+#### 3- In the prompt :  
+> a. Use an environment with uvicorn or install it with: `pip install uvicorn`  
+> b. Starts the api on : http://localhost:8000: `src.api.api:api`   
 
 ## Steps to follow To run a streamlit demo :
 
-see the README in the streamlit directory
-------------------------
+ See the README in the streamlit directory    
 
+--------------------------------------
+---
 # **Description détaillée du projet**
+  
 
 ## Description
 Ce projet vise à développer un modèle prédictif pour évaluer la gravité des accidents de la route en fonction des premières observations effectuées sur le site de l'accident. Ce modèle aide à définir les besoins en ressources pour chaque accident et permet une meilleure anticipation et allocation des secours.
