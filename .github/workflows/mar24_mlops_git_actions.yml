@@ -37,6 +37,7 @@ jobs:
   #Ajout de la génération des scores et des predictions
   predict-model:
     runs-on: ubuntu-latest
+    needs: train-model
     
     steps:
     - uses: actions/checkout@v4
@@ -70,7 +71,8 @@ jobs:
   push-aws-s3:
     runs-on: ubuntu-latest
     #needs: test-api
-    needs: train-model
+    #needs: train-model
+    needs: predict-model
     
     steps:
     - uses: actions/checkout@v4
@@ -162,7 +164,7 @@ jobs:
       with:
         name: trained-model
         path: ./src/models/ 
-        
+
     #Si besoin : Telechargement du fichier des scores
     - name: Download scores artifact
       uses: actions/download-artifact@v4
