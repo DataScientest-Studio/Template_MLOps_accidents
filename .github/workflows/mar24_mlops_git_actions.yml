@@ -64,14 +64,14 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: model-predictions
-        path: ./src/models/predictions/predictions.json
+        path: ./src/models/predictions/predictions.csv
         retention-days: 2
 
     - name: Upload model performance
       uses: actions/upload-artifact@v4
       with:
         name: model-scores
-        path: ./src/models/scores/scores.csv
+        path: ./src/models/scores/scores.json
         retention-days: 2
 
   push-aws-s3:
