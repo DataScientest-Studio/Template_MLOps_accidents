@@ -1,12 +1,16 @@
 import pytest
 from src.api.api import predict
+import json
 
-"""
+
 def test_performance():
     #récupérer les scores de scores.json
+    scores_file = "./src/models/scores/scores.json"
+    model_scores = json.load(open(scores_file))
     
-    assert performance>0.6
-"""
+    #si le f1 > 0.6 alors c'est un bon modèle, sinon tout se met en échec
+    assert model_scores["f1"] > 0.6
+
 
 def test_predict():
     features_4_prediction = {'place':10,
@@ -41,7 +45,6 @@ def test_predict():
     ma_prediction = predict(features_4_prediction)
     assert ma_prediction == 0
 
-
 # def test_predict_aws_s3():
     # features_4_prediction = {'place':10,
                              # 'catu':3,
@@ -74,3 +77,7 @@ def test_predict():
                             # }    
     # ma_prediction = predict_aws_s3(features_4_prediction)
     # assert ma_prediction == 0
+
+#pour debug manuel
+if __name__ == "__main__":
+    test_performance()
