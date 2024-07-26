@@ -64,7 +64,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: model-predictions
-        path: ./src/models/predictions/predictions.csv
+        path: ./src/models/predictions/predictions.json
         retention-days: 2
 
     - name: Upload model performance
