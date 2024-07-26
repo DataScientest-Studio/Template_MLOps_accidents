@@ -6,7 +6,7 @@ import json
 # Definition des chemins, url et noms 
 api_url_heroku = "https://dst-mar-accident-ee3901cfb695.herokuapp.com"
 api_url_local = "http://localhost:8000"  # A verifier
-api_url = api_url_heroku
+api_url = api_url_local
 
 # features utilisées par default (predict = 0)
 features_0= {'place':1,
