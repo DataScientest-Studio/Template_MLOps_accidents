@@ -51,6 +51,6 @@ st.sidebar.write("""
                 BOINALI Nadjedine  
                 CALMETTES Ludovic  
                 **Mentor:**  
-                Maria               
+                Maria DOMENZAIN ACEVEDO            
                  """)
 
