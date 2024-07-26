@@ -50,6 +50,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+    - name: Download model artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: trained-model
+        path: ./src/models/
     
     - name: Predict model
       run: python ./src/models/predict_model.py
