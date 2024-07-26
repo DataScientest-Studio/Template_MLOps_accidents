@@ -33,7 +33,39 @@ jobs:
         name: trained-model
         path: ./src/models/trained_model.joblib
         retention-days: 2
+  
+  #Ajout de la génération des scores et des predictions
+  predict-model:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12.0'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Predict model
+      run: python ./src/models/predict_model.py
+          
+    - name: Upload model predictions
+      uses: actions/upload-artifact@v4
+      with:
+        name: model-predictions
+        path: ./src/models/predictions/predictions.csv
+        retention-days: 2
 
+    - name: Upload model performance
+      uses: actions/upload-artifact@v4
+      with:
+        name: model-scores
+        path: ./src/models/scores/scores.csv
+        retention-days: 2
 
   push-aws-s3:
     runs-on: ubuntu-latest
@@ -47,7 +79,14 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: trained-model
-        path: ./src/models/          
+        path: ./src/models/ 
+
+    #Si besoin : Telechargement du fichier des scores
+    - name: Download scores artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: model-scores
+        path: ./src/models/scores/
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -87,6 +126,13 @@ jobs:
       with:
         name: trained-model
         path: ./src/models/
+
+    #Telechargement du fichier des scores
+    - name: Download scores artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: model-scores
+        path: ./src/models/scores/
         
     # Étapes suivantes pour déployer/utiliser le modèle téléchargé
     - name: lancement du serveur API
@@ -115,7 +161,14 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: trained-model
-        path: ./src/models/      
+        path: ./src/models/ 
+        
+    #Si besoin : Telechargement du fichier des scores
+    - name: Download scores artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: model-scores
+        path: ./src/models/scores/     
       
     - name: Construire l'image Docker
       run: docker build . -t ${{secrets.DOCKER_USERNAME}}/mar24accd:latest

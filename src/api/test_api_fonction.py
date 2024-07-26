@@ -1,6 +1,13 @@
 import pytest
 from src.api.api import predict
 
+"""
+def test_performance():
+    #récupérer les scores de scores.json
+    
+    assert performance>0.6
+"""
+
 def test_predict():
     features_4_prediction = {'place':10,
                              'catu':3,
