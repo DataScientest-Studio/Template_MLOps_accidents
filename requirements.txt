@@ -16,7 +16,6 @@ imbalanced-learn
 joblib
 bentoml
 #sys
-json
 pydantic
 requests
 pyjwt
