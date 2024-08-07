@@ -1,0 +1,82 @@
+2024-08-03 12:14:54,265 - __main__ - INFO - Temps d'entraînement du modèle : 27.72 secondes
+2024-08-03 12:15:05,843 - __main__ - INFO - Confusion Matrix:
+2024-08-03 12:15:06,038 - __main__ - INFO - [[235223  33463  65530]
+ [  1018   8236   2601]
+ [ 19821  29964  39939]]
+2024-08-03 12:15:06,038 - __main__ - INFO - 
+Classification Report:
+2024-08-03 12:15:06,494 - __main__ - INFO -               precision    recall  f1-score   support
+
+           1       0.92      0.70      0.80    334216
+           2       0.11      0.69      0.20     11855
+           3       0.37      0.45      0.40     89724
+
+    accuracy                           0.65    435795
+   macro avg       0.47      0.61      0.47    435795
+weighted avg       0.78      0.65      0.70    435795
+
+2024-08-03 12:15:06,495 - __main__ - INFO - 
+Accuracy Score:
+2024-08-03 12:15:06,511 - __main__ - INFO - 0.6503011737169999
+2024-08-03 13:08:10,229 - __main__ - INFO - Temps d'entraînement du modèle : 28.97 secondes
+2024-08-03 13:08:24,273 - __main__ - INFO - Confusion Matrix:
+2024-08-03 13:08:24,468 - __main__ - INFO - [[234350  33574  66292]
+ [   971   8320   2564]
+ [ 19282  30314  40128]]
+2024-08-03 13:08:24,468 - __main__ - INFO - 
+Classification Report:
+2024-08-03 13:08:24,952 - __main__ - INFO -               precision    recall  f1-score   support
+
+           1       0.92      0.70      0.80    334216
+           2       0.12      0.70      0.20     11855
+           3       0.37      0.45      0.40     89724
+
+    accuracy                           0.65    435795
+   macro avg       0.47      0.62      0.47    435795
+weighted avg       0.78      0.65      0.70    435795
+
+2024-08-03 13:08:24,952 - __main__ - INFO - 
+Accuracy Score:
+2024-08-03 13:08:24,970 - __main__ - INFO - 0.648924379582143
+2024-08-03 18:56:25,943 - __main__ - INFO - Temps d'entraînement du modèle : 27.18 secondes
+2024-08-03 18:56:37,892 - __main__ - INFO - Confusion Matrix:
+2024-08-03 18:56:38,089 - __main__ - INFO - [[234459  33895  65862]
+ [   969   8278   2608]
+ [ 19533  30038  40153]]
+2024-08-03 18:56:38,089 - __main__ - INFO - 
+Classification Report:
+2024-08-03 18:56:38,543 - __main__ - INFO -               precision    recall  f1-score   support
+
+           1       0.92      0.70      0.80    334216
+           2       0.11      0.70      0.20     11855
+           3       0.37      0.45      0.40     89724
+
+    accuracy                           0.65    435795
+   macro avg       0.47      0.62      0.47    435795
+weighted avg       0.78      0.65      0.70    435795
+
+2024-08-03 18:56:38,543 - __main__ - INFO - 
+Accuracy Score:
+2024-08-03 18:56:38,560 - __main__ - INFO - 0.6491354880161544
+2024-08-03 18:56:39,124 - __main__ - INFO - Model saved to ../../models/model_rf_clf.pkl
+2024-08-06 16:35:04,621 - __main__ - INFO - Temps d'entraînement du modèle : 30.64 secondes
+2024-08-06 16:35:18,414 - __main__ - INFO - Confusion Matrix:
+2024-08-06 16:35:18,645 - __main__ - INFO - [[234735  34324  65157]
+ [   954   8368   2533]
+ [ 19497  30391  39836]]
+2024-08-06 16:35:18,645 - __main__ - INFO - 
+Classification Report:
+2024-08-06 16:35:19,188 - __main__ - INFO -               precision    recall  f1-score   support
+
+           1       0.92      0.70      0.80    334216
+           2       0.11      0.71      0.20     11855
+           3       0.37      0.44      0.40     89724
+
+    accuracy                           0.65    435795
+   macro avg       0.47      0.62      0.47    435795
+weighted avg       0.78      0.65      0.70    435795
+
+2024-08-06 16:35:19,188 - __main__ - INFO - 
+Accuracy Score:
+2024-08-06 16:35:19,205 - __main__ - INFO - 0.6492479262038344
+2024-08-06 16:35:26,740 - __main__ - INFO - Model saved to ../../models/model_rf_clf.pkl
