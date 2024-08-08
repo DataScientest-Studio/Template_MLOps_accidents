@@ -7,12 +7,26 @@ Sphinx
 coverage
 #awscli>=1.29.0
 flake8
-pandas
-#logging
-numpy 
 pathlib 
+joblib
+
+# pour le modele
+pandas
+numpy
+imblearn
 scikit-learn
 imbalanced-learn
-joblib
-#sys
-#json
+
+# pour l api
+uvicorn
+fastapi 
+pydantic 
+pickle
+contextlib
+logging
+passlib
+
+#pour test
+
+pytest
+httpx
