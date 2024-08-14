@@ -25,33 +25,7 @@ with open(model_path, 'rb') as model_file:
     if model is None or accuracy is None:
         raise ValueError("Le dictionnaire chargé ne contient pas les clés 'model' et 'accuracy'.")
 
-# on définit une BaseModel permettant de cadrer le format de requete avec l ajout de nouvelles donnees d accident pour appeler le modele
-class DonneesAccident(BaseModel):
-    place: int
-    catu: int
-    trajet: float
-    an_nais: int
-    catv: int
-    choc: float
-    manv: float
-    mois: int
-    jour: int
-    lum: int
-    agg: int
-    int: int
-    col: float
-    com: int
-    dep: int
-    hr: int
-    mn: int
-    catr: int
-    circ: float
-    nbv: int
-    prof: float
-    plan: float
-    lartpc: int
-    larrout: int
-    situ: float
+
 
 
 # on définit la sécurité de notre app
