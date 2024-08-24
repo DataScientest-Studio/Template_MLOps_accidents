@@ -14,7 +14,7 @@ from Training import train_model, evaluate_model
 
 
 # préaparation de data pour testing
-file_path = "../data/data_2005a2021.csv"
+file_path = "../data/data 2005a2021 final.csv"
 X_train_resampled, X_test, y_train_resampled, y_test = process_data(file_path)
 
 model, training_time = train_model(X_train_resampled, y_train_resampled)
