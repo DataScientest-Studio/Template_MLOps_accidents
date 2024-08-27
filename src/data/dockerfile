@@ -1,0 +1,8 @@
+# Utiliser une image Python de base
+FROM python:slim
+
+# Définir le répertoire de travail dans le conteneur
+WORKDIR /data
+
+# Copier le fichier de base de données SQLite dans le conteneur
+COPY src/data/data_accident.db /data/
