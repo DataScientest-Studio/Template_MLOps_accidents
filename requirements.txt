@@ -1,5 +1,5 @@
 # local package
--e .
+#-e .
 
 # external requirements
 click
@@ -21,7 +21,7 @@ imbalanced-learn
 uvicorn
 fastapi 
 pydantic 
-logging
+#logging
 passlib
 
 #pour test
