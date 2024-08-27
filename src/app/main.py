@@ -10,7 +10,7 @@ import pickle
 app = FastAPI()
 
 # on charge notre modele allant être appelé dans l API
-model_path = '../../models/model_rf_clf.pkl'
+model_path = "model_rf_clf.pkl"
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Le fichier de modèle {model_path} n'existe pas.")
 with open(model_path, 'rb') as model_file:
