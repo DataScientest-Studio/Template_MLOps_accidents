@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  accident_prediction:
+    build:
+      context: .
+      dockerfile: ./src/app/dockerfile 
+    image: accident_prediction_app:latest
+    container_name: api_app
+    ports:
+      - "8000:8000"  
+    volumes:
+      - ./src/data:/data
+  db:
+    build:
+      context: .
+      dockerfile: ./src/data/dockerfile 
+    image: accident_database:latest
+    container_name: accident_db
+    volumes:
+      - ./src/data:/data 
