@@ -99,11 +99,44 @@ def clean_data(df):
     df = df.drop(columns=colonnes_a_supprimer)
     # on supprime désormais les lignes avec des NaN (ne pouvant les remplacer par d'autres catégories de façon aléatoire)
     df_cleaned = df.dropna()
-    return df_cleaned
+    # colonne non catégorielle
+    colonne_Non_cat=['num_acc', 'an_nais', "num_veh", 'annee', 'mois', 'jour', 'com', 'dep', 'hr', 'mn','nbv','lartpc','larrout']
 
+    # colonne catégorielle
+    cat_columns = [col for col in df_cleaned.columns if col not in colonne_Non_cat]
+
+    # Calculer les  correlations des variables categoricalles
+    #cat_corr = calculate_categorical_correlations(df_cleaned, cat_columns)
+
+    #print("Chi2 avec 'grav':")
+    #print(cat_corr)
+
+    # supprimer les variables atm, annee_y, annee_x, sexe et surf ne semblent pas corrélées avec grav 
+    colonnes_a_supprimer = ['atm', 'annee', 'sexe', 'surf', "num_veh"]
+    df_cleaned = df_cleaned.drop(columns=colonnes_a_supprimer)
+    return df_cleaned
 
 def save_cleaned_data(df, file_path):
     df.to_csv(file_path, index=False)
+
+# etape supplémentaire pour réduire le jeu de données (et pouvoir le déposer sur github)
+def select_sample(file_path,final_file_path):
+    df = pd.read_csv(file_path)
+    print(df['grav'].value_counts())
+    total_lignes = 50000 
+    colonne_classe = 'grav'  
+    # on vérifie que le nombre de lignes par classe en fonction des proportions existantes est égal car le jeu de données a fait l objet d un undersampling au préalable
+    prop_classes = df['grav'].value_counts(normalize=True)
+    lignes_par_classe = (prop_classes * total_lignes).astype(int)
+    df_final = pd.DataFrame()
+    for classe, n in lignes_par_classe.items():
+        df_classe = df[df['grav'] == classe].sample(n=n, random_state=42)
+        df_final = pd.concat([df_final, df_classe])
+    print(df_final['grav'].value_counts())
+    #df_final.to_csv(final_file_path,index=False)
+    return df_final
+
+
 
 def main():
 
@@ -127,7 +160,11 @@ def main():
     print(len(df_cleaned))
 
     # Save cleaned dataset
-    save_cleaned_data(df_cleaned, '../data/data_2005a2021.csv')
+    #save_cleaned_data(df_cleaned, '../data/data_2005a2021.csv')
+
+    file_path="../data/data_2005a2021.csv"
+    final_file_path="../data/data_2005a2021_final.csv"
+    df_final=select_sample(file_path,final_file_path)
     
 if __name__ == "__main__":
     main()

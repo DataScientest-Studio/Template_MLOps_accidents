@@ -46,7 +46,7 @@ def predict_model(model, X_test):
 
 def main():
     try:
-        file_path = '../data/data_2005a2021.csv'
+        file_path = '../data/data_2005a2021_final.csv'
         X_train_resampled, X_test, y_train_resampled, y_test = process_data(file_path)
         model_output_path = '../../models/model_rf_clf.pkl'
         

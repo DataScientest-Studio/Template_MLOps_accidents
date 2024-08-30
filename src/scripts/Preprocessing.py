@@ -44,24 +44,6 @@ def process_data(file_path):
     #import du dataset
     df = pd.read_csv(file_path, index_col=0)
     
-
-    # colonne non catégorielle
-    colonne_Non_cat=['num_acc', 'an_nais', "num_veh", 'annee', 'mois', 'jour', 'com', 'dep', 'hr', 'mn','nbv','lartpc','larrout']
-
-    # colonne catégorielle
-    cat_columns = [col for col in df.columns if col not in colonne_Non_cat]
-
-    # Calculer les  correlations des variables categoricalles
-    #cat_corr = calculate_categorical_correlations(df, cat_columns)
-
-    #print("Chi2 avec 'grav':")
-    #print(cat_corr)
-
-    # supprimer les variables atm, annee_y, annee_x, sexe et surf ne semblent pas corrélées avec grav 
-    colonnes_a_supprimer = ['atm', 'annee', 'sexe', 'surf', "num_veh"]
-    df = df.drop(columns=colonnes_a_supprimer)
-    
-
     # on sépare les variables cibles et les caractéristiques
     X, y = split_features_target(df, 'grav')
 
@@ -75,23 +57,12 @@ def process_data(file_path):
 
     return X_train_resampled, X_test, y_train_resampled, y_test
 
-
-
-   
-#def calculate_categorical_correlations(df, cat_columns):
-    
-    #cat_corr = {}
-    #for col in cat_columns:
-        #contingency_table = pd.crosstab(df['grav'], df[col])
-        #chi2, p, dof, ex = stats.chi2_contingency(contingency_table)
-        #cat_corr[col] = chi2
-    #return cat_corr
     
 
 
 
 def main():
-    file_path = '../data/data_2005a2021.csv'
+    file_path = '../data/data_2005a2021_final.csv'
     X_train_resampled, X_test, y_train_resampled, y_test = process_data(file_path)
     print(len(y_train_resampled))
     
