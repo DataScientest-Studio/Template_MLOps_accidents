@@ -1,0 +1,169 @@
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from passlib.context import CryptContext
+from pydantic import BaseModel
+import requests
+import httpx
+from typing import Dict
+
+app = FastAPI()
+
+# Définir les URLs des services internes
+PREDICTION_SERVICE_URL = "http://prediction_service:8001/predict"
+RETRAIN_SERVICE_URL = "http://retrain_service:8003/retrain"
+DB_SERVICE_URL = "http://db_service:5432/query"
+MONITORING_SERVICE_URL = "http://monitoring_service:8002/monitor"
+
+security = HTTPBasic()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+users = {
+    "user1": {
+        "username": "user1",
+        "name": "Sousou",
+        "hashed_password": pwd_context.hash('datascientest'),
+        "role": "standard",
+    },
+    "user2": {
+        "username": "user2",
+        "name": "Mim",
+        "hashed_password": pwd_context.hash('secret'),
+        "role": "standard",
+    },
+    "admin": {
+        "username": "admin",
+        "name": "Admin",
+        "hashed_password": pwd_context.hash('adminsecret'),
+        "role": "admin",
+    }
+}
+
+def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+    username = credentials.username
+    user = users.get(username)
+    if not user or not pwd_context.verify(credentials.password, user['hashed_password']):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Identifiant ou mot de passe incorrect",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return user
+
+def get_current_active_user(user: dict = Depends(get_current_user)):
+    if user.get("role") not in ["standard", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Utilisateur inactif",
+        )
+    return user
+
+def get_current_admin_user(user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Droits non autorisés",
+        )
+    return user
+
+# Définir la classe de données pour la prédiction
+class DonneesAccident(BaseModel):
+    place: int
+    catu: int
+    trajet: float
+    an_nais: int
+    catv: int
+    choc: float
+    manv: float
+    mois: int
+    jour: int
+    lum: int
+    agg: int
+    int: int
+    col: float
+    com: int
+    dep: int
+    hr: int
+    mn: int
+    catr: int
+    circ: float
+    nbv: int
+    prof: float
+    plan: float
+    lartpc: int
+    larrout: int
+    situ: float
+
+# Endpoints de l'API Gateway
+
+################################## statut de l'API Gateway ###################################
+
+@app.get("/status")
+def current_user(user: dict = Depends(get_current_active_user)):
+    return {"message": f"Bienvenue sur notre API Gateway, {user['name']}!"}
+
+################################## microservice prédiction ###################################   
+@app.post("/prediction")
+async def call_prediction_service(accident: DonneesAccident, user: dict = Depends(get_current_active_user)):
+     """
+    Endpoint pour prédire la gravité de l'accident en appelant le service de prédiction.
+
+    Args:
+    - accident : Les données de l'accident 
+    - user : L'utilisateur récupéré à partir de la dépendance `get_current_active_user`.
+
+    Returns:
+    - response: La prédiction de la gravité de l'accident.
+    """
+     payload = accident.model_dump()
+     response = requests.post(url=PREDICTION_SERVICE_URL, json=payload, timeout=10)
+     return response.json()
+################################## microservice retraining ###################################
+@app.post("/retrain")
+async def retrain(user: dict = Depends(get_current_admin_user)):
+    """
+    Endpoint pour réentraîner le modèle en appelant le service de réentraînement.
+
+    Args:
+    - user : L'utilisateur récupéré à partir de la dépendance `get_current_admin_user`.
+
+    Returns:
+    - dict: Confirmation de la demande de réentraînement.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.post(RETRAIN_SERVICE_URL)
+        response.raise_for_status() 
+        return response.json()
+
+################################## microservice monitoring ###################################
+@app.get("/monitor")
+async def monitor(user: dict = Depends(get_current_admin_user)):
+    """
+    Endpoint pour surveiller l'accuracy du modèle en appelant le service de monitoring.
+
+    Args:
+    - user : L'utilisateur récupéré à partir de la dépendance `get_current_admin_user`.
+
+    Returns:
+    - dict: L'accuracy actuelle du modèle et l'horodatage du réentraînement.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.get(MONITORING_SERVICE_URL)
+        response.raise_for_status() 
+        return response.json()
+
+################################## microservice accuracy ################################### 
+@app.get("/db")
+async def query_db(user: dict = Depends(get_current_active_user)):
+    """
+    Endpoint pour accéder aux données de la base de données en appelant le service de base de données.
+
+    Args:
+    - user : L'utilisateur récupéré à partir de la dépendance `get_current_active_user`.
+
+    Returns:
+    - dict: Les résultats de la requête à la base de données.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.get(DB_SERVICE_URL)
+        response.raise_for_status()  
+        return response.json()
