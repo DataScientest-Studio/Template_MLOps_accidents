@@ -1,0 +1,29 @@
+# local package
+#-e .
+
+# external requirements
+click
+Sphinx
+coverage
+#awscli>=1.29.0
+flake8
+pathlib 
+joblib
+
+# pour le modele
+pandas
+numpy
+imblearn
+scikit-learn
+imbalanced-learn
+
+# pour l api
+uvicorn
+fastapi 
+pydantic 
+#logging
+passlib
+
+#pour test
+pytest
+httpx
