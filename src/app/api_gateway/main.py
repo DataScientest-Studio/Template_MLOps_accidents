@@ -138,19 +138,26 @@ async def retrain(user: dict = Depends(get_current_admin_user)):
 @app.get("/monitor")
 async def monitor(user: dict = Depends(get_current_admin_user)):
     """
-    Endpoint pour surveiller l'accuracy du modèle en appelant le service de monitoring.
+    Endpoint pour surveiller l'accuracy du modèle,vérifier qu'il y a pas de drift (data+model).
+    
+    Accessible uniquement aux admin.
+
+    Si il ya un drift il déclenche un retraning en evoyant un request à l'api de retrain
 
     Args:
     - user : L'utilisateur récupéré à partir de la dépendance `get_current_admin_user`.
 
     Returns:
-    - dict: L'accuracy actuelle du modèle et l'horodatage du réentraînement.
+    - dict: Contient l'accuracy actuelle du modèle et la présence du drift ou non.
     """
-    async with httpx.AsyncClient() as client:
-        response = await client.get(MONITORING_SERVICE_URL)
-        response.raise_for_status() 
-        return response.json()
 
+    async with httpx.AsyncClient() as client:
+            try:
+                response = await client.get(MONITORING_SERVICE_URL)
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPStatusError as exc:
+                raise HTTPException(status_code=500, detail=f"Monitoring service error: {exc.response.text}")
 ################################## microservice accuracy ################################### 
 @app.get("/db")
 async def query_db(user: dict = Depends(get_current_active_user)):
