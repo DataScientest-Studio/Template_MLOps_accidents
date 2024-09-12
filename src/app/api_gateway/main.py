@@ -151,7 +151,7 @@ async def monitor(user: dict = Depends(get_current_admin_user)):
     - dict: Contient l'accuracy actuelle du modèle et la présence du drift ou non.
     """
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30.0) as client:
             try:
                 response = await client.get(MONITORING_SERVICE_URL)
                 response.raise_for_status()
