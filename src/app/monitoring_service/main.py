@@ -11,7 +11,7 @@ app = FastAPI()
 #charger les chemins
 model_path = "/app/models/model_rf_clf.pkl"
 reference_data_path = '/app/data/data_2005a2021_final.csv'
-new_data_path = '/app/data/data_2005a2021_final.csv'
+new_data_path = '/app/data/new_data.csv'
 status_file_path = 'drift_detected.txt'
 
 # URL de l'API de réentraînement
@@ -42,9 +42,25 @@ def load_data(reference_path: str, new_data_path: str):
     :param new_data_path: Chemin vers le nouveau jeu de données.
     :return: Tuple de DataFrames (reference_data, new_data).
     """
-    reference_data = pd.read_csv(reference_path)
-    new_data = pd.read_csv(new_data_path)
+    reference_data = pd.read_csv(reference_path,index_col=0)
+    new_data = pd.read_csv(new_data_path,index_col=0)
     return reference_data, new_data
+
+
+#fonction pour générer des prédiction
+def get_prediction(model, reference_data, current_data):
+    """
+    Générer des prédictions pour reference et current data.
+    """
+    # Créer une copie de dataframes tpour éviter la modification de l'originale
+    reference_data = reference_data.copy()
+    current_data = current_data.copy()
+
+    # Générer des prédictions pour reference et current data.
+    reference_data['prediction'] = model.predict(reference_data.drop(columns=['grav']))
+    current_data['prediction'] = model.predict(current_data.drop(columns=['grav']))
+
+    return reference_data, current_data
 
 
 # Fonction pour détecter le data drift
@@ -57,8 +73,8 @@ def detect_data_drift(reference_data: pd.DataFrame, new_data,SAVE_FILE = True):
     :return: Booléen indiquant si un drift a été détecté.
     """
     data_drift_report = Report(metrics=[DataDriftPreset()])
-    data_drift_report.run(reference_data=reference_data.drop('grav', axis=1), 
-                          current_data=new_data.drop('grav', axis=1), column_mapping=None)
+    data_drift_report.run(reference_data=reference_data.drop('target', axis=1), 
+                          current_data=new_data.drop('target', axis=1), column_mapping=None)
     report_json = data_drift_report.as_dict()
     drift_detected = report_json['metrics'][0]['result']['dataset_drift']
     # Save the report as HTML
@@ -77,36 +93,9 @@ def write_drift_status_to_file(status: str, file_path: str):
     with open(file_path, 'w') as f:
         f.write(status)
 
-# Fonction pour envoyer une requête à l'API de réentraînement
-def trigger_retraining():
-    """
-    Fonction qui envoie une requête à l'API de réentraînement
-    """
-    try:
-        response = requests.post(RETRAIN_API_URL)
-        if response.status_code == 200:
-            print("Réentraînement lancé avec succès via l'API.")
-        else:
-            print(f"Échec du réentraînement via l'API. Statut: {response.status_code}")
-    except Exception as e:
-        print(f"Erreur lors de la tentative d'appel à l'API de réentraînement: {str(e)}")
 
 
-#fonction pour générer des prédiction
-def get_prediction(model, reference_data, current_data):
-    """
-    Générer des prédictions pour reference et current data.
-    """
-    # Créer une copie de dataframes tpour éviter la modification de l'originale
-    reference_data = reference_data.copy()
-    current_data = current_data.copy()
-
-    # Générer des prédictions pour reference et current data.
-    reference_data['prediction'] = model.predict(reference_data.drop(columns=['grav']))[:, 1]
-    current_data['prediction'] = model.predict(current_data.drop(columns=['grav']))[:, 1]
-
-    return reference_data, current_data
-
+#fonction pour détecter le modèle drift
 def detect_model_drift(reference_data: pd.DataFrame, new_data: pd.DataFrame) -> bool:
     """
     Utilise Evidently pour détecter la dérive des performances du modèle.
@@ -117,18 +106,44 @@ def detect_model_drift(reference_data: pd.DataFrame, new_data: pd.DataFrame) -> 
     # Extraire les résultats sous forme de dictionnaire
     report_json = classification_perf_report.as_dict()
     
-    # Comparer la précision actuelle avec la précision de référence
-    performance_metrics = report_json['metrics'][0]['result']
-    current_accuracy = performance_metrics['accuracy']['current']
-    reference_accuracy = performance_metrics['accuracy']['reference']
     
-    # Vérifier si la précision actuelle est inférieure à 90% de la précision de référence
-    if current_accuracy < reference_accuracy * 0.8:
-        return True
+    print(report_json)
+    
+    performance_metrics = report_json['metrics'][0]['result']
+
+
+    if 'accuracy' in performance_metrics:
+        current_accuracy = performance_metrics['accuracy']['current']
+        reference_accuracy = performance_metrics['accuracy']['reference']
+        
+        # Vérifier si la précision actuelle est inférieure à 90% de la précision de référence
+        if current_accuracy < reference_accuracy * 0.8:
+            return True
+    else:
+        print("Accuracy metric is missing from the report.")
+        return False
+    
     return False
+    
+
+# Fonction pour envoyer une requête à l'API de réentraînement
+#def trigger_retraining():
+    """
+    #Fonction qui envoie une requête à l'API de réentraînement
+    """
+    #try:
+        #response = requests.post(RETRAIN_API_URL)
+        #if response.status_code == 200:
+            #print("Réentraînement lancé avec succès via l'API.")
+        #else:
+            #print(f"Échec du réentraînement via l'API. Statut: {response.status_code}")
+    #except Exception as e:
+        #print(f"Erreur lors de la tentative d'appel à l'API de réentraînement: {str(e)}")
+        
 
 
 #définir un endpoint pour évaluer la performance du modèle et vérifier s'il y a un drift
+
 @app.get("/monitor")
 def monitor():
     """
@@ -145,7 +160,7 @@ def monitor():
     - dict: Contient l'accuracy actuelle du modèle et la présence du drift ou non
     """
     
-
+    #charger les data
     reference_data, new_data = load_data(reference_data_path, new_data_path)
 
     # Ajouter des prédictions aux ensembles de données
@@ -167,7 +182,7 @@ def monitor():
     if data_drift_detected or model_drift_detected:
         status = "drift_detected"
         write_drift_status_to_file(status, status_file_path)
-        trigger_retraining()
+        #trigger_retraining()
         return {
             "accuracy": accuracy,
             "data_drift": data_drift_detected,
