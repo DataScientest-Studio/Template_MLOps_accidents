@@ -23,7 +23,7 @@ fastapi
 pydantic 
 #logging
 passlib
-
+evidently
 #pour test
 pytest
 httpx
