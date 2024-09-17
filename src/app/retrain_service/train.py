@@ -60,13 +60,14 @@ def load_data_from_db():
 
     return combined_df
 
-# Charger les nouvelles données
-data=load_data_from_db()
-X = data.drop(columns=['grav'])  
-y = data['grav']
 
-# Séparer les données en ensemble d'entraînement et de test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Fonction pour entraîner un nouveau modèle
+def train_new_model(X_train, X_test, y_train, y_test):
+    model = RandomForestClassifier(random_state=42)
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    return model, accuracy
 
 # Fonction pour charger le modèle en production
 def load_production_model(model_name):
@@ -79,13 +80,14 @@ def load_production_model(model_name):
     production_model = mlflow.sklearn.load_model(model_uri)
     return production_model
 
-# Fonction pour entraîner un nouveau modèle
-def train_new_model():
-    model = RandomForestClassifier(random_state=42)
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    return model, accuracy
+
+# Fonction pour comparer les modèles
+def compare_models(new_model_accuracy, production_model,X_test, y_test ):
+    prod_y_pred = production_model.predict(X_test)
+    production_model_accuracy = accuracy_score(y_test, prod_y_pred)
+    print(f"Performance du nouveau modèle : {new_model_accuracy}")
+    print(f"Performance du modèle en production : {production_model_accuracy}")
+    return production_model_accuracy
 
 # Fonction pour enregistrer le modèle avec MLflow
 def log_model(model, accuracy):
@@ -95,15 +97,7 @@ def log_model(model, accuracy):
         model_uri = f"runs:/{run.info.run_id}/model_rf_clf"
         mlflow.register_model(model_uri, model_name)
         return run.info.run_id
-
-# Fonction pour comparer les modèles
-def compare_models(new_model_accuracy, production_model):
-    prod_y_pred = production_model.predict(X_test)
-    production_model_accuracy = accuracy_score(y_test, prod_y_pred)
-    print(f"Performance du nouveau modèle : {new_model_accuracy}")
-    print(f"Performance du modèle en production : {production_model_accuracy}")
-    return production_model_accuracy
-
+    
 # Fonction pour promouvoir un modèle en production
 def promote_model(run_id):
     model_uri = f"runs:/{run_id}/model_rf_clf"
@@ -118,16 +112,24 @@ def promote_model(run_id):
 
 # Fonction principale
 def main():
-    
+
+    # préparer les  données
+    data=load_data_from_db()
+    X = data.drop(columns=['grav'])  
+    y = data['grav']
+
+    # Séparer les données en ensemble d'entraînement et de test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     # Entraîner le nouveau modèle
-    new_model, new_model_accuracy = train_new_model()
+    new_model, new_model_accuracy = train_new_model(X_train, X_test, y_train, y_test)
     
     # Charger le modèle en production
     production_model = load_production_model(model_name)
     
     if production_model:
         # Comparer les modèles
-        production_model_accuracy = compare_models(new_model_accuracy, production_model)
+        production_model_accuracy = compare_models(new_model_accuracy, production_model, X_test, y_test)
         
         # Promouvoir le nouveau modèle si nécessaire
         if new_model_accuracy > production_model_accuracy:
