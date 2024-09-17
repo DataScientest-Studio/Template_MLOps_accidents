@@ -7,6 +7,7 @@ import pandas as pd
 from mlflow.tracking import MlflowClient
 import psycopg2
 from psycopg2 import sql
+import os
 
 # Configuration MLflow
 mlflow.set_tracking_uri("http://mlflow-server:5000")
