@@ -5,13 +5,55 @@ import pandas as pd
 from evidently.metric_preset import DataDriftPreset, ClassificationPreset
 from evidently.report import Report
 import requests
+import psycopg2
+from psycopg2 import sql
+
+
+# Fonction pour obtenir une connexion à la database
+def get_db_connection():
+    connection = psycopg2.connect(
+        dbname=os.getenv("POSTGRES_DB", "accidents"),
+        user=os.getenv("POSTGRES_USER", "my_user"),
+        password=os.getenv("POSTGRES_PASSWORD", "your_password"),
+        host=os.getenv("POSTGRES_HOST", "db"),  
+        port=os.getenv("POSTGRES_PORT", "5432")
+    )
+    return connection
+
+# Fonction pour charger les données depuis la database
+
+def load_data_from_db():
+    """
+    Charger les données de la table 'donnees_accidents' à partir de la base de données PostgreSQL.
+    """
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            # Charger les données de référence
+            cursor.execute("SELECT * FROM donnees_accidents WHERE is_ref = 'yes';")
+            reference_data = cursor.fetchall()
+
+            # Charger les nouvelles données
+            cursor.execute("SELECT * FROM donnees_accidents WHERE is_ref = 'yes';")
+            new_data = cursor.fetchall()
+
+            # Convertir les résultats en DataFrame
+            colnames = [desc[0] for desc in cursor.description]
+            reference_df = pd.DataFrame(reference_data, columns=colnames)
+            new_data_df = pd.DataFrame(new_data, columns=colnames)
+            # Définir la colonne num_acc comme index
+            reference_df = reference_df.set_index('num_acc')
+            new_data_df = new_data_df.set_index('num_acc')
+
+    finally:
+        connection.close()
+
+    return reference_df, new_data_df
 
 
 app = FastAPI()
 #charger les chemins
 model_path = "/app/models/model_rf_clf.pkl"
-reference_data_path = '/app/data/data_2005a2021_final.csv'
-new_data_path = '/app/data/new_data.csv'
 status_file_path = 'drift_detected.txt'
 
 # URL de l'API de réentraînement
@@ -33,19 +75,6 @@ with open(model_path, 'rb') as model_file:
     if model is None or accuracy is None:
         raise ValueError("Le dictionnaire chargé ne contient pas les clés 'model' et 'accuracy'.")
 
-# Fonction pour charger les données
-def load_data(reference_path: str, new_data_path: str):
-    """
-    Charger les données de référence et les nouvelles données à partir des chemins spécifiés.
-    
-    :param reference_path: Chemin vers le jeu de données de référence.
-    :param new_data_path: Chemin vers le nouveau jeu de données.
-    :return: Tuple de DataFrames (reference_data, new_data).
-    """
-    reference_data = pd.read_csv(reference_path,index_col=0)
-    new_data = pd.read_csv(new_data_path,index_col=0)
-    return reference_data, new_data
-
 
 #fonction pour générer des prédiction
 def get_prediction(model, reference_data, current_data):
@@ -57,8 +86,8 @@ def get_prediction(model, reference_data, current_data):
     current_data = current_data.copy()
 
     # Générer des prédictions pour reference et current data.
-    reference_data['prediction'] = model.predict(reference_data.drop(columns=['grav']))
-    current_data['prediction'] = model.predict(current_data.drop(columns=['grav']))
+    reference_data['prediction'] = model.predict(reference_data.drop(columns=['grav','timestamp','is_ref']))
+    current_data['prediction'] = model.predict(current_data.drop(columns=['grav','timestamp','is_ref']))
 
     return reference_data, current_data
 
@@ -73,8 +102,8 @@ def detect_data_drift(reference_data: pd.DataFrame, new_data,SAVE_FILE = True):
     :return: Booléen indiquant si un drift a été détecté.
     """
     data_drift_report = Report(metrics=[DataDriftPreset()])
-    data_drift_report.run(reference_data=reference_data.drop('target', axis=1), 
-                          current_data=new_data.drop('target', axis=1), column_mapping=None)
+    data_drift_report.run(reference_data=reference_data.drop(['target','timestamp','is_ref'], axis=1), 
+                          current_data=new_data.drop(['target','timestamp','is_ref'], axis=1), column_mapping=None)
     report_json = data_drift_report.as_dict()
     drift_detected = report_json['metrics'][0]['result']['dataset_drift']
     # Save the report as HTML
@@ -160,8 +189,8 @@ def monitor():
     - dict: Contient l'accuracy actuelle du modèle et la présence du drift ou non
     """
     
-    #charger les data
-    reference_data, new_data = load_data(reference_data_path, new_data_path)
+    # Charger les données depuis la base de données
+    reference_data, new_data = load_data_from_db()
 
     # Ajouter des prédictions aux ensembles de données
     reference_data, new_data = get_prediction(model, reference_data,new_data)
