@@ -10,11 +10,29 @@ from psycopg2 import sql
 import os
 
 # Configuration MLflow
-mlflow.set_tracking_uri("http://mlflow-server:5000")
-mlflow.set_experiment("retraining_experiment")
-
+mlflow.set_tracking_uri("http://mlflow_service:5000") 
 client = MlflowClient()
+experiment_name = "accident_prediction"
+
+# voir si experiment existe déja
+experiment = client.get_experiment_by_name(experiment_name)
+
+if experiment is None:
+    # Créer experiment si n'existe pas
+    experiment_id = client.create_experiment(experiment_name,artifact_location="/mlflow/mlruns")
+else:
+    experiment_id = experiment.experiment_id
+
+print(f"Experiment ID: {experiment_id}")
+
+
+mlflow.set_experiment(experiment_name)
+
+
+run_name = "accident_run"
 model_name = "model_rf_clf"
+
+
 
 # Fonction pour obtenir une connexion à la database
 def get_db_connection():
@@ -40,25 +58,25 @@ def load_data_from_db():
             reference_data = cursor.fetchall()
 
             # Charger les nouvelles données
-            cursor.execute("SELECT * FROM donnees_accidents WHERE is_ref = 'no';")
-            new_data = cursor.fetchall()
+            #cursor.execute("SELECT * FROM donnees_accidents WHERE is_ref = 'no';")
+            #new_data = cursor.fetchall()
 
             # Convertir les résultats en DataFrame
             colnames = [desc[0] for desc in cursor.description]
             reference_df = pd.DataFrame(reference_data, columns=colnames)
-            new_data_df = pd.DataFrame(new_data, columns=colnames)
+            #new_data_df = pd.DataFrame(new_data, columns=colnames)
 
             # Définir la colonne num_acc comme index
             reference_df = reference_df.set_index('num_acc')
-            new_data_df = new_data_df.set_index('num_acc')
+            #new_data_df = new_data_df.set_index('num_acc')
 
             # Concaténer les deux DataFrames
-            combined_df = pd.concat([reference_df, new_data_df])
+            #combined_df = pd.concat([reference_df, new_data_df])
 
     finally:
         connection.close()
 
-    return combined_df
+    return  reference_df
 
 
 # Fonction pour entraîner un nouveau modèle
@@ -69,53 +87,13 @@ def train_new_model(X_train, X_test, y_train, y_test):
     accuracy = accuracy_score(y_test, y_pred)
     return model, accuracy
 
-# Fonction pour charger le modèle en production
-def load_production_model(model_name):
-    versions = client.get_latest_versions(model_name, stages=["Production"])
-    if len(versions) == 0:
-        print("Aucun modèle en production trouvé.")
-        return None
-    production_version = versions[0]
-    model_uri = f"models:/{model_name}/Production"
-    production_model = mlflow.sklearn.load_model(model_uri)
-    return production_model
-
-
-# Fonction pour comparer les modèles
-def compare_models(new_model_accuracy, production_model,X_test, y_test ):
-    prod_y_pred = production_model.predict(X_test)
-    production_model_accuracy = accuracy_score(y_test, prod_y_pred)
-    print(f"Performance du nouveau modèle : {new_model_accuracy}")
-    print(f"Performance du modèle en production : {production_model_accuracy}")
-    return production_model_accuracy
-
-# Fonction pour enregistrer le modèle avec MLflow
-def log_model(model, accuracy):
-    with mlflow.start_run() as run:
-        mlflow.log_metric("accuracy", accuracy)
-        mlflow.sklearn.log_model(model, "model_rf_clf")
-        model_uri = f"runs:/{run.info.run_id}/model_rf_clf"
-        mlflow.register_model(model_uri, model_name)
-        return run.info.run_id
-    
-# Fonction pour promouvoir un modèle en production
-def promote_model(run_id):
-    model_uri = f"runs:/{run_id}/model_rf_clf"
-    mlflow.register_model(model_uri, model_name)
-    new_version = client.get_latest_versions(model_name)[0].version
-    client.transition_model_version_stage(
-        name=model_name,
-        version=new_version,
-        stage="Production"
-    )
-    print(f"Nouveau modèle promu en Production (version {new_version})")
 
 # Fonction principale
 def main():
 
     # préparer les  données
     data=load_data_from_db()
-    X = data.drop(columns=['grav'])  
+    X = data.drop(columns=['grav','timestamp','is_ref'])  
     y = data['grav']
 
     # Séparer les données en ensemble d'entraînement et de test
@@ -124,24 +102,26 @@ def main():
     # Entraîner le nouveau modèle
     new_model, new_model_accuracy = train_new_model(X_train, X_test, y_train, y_test)
     
-    # Charger le modèle en production
-    production_model = load_production_model(model_name)
-    
-    if production_model:
-        # Comparer les modèles
-        production_model_accuracy = compare_models(new_model_accuracy, production_model, X_test, y_test)
+    # Démarrer une nouvelle exécution dans l'expérience définie
+   
+    with mlflow.start_run(run_name=run_name) as run:
         
-        # Promouvoir le nouveau modèle si nécessaire
-        if new_model_accuracy > production_model_accuracy:
-            run_id = log_model(new_model, new_model_accuracy)
-            promote_model(run_id)
-        else:
-            print("Le modèle en production est meilleur. Pas de changement.")
-    else:
-        # Pas de modèle en production, promouvoir directement
-        run_id = log_model(new_model, new_model_accuracy)
-        promote_model(run_id)
+        mlflow.log_metric("accuracy", new_model_accuracy)
+        mlflow.sklearn.log_model(new_model, model_name)
+        model_uri = f"runs:/{run.info.run_id}/{model_name}"
+        mlflow.register_model(model_uri, model_name)
+        new_version = client.get_latest_versions(model_name)[0].version
+        client.set_model_version_tag(
+            name=model_name,
+            version=new_version,
+            key="status",
+            value="Production"
+                )
+        print(f"Nouveau modèle enregistré avec le statut 'Production' (version {new_version})")
+        
+    
 
 
-
+if __name__ == "__main__":
+    main()
 
