@@ -14,6 +14,7 @@ RETRAIN_SERVICE_URL = "http://retrain_service:8003/retrain"
 DB_SERVICE_URL = "http://db_service:5432/query"
 MONITORING_SERVICE_URL = "http://monitoring_service:8002/monitor"
 
+
 security = HTTPBasic()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -129,7 +130,7 @@ async def retrain(user: dict = Depends(get_current_admin_user)):
     Returns:
     - dict: Confirmation de la demande de réentraînement.
     """
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(RETRAIN_SERVICE_URL)
         response.raise_for_status() 
         return response.json()
