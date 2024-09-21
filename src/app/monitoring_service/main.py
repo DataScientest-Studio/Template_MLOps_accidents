@@ -34,7 +34,7 @@ def load_data_from_db():
             reference_data = cursor.fetchall()
 
             # Charger les nouvelles données
-            cursor.execute("SELECT * FROM donnees_accidents WHERE is_ref = 'yes';")
+            cursor.execute("SELECT * FROM donnees_accidents WHERE is_ref = 'no';")
             new_data = cursor.fetchall()
 
             # Convertir les résultats en DataFrame
