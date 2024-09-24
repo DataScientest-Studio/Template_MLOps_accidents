@@ -28,5 +28,6 @@ evidently
 #pour test
 pytest
 httpx
+pytest-asyncio
 
 
