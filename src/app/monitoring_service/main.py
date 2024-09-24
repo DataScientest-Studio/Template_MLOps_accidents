@@ -57,7 +57,7 @@ model_path = "/app/models/model_rf_clf.pkl"
 status_file_path = 'drift_detected.txt'
 
 # URL de l'API de réentraînement
-RETRAIN_API_URL = "http://localhost:8003/retrain"
+RETRAIN_API_URL = "http://retrain_service:8003/retrain"
 
 #charger le modèle
 if not os.path.exists(model_path):
@@ -156,18 +156,18 @@ def detect_model_drift(reference_data: pd.DataFrame, new_data: pd.DataFrame) -> 
     
 
 # Fonction pour envoyer une requête à l'API de réentraînement
-#def trigger_retraining():
+def trigger_retraining():
     """
     #Fonction qui envoie une requête à l'API de réentraînement
     """
-    #try:
-        #response = requests.post(RETRAIN_API_URL)
-        #if response.status_code == 200:
-            #print("Réentraînement lancé avec succès via l'API.")
-        #else:
-            #print(f"Échec du réentraînement via l'API. Statut: {response.status_code}")
-    #except Exception as e:
-        #print(f"Erreur lors de la tentative d'appel à l'API de réentraînement: {str(e)}")
+    try:
+        response = requests.post(RETRAIN_API_URL)
+        if response.status_code == 200:
+            print("Réentraînement lancé avec succès via l'API.")
+        else:
+            print(f"Échec du réentraînement via l'API. Statut: {response.status_code}")
+    except Exception as e:
+        print(f"Erreur lors de la tentative d'appel à l'API de réentraînement: {str(e)}")
         
 
 
@@ -211,7 +211,7 @@ def monitor():
     if data_drift_detected or model_drift_detected:
         status = "drift_detected"
         write_drift_status_to_file(status, status_file_path)
-        #trigger_retraining()
+        trigger_retraining()
         return {
             "accuracy": accuracy,
             "data_drift": data_drift_detected,
