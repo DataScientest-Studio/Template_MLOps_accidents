@@ -3,10 +3,10 @@ name: Test unitaires
 on:
   push:
     branches:
-      - master
+      - soumaya
   pull_request:
     branches:
-      - master
+      - soumaya
 
 jobs:
   qa:
