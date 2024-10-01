@@ -26,7 +26,7 @@ jobs:
       # wait for services to be ready 
       - name: Wait for services to be ready
         run: |
-          until curl http://localhost:8000; do echo waiting for API Gateway to be ready; sleep 5; done
+          until curl http://localhost:8000/retrain; do echo "Waiting for retrain endpoint to be ready"; sleep 5; done
 
        # install dependencies for test
       - name: Install dependencies
