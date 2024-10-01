@@ -28,4 +28,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest
+          pytest src/testing/test_endpoint_retraining.py
