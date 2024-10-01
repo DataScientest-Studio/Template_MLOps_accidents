@@ -23,10 +23,6 @@ jobs:
           docker compose up -d --build
           docker compose ps
         
-      # wait for services to be ready 
-      - name: Wait for services to be ready
-        run: |
-          until curl http://localhost:8000/retrain; do echo "Waiting for retrain endpoint to be ready"; sleep 5; done
 
        # install dependencies for test
       - name: Install dependencies
