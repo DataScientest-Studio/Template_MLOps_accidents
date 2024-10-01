@@ -20,8 +20,8 @@ jobs:
       # build and start docker services in background
       - name: Build and start Docker Compose services 
         run: |
-          docker-compose up -d --build
-          docker-compose ps
+          docker compose up -d --build
+        
       # wait for services to be ready 
       - name: Wait for services to be ready
         run: |
