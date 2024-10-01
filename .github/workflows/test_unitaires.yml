@@ -39,4 +39,4 @@ jobs:
           pytest  src/testing/test_endpoint_retraining.py
         # stop and remove service
       - name: Stop and remove Docker Compose services
-        run: docker-compose down
+        run: docker compose down
