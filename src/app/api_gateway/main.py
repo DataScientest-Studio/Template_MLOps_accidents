@@ -68,6 +68,7 @@ def get_current_admin_user(user: dict = Depends(get_current_user)):
 
 # Définir la classe de données pour la prédiction
 class DonneesAccident(BaseModel):
+    num_acc : int
     place: int
     catu: int
     trajet: float
@@ -116,7 +117,7 @@ async def call_prediction_service(accident: DonneesAccident, user: dict = Depend
     - response: La prédiction de la gravité de l'accident.
     """
      payload = accident.model_dump()
-     response = requests.post(url=PREDICTION_SERVICE_URL, json=payload, timeout=10)
+     response = requests.post(url=PREDICTION_SERVICE_URL, json=payload, timeout=30)
      return response.json()
 ################################## microservice retraining ###################################
 @app.post("/retrain")
@@ -152,26 +153,10 @@ async def monitor(user: dict = Depends(get_current_admin_user)):
     - dict: Contient l'accuracy actuelle du modèle et la présence du drift ou non.
     """
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
             try:
                 response = await client.get(MONITORING_SERVICE_URL)
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPStatusError as exc:
                 raise HTTPException(status_code=500, detail=f"Monitoring service error: {exc.response.text}")
-################################## microservice accuracy ################################### 
-@app.get("/db")
-async def query_db(user: dict = Depends(get_current_active_user)):
-    """
-    Endpoint pour accéder aux données de la base de données en appelant le service de base de données.
-
-    Args:
-    - user : L'utilisateur récupéré à partir de la dépendance `get_current_active_user`.
-
-    Returns:
-    - dict: Les résultats de la requête à la base de données.
-    """
-    async with httpx.AsyncClient() as client:
-        response = await client.get(DB_SERVICE_URL)
-        response.raise_for_status()  
-        return response.json()
