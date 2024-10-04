@@ -40,6 +40,11 @@ jobs:
       - name: Run tests
         run: |
           pytest  src/testing/
+
+      - name: Display logs if tests fail
+        if: failure()
+        run: docker-compose logs
+
         # stop and remove service
       - name: Stop and remove Docker Compose services
         run: docker compose down
