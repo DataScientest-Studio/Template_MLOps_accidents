@@ -6,7 +6,9 @@ import requests
 import httpx
 from typing import Dict
 
-app = FastAPI()
+app = FastAPI(
+    title="SafeRoads",
+    description=" API de Prédiction de la gravité des accidents routiers en France.")
 
 # Définir les URLs des services internes
 PREDICTION_SERVICE_URL = "http://prediction_service:8001/predict"
