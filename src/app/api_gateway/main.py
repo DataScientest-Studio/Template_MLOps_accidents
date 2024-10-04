@@ -101,12 +101,12 @@ class DonneesAccident(BaseModel):
 
 ################################## statut de l'API Gateway ###################################
 
-@app.get("/status")
+@app.get("/status", tags=["Status"])
 def current_user(user: dict = Depends(get_current_active_user)):
     return {"message": f"Bienvenue sur notre API Gateway, {user['name']}!"}
 
 ################################## microservice prédiction ###################################   
-@app.post("/prediction")
+@app.post("/prediction", tags=["Prediction"])
 async def call_prediction_service(accident: DonneesAccident, user: dict = Depends(get_current_active_user)):
      """
     Endpoint pour prédire la gravité de l'accident en appelant le service de prédiction.
@@ -122,7 +122,7 @@ async def call_prediction_service(accident: DonneesAccident, user: dict = Depend
      response = requests.post(url=PREDICTION_SERVICE_URL, json=payload, timeout=30)
      return response.json()
 ################################## microservice retraining ###################################
-@app.post("/retrain")
+@app.post("/retrain", tags=["Retrain"])
 async def retrain(user: dict = Depends(get_current_admin_user)):
     """
     Endpoint pour réentraîner le modèle en appelant le service de réentraînement.
@@ -139,7 +139,7 @@ async def retrain(user: dict = Depends(get_current_admin_user)):
         return response.json()
 
 ################################## microservice monitoring ###################################
-@app.get("/monitor")
+@app.get("/monitor",tags=["Monitoring"])
 async def monitor(user: dict = Depends(get_current_admin_user)):
     """
     Endpoint pour surveiller l'accuracy du modèle,vérifier qu'il y a pas de drift (data+model).
