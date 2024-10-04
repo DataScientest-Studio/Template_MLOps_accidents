@@ -9,8 +9,7 @@ VALID_CREDENTIALS_ADMIN = ("admin", "adminsecret")
 INVALID_CREDENTIALS = ("user1", "wrongpassword")
 
 # Définir les URLs de API GATEWAY
-#API_GATEWAY_PREDICTION = "http://localhost:8000/prediction"
-API_GATEWAY_PREDICTION = "http://api_gateway:8000/prediction"
+API_GATEWAY_PREDICTION = "http://localhost:8000/prediction"
 
 # Define payload
 test_data = {
