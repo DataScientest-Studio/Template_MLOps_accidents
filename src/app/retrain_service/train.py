@@ -8,6 +8,21 @@ from mlflow.tracking import MlflowClient
 import psycopg2
 from psycopg2 import sql
 import os
+import logging
+
+#configurer le logging
+if not os.path.exists('logs'):
+        os.makedirs('logs')
+logging.basicConfig(
+    level=logging.INFO, 
+    format="%(asctime)s [%(levelname)s] %(message)s",  
+    handlers=[
+        logging.FileHandler(f'logs/{"retraining.log"}'),  
+        logging.StreamHandler() 
+    ]
+)
+# Création d'un logger
+logger = logging.getLogger(__name__)
 
 # Configuration MLflow
 mlflow.set_tracking_uri("http://mlflow_service:5000") 
@@ -50,6 +65,7 @@ def load_data_from_db():
     """
     Charger les données de la table 'donnees_accidents' à partir de la base de données PostgreSQL.
     """
+    logger.info("Loading data from the database...")
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
@@ -86,38 +102,45 @@ def load_data_from_db():
 
 # Fonction pour uploader le model existant en Production aet calculer l'accuracy
 def load_production_model_and_evaluate(X_test, y_test, model_name="model_rf_clf"):
-    # Récupérer toutes les versions du modèle et chercher le tag "is_production"
+    # Charger toutes les  versions du modele et chercher le tag "is_production"
+    logger.info("Loading production model...")
     try:
         versions = client.search_model_versions(f"name='{model_name}'")
     except mlflow.exceptions.RestException as e:
-        print(f"Model '{model_name}' not found in the registry. No production model to evaluate.")
+        logger.error(f"Model '{model_name}' not found in the registry. No production model to evaluate.")
         return None, None
-
+    
+    
     prod_model_info = None
     for version in versions:
-        if version.tags.get("is_production") == "true":  # Utiliser un tag personnalisé
+        if version.tags.get("is_production") == "true":
             prod_model_info = version
             break
 
     if not prod_model_info:
-        print(f"No model tagged as 'is_production=true' exists for '{model_name}'.")
+        logger.error(f"No model tagged as 'is_production=true' exists for '{model_name}'.")
         return None, None
     
     prod_model_version = prod_model_info.version
-    print(f"Loading model version {prod_model_version} (tagged as production).")
+    logger.info(f"Loading model version {prod_model_version} (tagged as production).")
 
-    model_uri = f"models:/{model_name}/{prod_model_version}"  # Charger une version spécifique
+    model_uri = f"models:/{model_name}/{prod_model_version}"
+
+
+    # Load model
     prod_model = mlflow.pyfunc.load_model(model_uri)
-    
-    # Faire des prédictions et calculer la précision
+
+    # Make predictions and calculate accuracy
     prod_model_predictions = prod_model.predict(X_test)
     prod_model_accuracy = accuracy_score(y_test, prod_model_predictions)
-    
+
     return prod_model_accuracy, prod_model_version
+
 
 
 # Fonction pour entraîner un nouveau modèle
 def train_new_model(X_train, X_test, y_train, y_test):
+    logger.info("Start training...")
     model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
@@ -128,28 +151,28 @@ def train_new_model(X_train, X_test, y_train, y_test):
 # Fonction principale
 def main():
 
-    # préparer les  données
-    data=load_data_from_db()
-    X = data.drop(columns=['grav','timestamp','is_ref'])  
-    y = data['grav']
-
-    # Séparer les données en ensemble d'entraînement et de test
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    # Entraîner le nouveau modèle
-    new_model, new_model_accuracy = train_new_model(X_train, X_test, y_train, y_test)
-
-    # Evaluer le model de production existant
-    prod_model_accuracy, prod_model_version = load_production_model_and_evaluate(X_test, y_test)
-
-    if prod_model_accuracy is not None:
-        print(f"Production model accuracy (version {prod_model_version}): {prod_model_accuracy}")
-    else:
-        print("No production model available for comparison.")
-    
     # Démarrer une nouvelle exécution dans l'expérience définie
    
-    with mlflow.start_run(run_name=run_name) as run:
+     with mlflow.start_run(run_name=run_name) as run:
+
+         # préparer les  données
+        data=load_data_from_db()
+        X = data.drop(columns=['grav','timestamp','is_ref'])  
+        y = data['grav']
+
+        # Séparer les données en ensemble d'entraînement et de test
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        # Entraîner le nouveau modèle
+        new_model, new_model_accuracy = train_new_model(X_train, X_test, y_train, y_test)
+
+        # Evaluer le model de production existant
+        prod_model_accuracy, prod_model_version = load_production_model_and_evaluate(X_test, y_test)
+
+        if prod_model_accuracy is not None:
+            logger.info(f"Production model accuracy (version {prod_model_version}): {prod_model_accuracy}")
+        else:
+            logger.error("No production model available for comparison.")
 
         # Enregistrer la précision du nouveau modèle
         mlflow.log_metric("new_model_accuracy", new_model_accuracy)
@@ -161,7 +184,7 @@ def main():
         # Enregistrer le nouveau modèle dans MLflow
         mlflow.sklearn.log_model(new_model, model_name)
         model_uri = f"runs:/{run.info.run_id}/{model_name}"
-        print(f"New model URI: {model_uri}")
+        logger.info(f"New model URI: {model_uri}")
 
         # Enregistrer le modèle dans le registre de modèles
         mlflow.register_model(model_uri, model_name)
@@ -177,9 +200,9 @@ def main():
             key="is_production",
             value="true"
             )
-            print(f"New model version {new_version} promoted to Production.")
+            logger.info(f"New model version {new_version} promoted to Production.")
         else:
-            print(f"New model version {new_version} not promoted as it underperformed compared to the current Production model.")
+            logger.error(f"New model version {new_version} not promoted as it underperformed compared to the current Production model.")
 
         
 

@@ -17,7 +17,7 @@ numpy
 imblearn
 scikit-learn==1.3.2
 imbalanced-learn
-mlflow
+mlflow==2.16.1
 
 # pour l api
 uvicorn
