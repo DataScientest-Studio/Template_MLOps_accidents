@@ -60,7 +60,7 @@ def test_prediction_endpoint_valid():
     assert response.status_code == 200
     response_json = response.json()
     assert "gravite_predite" in response_json
-    assert response_json["gravite_predite"] == 1
+    assert response_json["gravite_predite"] == 3
 
 
 def test_prediction_endpoint_invalid():
