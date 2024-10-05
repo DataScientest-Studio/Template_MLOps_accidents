@@ -17,7 +17,7 @@ test_data = {
     "place": 1,
     "catu": 2,
     "trajet": 10.0,
-    "an_nais": 2024,
+    "an_nais": 2020,
     "catv": 3,
     "choc": 1.0,
     "manv": 2.0,
