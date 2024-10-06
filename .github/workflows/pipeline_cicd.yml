@@ -67,23 +67,25 @@ jobs:
 
 
       # Push each Docker image to Docker Hub
-      - name: Push Docker images to Docker Hub
-        run: |
-          docker compose push
-
       - name: Push API Gateway image
-        run: docker tag api_gateway:latest ${{ secrets.DOCKERHUB_USERNAME }}/api_gateway:latest && docker push ${{ secrets.DOCKERHUB_USERNAME }}/api_gateway:latest
+        run: |
+          docker tag api_gateway:latest ${{ secrets.DOCKERHUB_USERNAME }}/api_gateway:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api_gateway:latest
 
       - name: Push Prediction Service image
-        run: docker tag prediction_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/prediction_service:latest && docker push ${{ secrets.DOCKERHUB_USERNAME }}/prediction_service:latest
+        run: |
+          docker tag prediction_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/prediction_service:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/prediction_service:latest
 
       - name: Push Retrain Service image
-        run: docker tag retrain_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/retrain_service:latest && docker push ${{ secrets.DOCKERHUB_USERNAME }}/retrain_service:latest
+        run: |
+          docker tag retrain_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/retrain_service:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/retrain_service:latest
 
       - name: Push Monitoring Service image
-        run: docker tag monitoring_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/monitoring_service:latest && docker push ${{ secrets.DOCKERHUB_USERNAME }}/monitoring_service:latest
-
-    
+        run: |
+          docker tag monitoring_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/monitoring_service:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/monitoring_service:latest
 
       
 
