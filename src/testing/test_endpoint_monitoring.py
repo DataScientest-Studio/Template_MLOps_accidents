@@ -35,9 +35,9 @@ def test_monitor_endpoint_as_user():
         url=API_GATEWAY_MONITOR,
         auth=VALID_CREDENTIALS_USER1 
     )
-"""
+
     
     assert response.status_code == 403
     
-
+"""
   
