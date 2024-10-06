@@ -64,28 +64,25 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-
-
-      # Push each Docker image to Docker Hub
-      - name: Push API Gateway image
+       
+      - name: Build Docker images with Docker Compose
         run: |
-          docker tag api_gateway:latest ${{ secrets.DOCKERHUB_USERNAME }}/api_gateway:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api_gateway:latest
-
-      - name: Push Prediction Service image
-        run: |
-          docker tag prediction_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/prediction_service:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/prediction_service:latest
-
-      - name: Push Retrain Service image
-        run: |
-          docker tag retrain_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/retrain_service:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/retrain_service:latest
-
-      - name: Push Monitoring Service image
-        run: |
-          docker tag monitoring_service:latest ${{ secrets.DOCKERHUB_USERNAME }}/monitoring_service:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/monitoring_service:latest
+          docker compose -f docker-compose.yml build
 
       
+      - name: Tag images for Docker Hub
+        run: |
+          docker tag mai24_mlops_accidents-api_gateway:latest saferoads/api_gateway:latest
+          docker tag mai24_mlops_accidents-prediction_service:latest saferoads/prediction_service:latest
+          docker tag mai24_mlops_accidents-retrain_service:latest saferoads/retrain_service:latest
+          docker tag mai24_mlops_accidents-monitoring_service:latest saferoads/monitoring_service:latest
+
+    
+      - name: Push Docker images to Docker Hub
+        run: |
+          docker push saferoads/api_gateway:latest
+          docker push saferoads/prediction_service:latest
+          docker push saferoads/retrain_service:latest
+          docker push saferoads/monitoring_service:latest
+
 
