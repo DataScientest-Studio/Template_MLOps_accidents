@@ -1,4 +1,4 @@
-name: CI Pipline
+name: CICD Pipline
 
 on:
   push:
@@ -72,11 +72,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/saferoads:latest
+          tags: saferoads/saferoads:latest 
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/saferoads-app:latest 
+          docker build -t saferoads/saferoads:latest 
 
     
 
