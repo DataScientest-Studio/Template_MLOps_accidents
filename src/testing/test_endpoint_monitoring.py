@@ -1,7 +1,6 @@
 import pytest
 import requests
 
-
 # Sample credentials for users
 VALID_CREDENTIALS_USER1 = ("user1", "datascientest")
 VALID_CREDENTIALS_ADMIN = ("admin", "adminsecret")
