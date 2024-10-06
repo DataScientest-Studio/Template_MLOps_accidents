@@ -1,0 +1,40 @@
+2024-08-28 17:10:08,952 - __main__ - INFO - Temps d'entraînement du modèle : 0.60 secondes
+2024-08-28 17:10:09,107 - __main__ - INFO - Confusion Matrix:
+2024-08-28 17:10:09,113 - __main__ - INFO - [[5232 1049 1435]
+ [  36  163   64]
+ [ 546  745  730]]
+2024-08-28 17:10:09,114 - __main__ - INFO - 
+Classification Report:
+2024-08-28 17:10:09,139 - __main__ - INFO -               precision    recall  f1-score   support
+
+           1       0.90      0.68      0.77      7716
+           2       0.08      0.62      0.15       263
+           3       0.33      0.36      0.34      2021
+
+    accuracy                           0.61     10000
+   macro avg       0.44      0.55      0.42     10000
+weighted avg       0.76      0.61      0.67     10000
+
+2024-08-28 17:10:09,140 - __main__ - INFO - 
+Accuracy Score:
+2024-08-28 17:10:09,141 - __main__ - INFO - 0.6125
+2024-08-28 17:10:27,908 - __main__ - INFO - Temps d'entraînement du modèle : 0.55 secondes
+2024-08-28 17:10:28,046 - __main__ - INFO - Confusion Matrix:
+2024-08-28 17:10:28,052 - __main__ - INFO - [[5052 1091 1573]
+ [  22  170   71]
+ [ 515  700  806]]
+2024-08-28 17:10:28,052 - __main__ - INFO - 
+Classification Report:
+2024-08-28 17:10:28,076 - __main__ - INFO -               precision    recall  f1-score   support
+
+           1       0.90      0.65      0.76      7716
+           2       0.09      0.65      0.15       263
+           3       0.33      0.40      0.36      2021
+
+    accuracy                           0.60     10000
+   macro avg       0.44      0.57      0.42     10000
+weighted avg       0.77      0.60      0.66     10000
+
+2024-08-28 17:10:28,076 - __main__ - INFO - 
+Accuracy Score:
+2024-08-28 17:10:28,078 - __main__ - INFO - 0.6028
