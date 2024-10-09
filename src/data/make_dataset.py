@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -55,10 +56,10 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     df = merge_datasets(df_users, df_veh, df_places, df_caract)
 
     # Add new columns
-    df = add_new_columns(df, nb_victim, nb_vehicules)
+#    df = add_new_columns(df, nb_victim, nb_vehicules)
 
     # Modify target variable
-    df = modif_target_variable(df)
+#    df = modif_target_variable(df)
 
     # Replace values -1 and 0
     df = replace_values(df)
