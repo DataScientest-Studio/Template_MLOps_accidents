@@ -1,0 +1,8 @@
+database_type: postgres
+database_username: login
+database_password: login
+database_host: localhost
+database_port: 5432
+database_name: login
+database_migration_dir: migration
+database_table: login.pyway
