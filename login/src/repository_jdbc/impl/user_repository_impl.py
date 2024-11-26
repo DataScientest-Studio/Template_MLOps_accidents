@@ -22,13 +22,13 @@ class UserRepositoryImpl(UserRepository):
 
     def save_user(self, username: str, password_hashed: bytes, role: Role) -> User:
         with Session(engine) as session:
-            spongebob = UserEntity(
+            user_entity = UserEntity(
                 user_id=uuid4(),
                 username=username,
                 hashed_password=password_hashed,
                 roles=[RoleEntity(role=role.value)],
             )
-            session.add(spongebob)
+            session.add(user_entity)
             session.commit()
             return self.get_user(username)
 
