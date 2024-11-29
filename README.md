@@ -74,7 +74,7 @@ Convention : All python scripts must be run from the root specifying the relativ
 
 ### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
 
-    `python .\src\data\make_dataset.py`
+    `python .\src\data\make_dataset.py` ./data/raw ./data/preprocessed
 
 ### 4- Execute train_model.py to instanciate the model in joblib format
 
