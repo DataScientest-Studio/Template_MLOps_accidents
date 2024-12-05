@@ -1,93 +1,32 @@
-# ETL avec airflow
+# Training system
 
-## (1) Retrieve data
-## (2) Make Dataset
-## (3) Creating a branch in LakeFS and push files
+The training system allows to generate a new version of the model using the recovery of new data.
 
-```python
-import lakefs
+![img.png](c4.png)
 
-branch1 = lakefs.repository("example-repo").branch("experiment1").create(source_reference="main")
-print("experiment1 ref:", branch1.get_commit().id)
+# Training container
 
-branch1 = lakefs.repository("example-repo").branch("experiment2").create(source_reference="main")
-print("experiment2 ref:", branch2.get_commit().id)
+The "training" container contains the MLFlow software package and system integration components :
+- Generation of new training experiment and push it in MLFlow repository
+- Deployment of the experiment to a new version of the final model to Redis
+
+![img.png](c4_lvl3.png)
+
+# Run application
+
+```bash
+docker compose build
+docker compose up
 ```
 
-branch_name = "UUID1"
+# 1. Launch new experiment
 
-# Training
+Run `1_import_experiment.http` with admin account.
 
-## (1) Retrieve data with LakeFS
+# 2. Choose new version of the model
 
-```python
-import csv
+Run `2_merge_experiment.http` to merge LakeFS pull request, add new `promote` tag in MLFlow and push latest version model to Redis application make it available at the front.
 
-branch = repo.branch("UUID1")
-obj = branch.object(path="csv/....csv")
+# 3. Push latest version model
 
-for row in csv.reader(obj.reader(mode='r')):
-    print(row)
-```
-
-## (2) Build model with python
-
-## (3) Store experiment in MLFlow
-
-```python
-# Store information in tracking server
-with mlflow.start_run(run_name=run_name) as run:
-    mlflow.log_params(params)
-    mlflow.log_metrics(metrics)
-    mlflow.sklearn.log_model(
-        sk_model=rf, input_example=X_val, artifact_path=artifact_path
-    )
-```
-
-run_name = "UUID1"
-
-# Select model
-
-With another airflow step, choose model
-
-```python
- with DAG(
-     "the_dag",
-     params={
-         "x": Param(5, type="integer", minimum=3),
-         "my_int_param": 6
-     },
- ) as dag:
-```
-
-
-![trigger-dag-tutorial-form.png](trigger-dag-tutorial-form.png)
-
-## Merge model
-
-### (1) MLFlow - add tag or register model
-
-```python
-from mlflow import MlflowClient
-
-client = MlflowClient()
-
-# Set registered model tag
-client.set_registered_model_tag("example-model", "task", "classification")
-
-# Delete registered model tag
-client.delete_registered_model_tag("example-model", "task")
-
-# Set model version tag
-client.set_model_version_tag("example-model", "1", "validation_status", "approved")
-
-# Delete model version tag
-client.delete_model_version_tag("example-model", "1", "validation_status")
-```
-
-### (2) LakeFS merge in main
-
-```python
-# in LakeFS
-res = branch.merge_into(main)
-```
+Run `3_deploy_last_model.http` to push latest version model to Redis application make it available at the front.

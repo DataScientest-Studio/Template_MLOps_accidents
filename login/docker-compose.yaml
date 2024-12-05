@@ -3,13 +3,8 @@ services:
     build: .
     ports:
       - "8000:80"
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /code
     environment:
-      ISS: login-api:80
+      ISS: http://login-api:80
       DATABASE_CONNECTION: postgresql://login:login@login-postgres:5432
       PYWAY_DATABASE_MIGRATION_DIR: migration
       PYWAY_TABLE: pyway
@@ -48,3 +43,5 @@ volumes:
 
 networks:
   mle:
+    name: mle
+    external: true

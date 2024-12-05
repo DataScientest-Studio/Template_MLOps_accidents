@@ -22,7 +22,7 @@ class JwtRepositoryImpl(JwtRepository):
         if Role.ADMIN in user.roles:
             scopes = ['admin']
         to_encode = {
-            "sub": user.username,
+            "sub": user.user_id,
             "scope": scopes,
             'iss': ISS,
             "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
