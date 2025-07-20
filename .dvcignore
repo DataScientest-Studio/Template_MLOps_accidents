@@ -1,0 +1,40 @@
+# DVC ignore patterns
+# Learn more: https://dvc.org/doc/user-guide/dvcignore
+
+# Git-related files (already handled by Git)
+.git/
+.gitignore
+
+# MLflow experiment tracking artifacts
+mlruns/
+
+# Log files
+logs/
+
+# Jupyter notebooks (if not tracked by DVC)
+notebooks/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+
+# IDE/editor configuration
+.vscode/
+.idea/
+
+# OS-specific hidden files
+.DS_Store
+Thumbs.db
+
+# Docker-related artifacts (optional)
+*.tar
+*.img
+
+# Intermediate documentation and visual reports (handled by Git instead)
+reports/
+references/
+
+# Trained models (if handled by MLflow, not DVC)
+models/
+
+# VS Code devc

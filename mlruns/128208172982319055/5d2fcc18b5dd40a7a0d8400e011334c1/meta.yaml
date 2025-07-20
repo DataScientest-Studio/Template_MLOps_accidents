@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/5d2fcc18b5dd40a7a0d8400e011334c1/artifacts
+end_time: 1751142515147
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 5d2fcc18b5dd40a7a0d8400e011334c1
+run_name: awesome-hawk-504
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751142512781
+status: 4
+tags: []
+user_id: martahoisak

@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/b9817d486b924eb58169fdb5bbd11268/artifacts
+end_time: 1752956524028
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: b9817d486b924eb58169fdb5bbd11268
+run_name: spiffy-shad-37
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752956513092
+status: 3
+tags: []
+user_id: martahoisak

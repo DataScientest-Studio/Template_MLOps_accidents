@@ -1,0 +1,6 @@
+artifact_location: file:///workspaces/MLOps_accidents/mlruns/128208172982319055
+creation_time: 1749313065572
+experiment_id: '128208172982319055'
+last_update_time: 1749313065572
+lifecycle_stage: active
+name: Accident_Prediction

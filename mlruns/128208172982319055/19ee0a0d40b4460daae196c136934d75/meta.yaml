@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/19ee0a0d40b4460daae196c136934d75/artifacts
+end_time: 1753025584657
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 19ee0a0d40b4460daae196c136934d75
+run_name: rebellious-stag-592
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1753025574738
+status: 3
+tags: []
+user_id: martahoisak

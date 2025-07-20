@@ -1,0 +1,6 @@
+[core]
+    remote = localremote
+['remote "origin"']
+    url = https://dagshub.com/CarolinHertel/MLOps_accidents/src/master/.dvc
+['remote "localremote"']
+    url = /tmp/dvc-storage

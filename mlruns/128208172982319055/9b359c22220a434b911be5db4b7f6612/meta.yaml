@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/9b359c22220a434b911be5db4b7f6612/artifacts
+end_time: 1751185378090
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 9b359c22220a434b911be5db4b7f6612
+run_name: persistent-rook-581
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751185368924
+status: 4
+tags: []
+user_id: martahoisak

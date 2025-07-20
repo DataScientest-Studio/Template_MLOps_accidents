@@ -1,0 +1,36 @@
+stages:
+  import_raw_data:
+    cmd: python src/data/import_raw_data.py
+    deps:
+    - src/data/import_raw_data.py
+    outs:
+    - data/raw_data/caracteristiques-2021.csv
+    - data/raw_data/lieux-2021.csv
+    - data/raw_data/usagers-2021.csv
+    - data/raw_data/vehicules-2021.csv
+  make_dataset:
+    cmd: python src/data/make_dataset.py
+    deps:
+    - data/raw_data/caracteristiques-2021.csv
+    - data/raw_data/lieux-2021.csv
+    - data/raw_data/usagers-2021.csv
+    - data/raw_data/vehicules-2021.csv
+    outs:
+    - data/preprocessed_data/X_train.csv
+    - data/preprocessed_data/X_test.csv
+    - data/preprocessed_data/y_train.csv
+    - data/preprocessed_data/y_test.csv
+  train_model:
+    cmd: python src/models/train_model.py
+    deps:
+    - data/preprocessed_data/X_train.csv
+    - data/preprocessed_data/X_test.csv
+    - data/preprocessed_data/y_train.csv
+    - data/preprocessed_data/y_test.csv
+  #  outs:
+  #  - src/models/trained_model.joblib
+  #predict_model:
+  #  cmd: python src/models/predict_model.py
+  #  deps:
+  #  - src/models/trained_model.joblib
+  #  outs:

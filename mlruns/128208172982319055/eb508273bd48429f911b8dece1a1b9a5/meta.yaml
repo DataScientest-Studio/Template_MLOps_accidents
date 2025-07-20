@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/eb508273bd48429f911b8dece1a1b9a5/artifacts
+end_time: 1753009662898
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: eb508273bd48429f911b8dece1a1b9a5
+run_name: bold-sow-687
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1753009652053
+status: 3
+tags: []
+user_id: martahoisak

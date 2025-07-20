@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/c8d36e59263846d486e2749b5b71f76c/artifacts
+end_time: 1751184205507
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: c8d36e59263846d486e2749b5b71f76c
+run_name: bald-colt-66
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751184205476
+status: 4
+tags: []
+user_id: martahoisak

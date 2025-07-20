@@ -1,97 +1,136 @@
-Project Name
-==============================
+# MLOps_accidents — Technical Documentation
 
-This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
+This repository is a production-grade MLOps project designed around road accident data. It follows a modular structure enabling reproducibility, scalability, monitoring, and CI/CD deployment using modern MLOps best practices.
 
-Project Organization
-------------
+---
 
-    ├── LICENSE
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── logs               <- Logs from training and predicting
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   ├── check_structure.py    
-    │   │   ├── import_raw_data.py 
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   ├── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │   │   └── visualize.py
-    │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
+## Project Structure
 
----------
+```
+├── .dvc/                         # DVC metadata for versioning
+├── .github/workflows/           # GitHub Actions CI/CD pipeline
+│   └── python-app.yml           # Main CI workflow definition
+├── Grafana/                     # Dashboard JSONs for monitoring
+├── config/
+│   └── airflow.cfg              # Airflow configuration
+├── dags/                        # Airflow DAGs for orchestration
+│   ├── example_teardown.py      
+│   └── our_first_dag.py
+├── data/
+│   ├── .gitignore
+│   ├── preprocessed.dvc         # Preprocessed dataset
+│   └── raw.dvc                  # Raw input dataset
+├── mlruns/                      # MLflow experiment logs and metadata
+│   └── <run_id>/                # MLflow experiment subfolders
+├── models/                      # Trained and serialized models
+├── notebooks/
+│   └── 1.0-ldj-initial-data-exploration.ipynb
+├── references/                  # Data dictionaries & documentation
+├── reports/                     # Generated plots, HTML reports, etc.
+│   └── figures/
+├── src/
+│   ├── api/                     # Inference API logic (FastAPI)
+│   ├── data/                    # Scripts for loading and preprocessing
+│   ├── features/                # Feature engineering scripts
+│   ├── models/                  # Model training & evaluation
+│   ├── orchestration/          # Microservices and workflow composition
+│   ├── pipeline/               # Training/inference DAG pipelines
+│   ├── tests/                  # Unit and integration tests
+│   └── visualization/          # EDA, plotting, and monitoring visuals
+├── Dockerfile
+├── docker-compose.yml
+├── dvc.yaml                    # Pipeline specification for DVC
+├── requirements.txt
+├── bentofile.yaml             # Model serving definition for BentoML
+├── setup.py
+├── LICENSE
+└── README.md
+```
 
-## Steps to follow 
+---
 
-Convention : All python scripts must be run from the root specifying the relative file path.
+## Objectives
 
-### 1- Create a virtual environment using Virtualenv.
+This project is focused on implementing the full MLOps lifecycle for a road accident prediction model. It ensures:
 
-    `python -m venv my_env`
+- Reproducible research & production setup  
+- Modular microservices for training, inference & monitoring  
+- GitHub-integrated CI/CD  
+- MLflow tracking & DVC versioning  
+- Orchestration using Airflow  
+- Containerized deployment via Docker  
 
-###   Activate it 
+---
 
-    `./my_env/Scripts/activate`
+## Roadmap & Milestones
 
-###   Install the packages from requirements.txt
+### Phase 1: Foundations & Containerization
 
-    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
+- [x] Define project objectives and KPIs  
+- [x] Set up Dockerized Python environment  
+- [x] Load & preprocess raw data using `data/` and DVC  
+- [x] Establish baseline models via `src/models/` & notebook  
+- [x] Unit tests in `src/tests/`  
+- [x] Create minimal inference API in `src/api/`  
 
-### 2- Execute import_raw_data.py to import the 4 datasets.
+### Phase 2: Microservices, Tracking & Versioning
 
-    `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
+- [x] Track experiments using MLflow (`mlruns/`)  
+- [x] Version datasets and models via DVC  
+- [x] Implement DAGs in `dags/` with Airflow  
+- [x] Orchestrate model training & evaluation  
 
-### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
+### Phase 3: Orchestration & Deployment
 
-    `python .\src\data\make_dataset.py`
+- [x] CI pipeline with GitHub Actions (`.github/workflows/python-app.yml`)  
+- [x] Secure, optimized FastAPI-based inference API  
+- [x] Containerized deployment with Docker & Compose  
+- [ ] Kubernetes scalability layer (WIP)  
 
-### 4- Execute train_model.py to instanciate the model in joblib format
+### Phase 4: Monitoring & Maintenance
 
-    `python .\src\models\train_model.py`
+- [x] Monitor metrics using Prometheus & Grafana  
+- [ ] Drift detection using Evidently  
+- [ ] Automated model updates & retraining triggers  
+- [ ] Complete & publish technical documentation  
 
-### 5- Finally, execute predict_model.py with respect to one of these rules :
-  
-  - Provide a json file as follow : 
+---
 
-    
-    `python ./src/models/predict_model.py ./src/models/test_features.json`
+## CI/CD Pipeline
 
-  test_features.json is an example that you can try 
+- Trigger: Pull requests on `dev` and `main`  
+- Validation: Unit tests, flake8, Black formatting  
+- Build: Docker image builds on push  
+- Deploy: Model artifacts versioned & deployed via MLflow/BentoML (WIP)  
 
-  - If you do not specify a json file, you will be asked to enter manually each feature. 
+Workflow file: `.github/workflows/python-app.yml`
 
+---
 
-------------------------
+## Versioning & Reproducibility
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+- Data: Managed via DVC (`data/raw.dvc`, `data/preprocessed.dvc`)  
+- Models: Stored in `models/`, versioned and logged via MLflow  
+- Code: All components tracked with Git, commits tied to artifacts  
+- Parameters: Stored in `params.yaml` and tracked per experiment run  
+
+---
+
+## Notebooks
+
+Exploratory and modeling notebooks are tracked in:
+
+```
+notebooks/
+└── 1.0-ldj-initial-data-exploration.ipynb
+```
+
+Each notebook is named using the convention:  
+`[PHASE].[INITIALS]-[short-description].ipynb`
+
+---
+
+## Monitoring Stack
+
+- Prometheus: Collects inference latency and resource usage  
+- Grafana: Preconfigured dashboards in `Grafana/dashboard.json`
