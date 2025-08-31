@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/7004f575b3404541bf76b4f069540eef/artifacts
+end_time: 1751144024846
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 7004f575b3404541bf76b4f069540eef
+run_name: bedecked-elk-856
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751144024816
+status: 4
+tags: []
+user_id: martahoisak

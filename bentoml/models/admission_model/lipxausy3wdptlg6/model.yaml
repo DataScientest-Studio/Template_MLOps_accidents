@@ -1,0 +1,17 @@
+name: admission_model
+version: lipxausy3wdptlg6
+module: bentoml.sklearn
+labels: {}
+options: {}
+metadata: {}
+context:
+  framework_name: sklearn
+  framework_versions:
+    scikit-learn: 1.7.0
+  bentoml_version: 1.4.17
+  python_version: 3.12.0
+signatures:
+  predict:
+    batchable: false
+api_version: v1
+creation_time: '2025-07-04T13:46:57.152807+00:00'

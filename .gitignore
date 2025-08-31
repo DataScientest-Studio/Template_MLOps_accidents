@@ -78,9 +78,6 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
-# exclude data from source control by default
-/data/
-
 # Mac OS-specific storage files
 .DS_Store
 
@@ -91,3 +88,26 @@ target/
 # Mypy cache
 .mypy_cache/
 *.joblib
+.devcontainer/devcontainer.json
+
+# exclude models from source control by default
+mlruns/128208172982319055/f2cbdb28d52048bb97173a478cb8e154/artifacts/model/model.pkl
+src/models/mlruns/
+MlOps_img.tar.gz
+Mlops_image.tar.gz
+docs/2025-06-30 19 00 11.png
+docs/2025-06-30 19 00 12 (2).png
+docs/2025-06-30 19 00 12 (3).png
+docs/2025-06-30 19 00 12 (4).png
+docs/2025-06-30 19 00 12 (5).png
+docs/2025-06-30 19 00 12 (6).png
+docs/2025-06-30 19 00 12 (7).png
+docs/2025-06-30 19 00 12 (8).png
+docs/2025-06-30 19 00 12 (9).png
+docs/2025-06-30 19 00 12.png
+data/raw_data/caracteristiques-2021.csv
+data/raw_data/lieux-2021.csv
+data/raw_data/usagers-2021.csv
+data/raw_data/vehicules-2021.csv
+dags/models/rf_classifier_model.pkl
+.venv/

@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/7ebc37ea7f3a4a9d9624c47d9d52c2a2/artifacts
+end_time: 1751184313628
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 7ebc37ea7f3a4a9d9624c47d9d52c2a2
+run_name: nebulous-elk-637
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751184313599
+status: 4
+tags: []
+user_id: martahoisak

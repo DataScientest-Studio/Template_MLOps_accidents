@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/b573d7d4479a417283ca32341d008a41/artifacts
+end_time: 1751141401861
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: b573d7d4479a417283ca32341d008a41
+run_name: carefree-mare-981
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751141401773
+status: 4
+tags: []
+user_id: martahoisak

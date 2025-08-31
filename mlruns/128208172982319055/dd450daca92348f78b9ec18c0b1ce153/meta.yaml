@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/dd450daca92348f78b9ec18c0b1ce153/artifacts
+end_time: 1751193518679
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: dd450daca92348f78b9ec18c0b1ce153
+run_name: delightful-stork-704
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751193511106
+status: 4
+tags: []
+user_id: martahoisak

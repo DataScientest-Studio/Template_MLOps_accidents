@@ -1,0 +1,21 @@
+# external requirements
+click
+Sphinx
+coverage
+flake8
+pandas
+numpy 
+pathlib 
+scikit-learn
+imbalanced-learn
+joblib
+mlflow
+dvc
+bentoml
+transformers
+pydantic
+fastapi
+PyJWT
+python-dotenv
+requests
+pytest

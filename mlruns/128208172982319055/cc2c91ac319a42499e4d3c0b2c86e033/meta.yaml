@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/cc2c91ac319a42499e4d3c0b2c86e033/artifacts
+end_time: 1751184365553
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: cc2c91ac319a42499e4d3c0b2c86e033
+run_name: colorful-roo-786
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751184365524
+status: 4
+tags: []
+user_id: martahoisak

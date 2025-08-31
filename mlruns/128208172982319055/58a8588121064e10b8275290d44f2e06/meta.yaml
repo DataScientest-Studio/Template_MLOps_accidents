@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/58a8588121064e10b8275290d44f2e06/artifacts
+end_time: 1751142679555
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 58a8588121064e10b8275290d44f2e06
+run_name: marvelous-mink-819
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751142677300
+status: 4
+tags: []
+user_id: martahoisak

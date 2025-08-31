@@ -5,15 +5,31 @@ This project is a starting Pack for MLOps projects based on the subject "road ac
 
 Project Organization
 ------------
-
+    ├── devcontainer          <- Contains the Dockerfile and devcontainer.json for VS Code remote development.
+    │   ├── devcontainer.json
+    ├── .dvc                <- DVC configuration files for data versioning.
+    │   ├── cache
+    │   ├── tmp
+    │   ├── config
+    │   ├── config.local
+    │   ├── gitignore
+    ├── github/workflows <- GitHub Actions workflows for CI/CD.
+    │   ├── python-app.yml 
     ├── LICENSE
+    ├── dvcignore          <- DVC ignore file, similar to .gitignore.
+    ├── .gitignore         <- A default gitignore file for Python projects
+    ├── Dockerfile          <- Dockerfile for containerizing the application.
+    ├── dvc.yaml 
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
     │   ├── processed      <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
-    │
+    ├── mlruns
+    │   ├── .trash
+    │   ├── 0                <- Directory for the first experiment run
+    │   ├── 128208172982319055                <- Directory for the second experiment run
+    │   ├── models          <- Directory for storing model artifacts
+
     ├── logs               <- Logs from training and predicting
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
@@ -52,46 +68,72 @@ Project Organization
 
 ---------
 
-## Steps to follow 
+## Steps to follow
 
 Convention : All python scripts must be run from the root specifying the relative file path.
 
 ### 1- Create a virtual environment using Virtualenv.
 
-    `python -m venv my_env`
+`python -m venv my_env`  
+### Activate it
 
-###   Activate it 
+`./my_env/Scripts/activate`
 
-    `./my_env/Scripts/activate`
+### 2- Build docker container
 
-###   Install the packages from requirements.txt
+`docker build -t accidentpredictionservice:1.0.0 .`
 
-    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
+### 3- Create the `.env` file
 
-### 2- Execute import_raw_data.py to import the 4 datasets.
+Create a file named `.env` in the project root (next to `docker-compose.yml`).  
+Start from `.env.example`:
 
-    `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
+#### macOS / Linux
+cp .env.example .env
+echo "AIRFLOW_UID=$(id -u)" >> .env
 
-### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
+#### Windows (PowerShell or cmd)
+copy .env.example .env
 
-    `python .\src\data\make_dataset.py`
+open .env and ensure AIRFLOW_UID=50000
 
-### 4- Execute train_model.py to instanciate the model in joblib format
+Do not commit your `.env` (keep `.env` in .gitignore). Commit only `.env.example`.
 
-    `python .\src\models\train_model.py`
+### 4- Execute docker compose
 
-### 5- Finally, execute predict_model.py with respect to one of these rules :
+`docker-compose up -d`
+
+### 5- Run the Docker Container
+
+`docker run --rm -d -p 3000:3000 examen_bentoml:1.0.0`  
+BentoML API will be available at http://localhost:3000
+
+### 6- Please use the login-service with this credentials
+
+USERNAME = "admin"  
+PASSWORD = "4dm1N"
+
+- **Airflow (Web UI)**  
+  URL: `http://localhost:8080`  
+  Username: `airflow`  
+  Password: `airflow`
+
+- **Grafana**  
+  URL: `http://localhost:3001`  
+  Username: `admin`  
+  Password: `admin`
+
+- **BentoML / API**
+  URL: http://localhost:3000
   
-  - Provide a json file as follow : 
+- **Prometheus**
+  URL: http://localhost:9090
 
-    
-    `python ./src/models/predict_model.py ./src/models/test_features.json`
-
-  test_features.json is an example that you can try 
-
-  - If you do not specify a json file, you will be asked to enter manually each feature. 
+- **Flower (Celery UI)**
+  URL: http://localhost:5555
 
 
-------------------------
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+

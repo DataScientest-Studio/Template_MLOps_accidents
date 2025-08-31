@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/2ff2bd29609c4827bef519ac433e8a6f/artifacts
+end_time: 1751184522897
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 2ff2bd29609c4827bef519ac433e8a6f
+run_name: smiling-perch-201
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751184513610
+status: 4
+tags: []
+user_id: martahoisak

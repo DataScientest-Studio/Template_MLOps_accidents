@@ -1,0 +1,26 @@
+service: "api.service:svc"
+name: AccidentPredictionService
+
+description: "Predict the chance of having a heavy"
+
+labels:
+  owner: "Carolin Hertel"
+  project: "Admissions Prediction"
+
+models:
+  - "predict_model:latest"
+
+include:
+  - "api/"
+  - "models/"
+  - "data/processed/"
+  - ".env"
+  - "tests/"
+
+python:
+  requirements_txt: "requirements.txt"
+
+docker:
+  python_version: "3.12"
+  system_packages:
+    - 'git'
