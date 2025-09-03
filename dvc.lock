@@ -1,0 +1,31 @@
+schema: '2.0'
+stages:
+  import_raw_data:
+    cmd: python src/data/import_raw_data.py
+    deps:
+    - path: src/data/import_raw_data.py
+      hash: md5
+      md5: 76cab474c748ab73983e6d308f5556d2
+      size: 1933
+      isexec: true
+    outs:
+    - path: data/raw_data/caracteristiques-2021.csv
+      hash: md5
+      md5: de851f3cfbd7d3c4b4cebc5c9c2d8e5d
+      size: 7055448
+      isexec: true
+    - path: data/raw_data/lieux-2021.csv
+      hash: md5
+      md5: 0e6fdb609b301a1d5190e821f3597444
+      size: 5773984
+      isexec: true
+    - path: data/raw_data/usagers-2021.csv
+      hash: md5
+      md5: 71e225f90cffbb7fea4a9a3d2264c814
+      size: 11856536
+      isexec: true
+    - path: data/raw_data/vehicules-2021.csv
+      hash: md5
+      md5: 5aa80e5b0a33a1fe8a55b00dc25f74dd
+      size: 6396946
+      isexec: true

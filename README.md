@@ -5,15 +5,31 @@ This project is a starting Pack for MLOps projects based on the subject "road ac
 
 Project Organization
 ------------
-
+    ├── devcontainer          <- Contains the Dockerfile and devcontainer.json for VS Code remote development.
+    │   ├── devcontainer.json
+    ├── .dvc                <- DVC configuration files for data versioning.
+    │   ├── cache
+    │   ├── tmp
+    │   ├── config
+    │   ├── config.local
+    │   ├── gitignore
+    ├── github/workflows <- GitHub Actions workflows for CI/CD.
+    │   ├── python-app.yml 
     ├── LICENSE
+    ├── dvcignore          <- DVC ignore file, similar to .gitignore.
+    ├── .gitignore         <- A default gitignore file for Python projects
+    ├── Dockerfile          <- Dockerfile for containerizing the application.
+    ├── dvc.yaml 
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
     │   ├── processed      <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
-    │
+    ├── mlruns
+    │   ├── .trash
+    │   ├── 0                <- Directory for the first experiment run
+    │   ├── 128208172982319055                <- Directory for the second experiment run
+    │   ├── models          <- Directory for storing model artifacts
+
     ├── logs               <- Logs from training and predicting
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
@@ -52,46 +68,79 @@ Project Organization
 
 ---------
 
-## Steps to follow 
+## Prerequisites
+- Docker and Docker Compose installed
+- Run commands from the repository root
 
-Convention : All python scripts must be run from the root specifying the relative file path.
+## Steps to follow
 
-### 1- Create a virtual environment using Virtualenv.
+### 1 Prepare environment (.env)
+#### On macOS / Linux:
+cp .env.example .env
+echo AIRFLOW_UID=$(id -u) >> .env
 
-    `python -m venv my_env`
+#### On Windows (PowerShell):
+copy .env.example .env
+rem open .env and set AIRFLOW_UID=50000 if needed
 
-###   Activate it 
+### 2 (Optional) Build local prediction image
+docker build -t accidentpredictionservice:1.0.0 .
 
-    `./my_env/Scripts/activate`
+### 3 Start the stack
+docker compose -f docker-compose.yaml up -d
 
-###   Install the packages from requirements.txt
+### 4 Confirm services are running
+docker compose -f docker-compose.yaml ps
 
-    `pip install -r .\requirements.txt` ### You will have an error in "setup.py" but this won't interfere with the rest
+### 5 Confirm Grafana provisioning files are mounted in the container
+docker compose -f docker-compose.yaml exec -T grafana sh -c "ls -la /etc/grafana/provisioning/dashboards /etc/grafana/provisioning/datasources /var/lib/grafana/dashboards || true"
 
-### 2- Execute import_raw_data.py to import the 4 datasets.
+### 6 Use Grafana API to list dashboards
+curl -sS -u admin:admin "http://localhost:3001/api/search?query="
 
-    `python .\src\data\import_raw_data.py` ### It will ask you to create a new folder, accept it.
+### 7 Check that grafana-dashboard is provisioned from file
+curl -sS -u admin:admin "http://localhost:3001/api/dashboards/uid/grafana-dashboard" | python -c "import sys,json; j=json.load(sys.stdin); m=j.get('meta',{}); print('provisioned:', m.get('provisioned')); print('provisionedExternalId:', m.get('provisionedExternalId'))"
 
-### 3- Execute make_dataset.py initializing `./data/raw` as input file path and `./data/preprocessed` as output file path.
+### 8 Check that bentoml-dashboard is present
+curl -sS -u admin:admin "http://localhost:3001/api/dashboards/uid/bentoml-dashboard" | python -c "import sys,json; j=json.load(sys.stdin); print(j.get('dashboard', {}).get('uid'))"
 
-    `python .\src\data\make_dataset.py`
+### 9 Credentials
+http://localhost:3001/d/grafana-dashboard/grafana-dashboard
 
-### 4- Execute train_model.py to instanciate the model in joblib format
+http://localhost:3001/d/bentoml-dashboard/bentoml-admission-prediction-api-dashboard
 
-    `python .\src\models\train_model.py`
+Grafana credentials
+Username: admin
+Password: admin
 
-### 5- Finally, execute predict_model.py with respect to one of these rules :
-  
-  - Provide a json file as follow : 
+BentoML / API 
+http://localhost:3000
 
-    
-    `python ./src/models/predict_model.py ./src/models/test_features.json`
+Prometheus UI
+http://localhost:9090
 
-  test_features.json is an example that you can try 
+Flower (Celery UI) 
+http://localhost:5555
 
-  - If you do not specify a json file, you will be asked to enter manually each feature. 
+Airflow UI
+http://localhost:8080
+Username: airflow
+Password: airflow
+
+### 10 Prediction server
+docker compose -f docker-compose.yaml ps prediction-server
+If the image does not serve automatically, run:
+docker run --rm -d -p 3000:3000 accidentpredictionservice:1.0.0
+
+### 11 Stop the stack
+docker compose -f docker-compose.yaml down
 
 
-------------------------
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+
+
+
+
+

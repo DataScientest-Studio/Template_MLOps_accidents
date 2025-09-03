@@ -48,7 +48,7 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
         if (i>120)|(i<0):
             df_users["victim_age"].replace(i,np.nan)
     df_caract["hour"] = df_caract["hrmn"].astype(str).apply(lambda x : x[:-3])
-    df_caract.drop(['hrmn', 'an'], inplace=True, axis=1)
+#   df_caract.drop(['hrmn', 'an'], inplace=True, axis=1)
     df_users.drop(['an_nais'], inplace=True, axis=1)
 
     #--Replacing names 
@@ -90,19 +90,19 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     df.rename({"count" :"nb_vehicules"},axis = 1, inplace = True)
 
     #--Modification of the target variable  : 1 : prioritary // 0 : non-prioritary
-    df['grav'].replace([2,3,4], [0,1,1], inplace=True)
+#   df['grav'].replace([2,3,4], [0,1,1], inplace=True)
 
 
     #--Replacing values -1 and 0 
-    col_to_replace0_na = [ "trajet", "catv", "motor"]
-    col_to_replace1_na = [ "trajet", "secu1", "catv", "obsm", "motor", "circ", "surf", "situ", "vma", "atm", "col"]
-    df[col_to_replace1_na] = df[col_to_replace1_na].replace(-1, np.nan)
-    df[col_to_replace0_na] = df[col_to_replace0_na].replace(0, np.nan)
+#    col_to_replace0_na = [ "trajet", "catv", "motor"]
+#    col_to_replace1_na = [ "trajet", "secu1", "catv", "obsm", "motor", "circ", "surf", "situ", "vma", "atm", "col"]
+#    df[col_to_replace1_na] = df[col_to_replace1_na].replace(-1, np.nan)
+#    df[col_to_replace0_na] = df[col_to_replace0_na].replace(0, np.nan)
 
 
     #--Dropping columns 
-    list_to_drop = ['senc','larrout','actp', 'manv', 'choc', 'nbv', 'prof', 'plan', 'Num_Acc', 'id_vehicule', 'num_veh', 'pr', 'pr1','voie', 'trajet',"secu2", "secu3",'adr', 'v1', 'lartpc','occutc','v2','vosp','locp','etatp', 'infra', 'obs' ]
-    df.drop(list_to_drop, axis=1, inplace=True)
+#    list_to_drop = ['senc','larrout','actp', 'manv', 'choc', 'nbv', 'prof', 'plan', 'Num_Acc', 'id_vehicule', 'num_veh', 'pr', 'pr1','voie', 'trajet',"secu2", "secu3",'adr', 'v1', 'lartpc','occutc','v2','vosp','locp','etatp', 'infra', 'obs' ]
+#   df.drop(list_to_drop, axis=1, inplace=True)
 
     #--Dropping lines with NaN values
     col_to_drop_lines = ['catv', 'vma', 'secu1', 'obsm', 'atm']
@@ -115,9 +115,9 @@ def process_data(input_filepath_users, input_filepath_caract, input_filepath_pla
     X_train, X_test, y_train, y_test = train_test_split(feats, target, test_size=0.3, random_state = 42)
 
     #--Filling NaN values
-    col_to_fill_na = ["surf", "circ", "col", "motor"]
-    X_train[col_to_fill_na] = X_train[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
-    X_test[col_to_fill_na] = X_test[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
+#    col_to_fill_na = ["surf", "circ", "col", "motor"]
+#   X_train[col_to_fill_na] = X_train[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
+#   X_test[col_to_fill_na] = X_test[col_to_fill_na].fillna(X_train[col_to_fill_na].mode().iloc[0])
 
     # Create folder if necessary 
     if check_existing_folder(output_folderpath) :

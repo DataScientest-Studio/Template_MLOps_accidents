@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/b007bd0e815f4b9db6dd814d978fad1e/artifacts
+end_time: 1751185775776
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: b007bd0e815f4b9db6dd814d978fad1e
+run_name: puzzled-moose-935
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751185775644
+status: 4
+tags: []
+user_id: martahoisak

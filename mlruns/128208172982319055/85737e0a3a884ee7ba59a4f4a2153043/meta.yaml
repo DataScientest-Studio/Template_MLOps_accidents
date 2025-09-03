@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/85737e0a3a884ee7ba59a4f4a2153043/artifacts
+end_time: 1751184249854
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 85737e0a3a884ee7ba59a4f4a2153043
+run_name: smiling-shad-331
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751184249824
+status: 4
+tags: []
+user_id: martahoisak

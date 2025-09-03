@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/ecc29e7fa0f2441c9ab79876f2a413d9/artifacts
+end_time: 1751185655224
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: ecc29e7fa0f2441c9ab79876f2a413d9
+run_name: selective-snail-620
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751185642652
+status: 4
+tags: []
+user_id: martahoisak

@@ -1,18 +1,21 @@
-# local package
--e .
-
-# external requirements
+bentoml==1.0.20
+fastapi==0.79.1
+starlette==0.19.1
+pydantic==1.10.13
 click
 Sphinx
 coverage
-#awscli>=1.29.0
 flake8
 pandas
-#logging
 numpy 
 pathlib 
 scikit-learn
 imbalanced-learn
 joblib
-#sys
-#json
+mlflow
+dvc
+transformers
+PyJWT
+python-dotenv
+requests
+pytest

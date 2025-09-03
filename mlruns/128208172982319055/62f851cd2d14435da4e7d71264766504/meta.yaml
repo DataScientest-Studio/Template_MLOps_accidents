@@ -1,0 +1,14 @@
+artifact_uri: file:///workspaces/MLOps_accidents/mlruns/128208172982319055/62f851cd2d14435da4e7d71264766504/artifacts
+end_time: 1751193362004
+entry_point_name: ''
+experiment_id: '128208172982319055'
+lifecycle_stage: active
+run_id: 62f851cd2d14435da4e7d71264766504
+run_name: sedate-cat-195
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1751193361861
+status: 4
+tags: []
+user_id: martahoisak
