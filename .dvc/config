@@ -1,0 +1,6 @@
+[core]
+    remote = origin
+    autostage = true
+['remote "origin"']
+    url = s3://dvc
+    endpointurl = https://dagshub.com/chrmei/MLOps_accidents.s3

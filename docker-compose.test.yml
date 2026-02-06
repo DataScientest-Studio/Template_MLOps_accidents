@@ -1,0 +1,17 @@
+# =============================================================================
+# Override for test runs: relaxed auth rate limits and nginx auth zone
+# so the test suite does not hit 429/503. Use with:
+#   docker compose -f docker-compose.yml -f docker-compose.test.yml --profile test up -d
+#   docker compose -f docker-compose.yml -f docker-compose.test.yml --profile test run --rm test
+# =============================================================================
+
+services:
+  auth:
+    environment:
+      - LOGIN_RATE_LIMIT_PER_USER=100
+      - REFRESH_RATE_LIMIT_PER_USER=100
+      - MAX_FAILED_LOGIN_ATTEMPTS=10
+
+  nginx:
+    volumes:
+      - ./services/nginx/nginx.test.conf:/etc/nginx/conf.d/default.conf:ro

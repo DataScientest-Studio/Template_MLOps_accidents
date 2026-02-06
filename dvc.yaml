@@ -1,0 +1,64 @@
+stages:
+  preprocess:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python src/data/make_dataset.py'
+    deps:
+    - data/raw
+    - src/data/make_dataset.py
+    outs:
+    - data/preprocessed/interim_dataset.csv
+  build_features:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python src/features/build_features.py'
+    deps:
+    - data/preprocessed/interim_dataset.csv
+    - src/features/build_features.py
+    outs:
+    - data/preprocessed/features.csv
+    - models/label_encoders.joblib
+  train_eval:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python src/models/train_multi_model.py'
+    deps:
+    - data/preprocessed/features.csv
+    - src/models/train_multi_model.py
+    - src/models/base_trainer.py
+    - src/models/model_trainers.py
+    - src/models/mlflow_utils.py
+    params:
+    - src/config/model_config.yaml:
+    outs:
+    - data/metrics/model_comparison.csv
+    # Model files tracked for pipeline reproducibility (local development/testing)
+    # NOTE: These are NOT used for production inference.
+    # Production models are loaded from MLflow Model Registry (see predict_model.py).
+    # DVC tracks these files to enable reproducible training pipelines (dvc repro).
+    # Model files - all 4 models trained by default (from multi_model.enabled_models in config)
+    # Note: If you change enabled_models in config to train fewer models, update this list accordingly
+    # DVC requires all listed outputs to exist after the command runs
+    - models/xgboost_model.joblib
+    - models/xgboost_model_metadata.joblib
+    - models/random_forest_model.joblib
+    - models/random_forest_model_metadata.joblib
+    - models/logistic_regression_model.joblib
+    - models/logistic_regression_model_metadata.joblib
+    - models/lightgbm_model.joblib
+    - models/lightgbm_model_metadata.joblib
+    metrics:
+    # Track metrics for all models - these are used for DVC metrics tracking
+    - data/metrics/xgboost_metrics.json:
+        cache: false
+    - data/metrics/random_forest_metrics.json:
+        cache: false
+    - data/metrics/logistic_regression_metrics.json:
+        cache: false
+    - data/metrics/lightgbm_metrics.json:
+        cache: false
+  test_prediction:
+    # Test prediction using local model file (for pipeline reproducibility)
+    # For production inference, use MLflow Model Registry instead
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python src/models/predict_model.py --model-path models/xgboost_model.joblib'
+    deps:
+    - models/label_encoders.joblib
+    - models/xgboost_model.joblib
+    - models/xgboost_model_metadata.joblib
+    - src/models/predict_model.py
+    params:
+    - src/models/test_features.json:

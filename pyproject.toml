@@ -1,0 +1,172 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlops-accidents"
+version = "0.1.0"
+description = "MLOps project for predicting road accidents using machine learning"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    {name = "DataScientest"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "click",
+    "Sphinx",
+    "coverage",
+    "flake8",
+    "pandas",
+    "numpy",
+    "mlflow>=2.0.0",
+    "pathlib",
+    "pyyaml",
+    "scikit-learn>=1.4.2,<1.5",
+    "imbalanced-learn==0.14.0",
+    "joblib",
+    "dvc[s3]>=3.42.0",
+    "boto3",
+    "lightgbm",
+    "pandera[pandas]>=0.28.1",
+    "seaborn==0.13.2",
+    # FastAPI Microservices
+    "fastapi>=0.109.0,<1.0.0",
+    "uvicorn[standard]>=0.27.0,<1.0.0",
+    "python-jose[cryptography]>=3.3.0,<4.0.0",
+    "passlib[bcrypt]>=1.7.4,<2.0.0",
+    "bcrypt>=3.2.0,<4.0.0",  # Compatible with passlib 1.7.4
+    "python-multipart>=0.0.6,<1.0.0",
+    "pydantic>=2.5.0,<3.0.0",
+    "pydantic-settings>=2.1.0,<3.0.0",
+    "httpx>=0.26.0,<1.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "sqlalchemy>=2.0.0,<3.0.0",
+    "psycopg2-binary>=2.9.0,<3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "isort",
+    "mypy",
+    "types-PyYAML",
+    "xgboost==3.1.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/MLOps_accidents"
+Repository = "https://github.com/yourusername/MLOps_accidents"
+Issues = "https://github.com/yourusername/MLOps_accidents/issues"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "."
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = [
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+markers = [
+    "auth: marks tests related to authentication",
+    "data: marks tests related to data service",
+    "train: marks tests related to train service",
+    "predict: marks tests related to predict service",
+    "integration: marks integration tests",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = false
+# Ignore missing stubs for third-party libraries that don't have type stubs
+[[tool.mypy.overrides]]
+module = [
+    "joblib.*",
+    "sklearn.*",
+    "requests.*",
+    "pandas.*",
+    "jose.*",
+    "passlib.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "services.auth_service.*",
+    "services.common.*",
+    "services.docs_service.*",
+    "services.dashboard.*",
+    "services.train_service.*",
+    "src.data.*",
+    "src.models.*",
+]
+ignore_errors = true
+

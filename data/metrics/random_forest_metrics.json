@@ -1,0 +1,6 @@
+{
+  "random_forest_test_accuracy": 0.7779046703131575,
+  "random_forest_test_precision": 0.6874540103016924,
+  "random_forest_test_recall": 0.6518402232687946,
+  "random_forest_test_f1_score": 0.6691736055152655
+}

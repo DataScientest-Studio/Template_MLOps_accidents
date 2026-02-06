@@ -1,0 +1,164 @@
+model:
+  type: xgboost
+  name: XGBoost Baseline
+multi_model:
+  enabled_models:
+  - lightgbm
+xgboost:
+  default_params:
+    colsample_bytree: 0.7
+    learning_rate: 0.05
+    max_depth: 5
+    n_estimators: 300
+    subsample: 1.0
+    random_state: 42
+    eval_metric: logloss
+random_forest:
+  default_params:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 2
+    min_samples_leaf: 1
+    random_state: 42
+logistic_regression:
+  default_params:
+    C: 1.0
+    penalty: l2
+    solver: lbfgs
+    max_iter: 1000
+    random_state: 42
+lightgbm:
+  default_params:
+    n_estimators: 300
+    learning_rate: 0.1
+    max_depth: 6
+    num_leaves: 31
+    random_state: 42
+grid_search:
+  enabled: false
+  cv: 5
+  scoring: f1
+  n_jobs: -1
+  verbose: 3
+  param_grid:
+    xgb__n_estimators:
+    - 300
+    - 500
+    - 750
+    - 1000
+    xgb__max_depth:
+    - 4
+    - 5
+    - 6
+    xgb__learning_rate:
+    - 0.01
+    - 0.05
+    - 0.1
+    - 0.15
+    - 0.2
+    xgb__subsample:
+    - 0.8
+    - 1.0
+    xgb__colsample_bytree:
+    - 0.7
+    - 0.8
+    - 0.9
+  param_grid_rf:
+    rf__n_estimators:
+    - 100
+    - 200
+    - 300
+    rf__max_depth:
+    - 5
+    - 10
+    - 15
+    - null
+    rf__min_samples_split:
+    - 2
+    - 5
+    - 10
+    rf__min_samples_leaf:
+    - 1
+    - 2
+    - 4
+  param_grid_lr:
+    lr__C:
+    - 0.1
+    - 1.0
+    - 10.0
+    - 100.0
+    lr__penalty:
+    - l1
+    - l2
+    lr__solver:
+    - liblinear
+    - lbfgs
+  param_grid_lgbm:
+    lgbm__n_estimators:
+    - 300
+    - 500
+    - 750
+    lgbm__learning_rate:
+    - 0.01
+    - 0.05
+    - 0.1
+    lgbm__max_depth:
+    - 4
+    - 5
+    - 6
+    lgbm__num_leaves:
+    - 31
+    - 50
+    - 70
+smote:
+  enabled: true
+  random_state: 42
+data_split:
+  test_size: 0.3
+  random_state: 42
+  shuffle: true
+feature_engineering:
+  apply_cyclic_encoding: true
+  apply_interactions: true
+paths:
+  features: data/preprocessed/features.csv
+  model_output: models/trained_model.joblib
+  metrics_dir: data/metrics
+  label_encoders: models/label_encoders.joblib
+  model_metadata: models/trained_model_metadata.joblib
+evaluation:
+  metrics:
+  - accuracy
+  - precision
+  - recall
+  - f1
+  save_confusion_matrix: true
+  save_classification_report: true
+mlflow:
+  enabled: true
+  tracking_uri: ''
+  experiment_name: accident_prediction
+  log_model: true
+  log_artifacts: true
+  model_registry:
+    registered_model_name: Accident_Prediction
+    default_stage: None
+    auto_transition_to_staging: false
+    production_stage: Production
+    auto_comparison:
+      enabled: true
+      include_stages:
+      - Production
+    auto_promotion:
+      enabled: true
+      target_stage: Staging
+      comparison_stage:
+      - Staging
+      - Production
+    promotion:
+      rules:
+        primary_metric: f1_score
+        min_threshold:
+          f1_score: 0.65
+          accuracy: 0.77
+        improvement_threshold_pct: 0.1

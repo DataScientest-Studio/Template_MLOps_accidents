@@ -1,0 +1,141 @@
+# =============================================================================
+# Multi-stage Dockerfile for all Python microservices
+# =============================================================================
+# Build with: docker build -f services/Dockerfile.python --target <stage> .
+# Stages: base | auth_service | data_service | train_service | predict_service | geocode_service | docs_service | test_service
+# Base is shared; only one pip install of external deps. Service stages add code
+# and run fast editable install. Use DOCKER_BUILDKIT=1 for cache mounts.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Base: Python, system deps, external pip packages only (no -e .)
+# Rebuilds only when requirements.txt changes.
+# -----------------------------------------------------------------------------
+FROM python:3.11-slim AS base
+
+LABEL maintainer="MLOps Team"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Union of system deps needed by any service (curl, git, libgomp1 for lightgbm)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd --create-home --shell /bin/bash mlops
+WORKDIR /app
+
+# Install only external deps (exclude -e .) so this layer caches when requirements.txt is unchanged
+COPY requirements.txt ./
+RUN --mount=type=cache,target=/root/.cache/pip \
+    grep -v '^-e' requirements.txt > /tmp/requirements.txt && \
+    pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt
+
+# -----------------------------------------------------------------------------
+# Auth Service
+# -----------------------------------------------------------------------------
+FROM base AS auth_service
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY services/auth_service /app/services/auth_service
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+EXPOSE 8004
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8004/health || exit 1
+CMD ["uvicorn", "services.auth_service.main:app", "--host", "0.0.0.0", "--port", "8004"]
+
+# -----------------------------------------------------------------------------
+# Data Service
+# -----------------------------------------------------------------------------
+FROM base AS data_service
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY services/data_service /app/services/data_service
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+EXPOSE 8001
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8001/health || exit 1
+CMD ["uvicorn", "services.data_service.main:app", "--host", "0.0.0.0", "--port", "8001"]
+
+# -----------------------------------------------------------------------------
+# Train Service
+# -----------------------------------------------------------------------------
+FROM base AS train_service
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY services/train_service /app/services/train_service
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+EXPOSE 8002
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8002/health || exit 1
+CMD ["uvicorn", "services.train_service.main:app", "--host", "0.0.0.0", "--port", "8002"]
+
+# -----------------------------------------------------------------------------
+# Predict Service
+# -----------------------------------------------------------------------------
+FROM base AS predict_service
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY services/predict_service /app/services/predict_service
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+EXPOSE 8003
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8003/health || exit 1
+CMD ["uvicorn", "services.predict_service.main:app", "--host", "0.0.0.0", "--port", "8003"]
+
+# -----------------------------------------------------------------------------
+# Geocode Service - Address to latitude/longitude conversion
+# -----------------------------------------------------------------------------
+FROM base AS geocode_service
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY services/geocode_service /app/services/geocode_service
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+EXPOSE 8005
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8005/health || exit 1
+CMD ["uvicorn", "services.geocode_service.main:app", "--host", "0.0.0.0", "--port", "8005"]
+
+# -----------------------------------------------------------------------------
+# Docs Service - OpenAPI aggregator (merged /docs and /openapi.json)
+# -----------------------------------------------------------------------------
+FROM base AS docs_service
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY services/docs_service /app/services/docs_service
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+EXPOSE 8010
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8010/health || exit 1
+CMD ["uvicorn", "services.docs_service.main:app", "--host", "0.0.0.0", "--port", "8010"]
+
+# -----------------------------------------------------------------------------
+# Test Service
+# -----------------------------------------------------------------------------
+FROM base AS test_service
+ENV PYTHONPATH=/app
+COPY pyproject.toml setup.py README.md ./
+COPY src /app/src
+COPY services/common /app/services/common
+COPY tests /app/tests
+RUN pip install -e . && chown -R mlops:mlops /app
+USER mlops
+CMD ["pytest", "tests/", "-v", "--tb=short"]

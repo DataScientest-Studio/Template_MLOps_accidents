@@ -11,8 +11,51 @@ pandas
 #logging
 numpy 
 pathlib 
-scikit-learn
-imbalanced-learn
+scikit-learn>=1.4.2,<1.5
+imbalanced-learn==0.14.0
 joblib
+xgboost==3.1.2
+lightgbm
+matplotlib
+seaborn
+mlflow
 #sys
 #json
+
+# =============================================================================
+# FastAPI Microservices Dependencies
+# =============================================================================
+
+# FastAPI & ASGI
+fastapi>=0.109.0,<1.0.0
+uvicorn[standard]>=0.27.0,<1.0.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0,<4.0.0
+passlib[bcrypt]>=1.7.4,<2.0.0
+bcrypt>=3.2.0,<4.0.0  # Compatible with passlib 1.7.4
+python-multipart>=0.0.6,<1.0.0
+
+# Pydantic (settings management)
+pydantic>=2.5.0,<3.0.0
+pydantic-settings>=2.1.0,<3.0.0
+email-validator>=2.1.0,<3.0.0
+
+# HTTP client for inter-service communication
+httpx>=0.26.0,<1.0.0
+requests>=2.31.0,<3.0.0  # For geocoding service (Nominatim API)
+
+# Additional utilities
+python-dotenv>=1.0.0,<2.0.0
+
+# Database (Postgres persistence for users and job logs)
+sqlalchemy>=2.0.0,<3.0.0
+psycopg2-binary>=2.9.0,<3.0.0
+
+# =============================================================================
+# Testing Dependencies
+# =============================================================================
+pytest>=7.4.0,<8.0.0
+pytest-asyncio>=0.21.0,<1.0.0
+pytest-cov>=4.1.0,<5.0.0
+httpx>=0.26.0,<1.0.0  # Already listed above, but needed for async testing

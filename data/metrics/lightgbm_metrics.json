@@ -1,0 +1,6 @@
+{
+  "lightgbm_test_accuracy": 0.7937128087996634,
+  "lightgbm_test_precision": 0.726431804762842,
+  "lightgbm_test_recall": 0.643816500959358,
+  "lightgbm_test_f1_score": 0.682633623081191
+}

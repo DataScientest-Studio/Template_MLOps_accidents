@@ -1,0 +1,331 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python 
+      src/data/make_dataset.py'
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 90c3e04bb8fa1558eb70f9096b5b6010.dir
+      size: 31082914
+      nfiles: 4
+    - path: src/data/make_dataset.py
+      hash: md5
+      md5: 27bbe8545fcf46545e7f4c947fafd6b6
+      size: 8802
+    outs:
+    - path: data/preprocessed/interim_dataset.csv
+      hash: md5
+      md5: 0793a947d82089ff3b8617d904461295
+      size: 7959718
+  build_features:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python 
+      src/features/build_features.py'
+    deps:
+    - path: data/preprocessed/interim_dataset.csv
+      hash: md5
+      md5: 0793a947d82089ff3b8617d904461295
+      size: 7959718
+    - path: src/features/build_features.py
+      hash: md5
+      md5: 07b8548971be7f996f7ada1896fb0895
+      size: 17853
+    outs:
+    - path: data/preprocessed/features.csv
+      hash: md5
+      md5: 34c692a7c2b09f4671b59c22c9e145c0
+      size: 12677276
+    - path: models/label_encoders.joblib
+      hash: md5
+      md5: 6c3813a0ffaa347be23b1924dbf394c2
+      size: 18263
+  train_eval:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python 
+      src/models/train_multi_model.py'
+    deps:
+    - path: data/preprocessed/features.csv
+      hash: md5
+      md5: 34c692a7c2b09f4671b59c22c9e145c0
+      size: 12677276
+    - path: src/models/base_trainer.py
+      hash: md5
+      md5: 27f6a36e3f43f7ebedefaf17a61384dc
+      size: 11511
+    - path: src/models/mlflow_utils.py
+      hash: md5
+      md5: 7cc4a818c49e4586a9497685a88bf107
+      size: 13856
+    - path: src/models/model_trainers.py
+      hash: md5
+      md5: 8e33db78b7a00c840ff47512c765d9fb
+      size: 16330
+    - path: src/models/train_multi_model.py
+      hash: md5
+      md5: 9c791865d0b4af22f97a1abf0da7f7f1
+      size: 10730
+    params:
+      src/config/model_config.yaml:
+        data_split:
+          test_size: 0.3
+          random_state: 42
+          shuffle: true
+        evaluation:
+          metrics:
+          - accuracy
+          - precision
+          - recall
+          - f1
+          save_confusion_matrix: true
+          save_classification_report: true
+        feature_engineering:
+          apply_cyclic_encoding: true
+          apply_interactions: true
+        grid_search:
+          enabled: false
+          cv: 5
+          scoring: f1
+          n_jobs: -1
+          verbose: 1
+          param_grid:
+            xgb__n_estimators:
+            - 300
+            - 500
+            - 750
+            - 1000
+            xgb__max_depth:
+            - 4
+            - 5
+            - 6
+            xgb__learning_rate:
+            - 0.01
+            - 0.05
+            - 0.1
+            - 0.15
+            - 0.2
+            xgb__subsample:
+            - 0.8
+            - 1.0
+            xgb__colsample_bytree:
+            - 0.7
+            - 0.8
+            - 0.9
+          param_grid_rf:
+            rf__n_estimators:
+            - 100
+            - 200
+            - 300
+            rf__max_depth:
+            - 5
+            - 10
+            - 15
+            - None
+            rf__min_samples_split:
+            - 2
+            - 5
+            - 10
+            rf__min_samples_leaf:
+            - 1
+            - 2
+            - 4
+          param_grid_lr:
+            lr__C:
+            - 0.1
+            - 1.0
+            - 10.0
+            - 100.0
+            lr__penalty:
+            - l1
+            - l2
+            lr__solver:
+            - liblinear
+            - lbfgs
+          param_grid_lgbm:
+            lgbm__n_estimators:
+            - 300
+            - 500
+            - 750
+            lgbm__learning_rate:
+            - 0.01
+            - 0.05
+            - 0.1
+            lgbm__max_depth:
+            - 4
+            - 5
+            - 6
+            lgbm__num_leaves:
+            - 31
+            - 50
+            - 70
+        lightgbm:
+          default_params:
+            n_estimators: 300
+            learning_rate: 0.05
+            max_depth: 5
+            num_leaves: 31
+            random_state: 42
+        logistic_regression:
+          default_params:
+            C: 1.0
+            penalty: l2
+            solver: lbfgs
+            max_iter: 1000
+            random_state: 42
+        mlflow:
+          enabled: true
+          tracking_uri: ''
+          experiment_name: accident_prediction
+          log_model: true
+          log_artifacts: true
+          model_registry:
+            registered_model_name: Accident_Prediction
+            default_stage: None
+            auto_transition_to_staging: false
+            production_stage: Production
+        model:
+          type: xgboost
+          name: XGBoost Baseline
+        multi_model:
+          enabled_models:
+          - xgboost
+          - random_forest
+          - logistic_regression
+          - lightgbm
+        paths:
+          features: data/preprocessed/features.csv
+          model_output: models/trained_model.joblib
+          metrics_dir: data/metrics
+          label_encoders: models/label_encoders.joblib
+          model_metadata: models/trained_model_metadata.joblib
+        random_forest:
+          default_params:
+            n_estimators: 100
+            max_depth: 10
+            min_samples_split: 2
+            min_samples_leaf: 1
+            random_state: 42
+        smote:
+          enabled: true
+          random_state: 42
+        xgboost:
+          default_params:
+            colsample_bytree: 0.7
+            learning_rate: 0.05
+            max_depth: 5
+            n_estimators: 300
+            subsample: 1.0
+            random_state: 42
+            eval_metric: logloss
+    outs:
+    - path: data/metrics/lightgbm_metrics.json
+      hash: md5
+      md5: b5fa9903cea64b3e1b27093a8795245c
+      size: 190
+    - path: data/metrics/logistic_regression_metrics.json
+      hash: md5
+      md5: 8519f265908fcf18b2e33d982204b3fd
+      size: 237
+    - path: data/metrics/model_comparison.csv
+      hash: md5
+      md5: 94c4b1f673e6f81460b3f630e596a936
+      size: 415
+    - path: data/metrics/random_forest_metrics.json
+      hash: md5
+      md5: 399234bfc05d18f0c8a762edd790366b
+      size: 212
+    - path: data/metrics/xgboost_metrics.json
+      hash: md5
+      md5: f65ef92ab69f2729ade6af547f4ebefb
+      size: 189
+    - path: models/lightgbm_model.joblib
+      hash: md5
+      md5: fc362c50b5087da1bbafcdc46ce8db16
+      size: 6554722
+    - path: models/lightgbm_model_metadata.joblib
+      hash: md5
+      md5: 654864346a4b4027d2fcd9f9b684a204
+      size: 3519
+    - path: models/logistic_regression_model.joblib
+      hash: md5
+      md5: d7ae8de7d18277cb460942cf93929463
+      size: 5599677
+    - path: models/logistic_regression_model_metadata.joblib
+      hash: md5
+      md5: 2044badf0666b9ba5ffc6f4da67d1376
+      size: 598
+    - path: models/random_forest_model.joblib
+      hash: md5
+      md5: c5b0fcbce8ea3e3f64fce002595e746c
+      size: 15458206
+    - path: models/random_forest_model_metadata.joblib
+      hash: md5
+      md5: 6e248916a3f1ef6b63d1b509e0a666cf
+      size: 592
+    - path: models/xgboost_model.joblib
+      hash: md5
+      md5: 3621124e2003522071e1d2bad1f30d93
+      size: 6358890
+    - path: models/xgboost_model_metadata.joblib
+      hash: md5
+      md5: b794063950695a72d3eabf729d7b4a13
+      size: 3518
+  test_prediction:
+    cmd: bash -c 'set -a; [ -f .env ] && . .env || true; set +a; python 
+      src/models/predict_model.py --model-path models/xgboost_model.joblib'
+    deps:
+    - path: models/label_encoders.joblib
+      hash: md5
+      md5: 6c3813a0ffaa347be23b1924dbf394c2
+      size: 18263
+    - path: models/xgboost_model.joblib
+      hash: md5
+      md5: 3621124e2003522071e1d2bad1f30d93
+      size: 6358890
+    - path: models/xgboost_model_metadata.joblib
+      hash: md5
+      md5: b794063950695a72d3eabf729d7b4a13
+      size: 3518
+    - path: src/models/predict_model.py
+      hash: md5
+      md5: eab912c44a93eb64dc9e8bb85d847519
+      size: 12670
+    params:
+      src/models/test_features.json:
+        actp: 0
+        agg_: 2
+        an: 2021
+        an_nais: 1961
+        atm: 0
+        catr: 3
+        catu: 3
+        catv: 2
+        circ: 2
+        col: 6
+        com: 77317
+        dep: 77
+        etatp: 0
+        hrmn: 17:00
+        infra: 0
+        int: 1
+        jour: 7
+        larrout: 0.0
+        lat: 48.6
+        locp: 0
+        long: 2.89
+        lum: 5
+        mois: 12
+        motor: 1
+        nb_vehicules: 1
+        nb_victim: 2
+        obs: 0
+        obsm: 1
+        place: 10
+        plan: 0
+        prof: 0
+        secu1: 0.0
+        sexe: 1
+        situ: 1
+        surf: 1
+        v1: 0
+        vma: 50
+        vosp: 0
+        year_acc: 2021

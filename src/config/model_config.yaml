@@ -1,0 +1,160 @@
+# Model Configuration File
+# This file contains all configurable parameters for model training and evaluation
+
+# Model type: baseline model is XGBoost
+model:
+  type: "xgboost"  # Baseline model: XGBoost (changed from RandomForest)
+  name: "XGBoost Baseline"
+
+# Multi-model training configuration
+multi_model:
+  enabled_models:  # Models to train when using train_multi_model.py (default training method)
+    #- "xgboost"
+    #- "random_forest"
+    #- "logistic_regression"
+    - "lightgbm"
+
+# XGBoost default parameters (baseline model)
+xgboost:
+  default_params:
+    colsample_bytree: 0.7
+    learning_rate: 0.05
+    max_depth: 5
+    n_estimators: 300
+    subsample: 1.0
+    random_state: 42
+    eval_metric: "logloss"
+
+# Random Forest default parameters
+random_forest:
+  default_params:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 2
+    min_samples_leaf: 1
+    random_state: 42
+
+# Logistic Regression default parameters
+logistic_regression:
+  default_params:
+    C: 1.0
+    penalty: "l2"
+    solver: "lbfgs"
+    max_iter: 1000
+    random_state: 42
+
+# LightGBM default parameters
+lightgbm:
+  default_params:
+    n_estimators: 300
+    learning_rate: 0.1
+    max_depth: 6
+    num_leaves: 31
+    random_state: 42
+
+# Grid search parameters (for hyperparameter tuning)
+grid_search:
+  enabled: false  # Set to true to enable grid search
+  cv: 5  # Number of cross-validation folds
+  scoring: "f1"  # Scoring metric for grid search
+  n_jobs: -1  # Use all available cores
+  verbose: 3  # Verbosity level (0-3)
+  # XGBoost parameter grid
+  param_grid:
+    xgb__n_estimators: [300, 500, 750, 1000]
+    xgb__max_depth: [4, 5, 6]
+    xgb__learning_rate: [0.01, 0.05, 0.1, 0.15, 0.2]
+    xgb__subsample: [0.8, 1.0]
+    xgb__colsample_bytree: [0.7, 0.8, 0.9]
+  # Random Forest parameter grid
+  param_grid_rf:
+    rf__n_estimators: [100, 200, 300]
+    rf__max_depth: [5, 10, 15, null]  # null means no max_depth limit
+    rf__min_samples_split: [2, 5, 10]
+    rf__min_samples_leaf: [1, 2, 4]
+  # Logistic Regression parameter grid
+  param_grid_lr:
+    lr__C: [0.1, 1.0, 10.0, 100.0]
+    lr__penalty: ["l1", "l2"]
+    lr__solver: ["liblinear", "lbfgs"]
+  # LightGBM parameter grid
+  param_grid_lgbm:
+    lgbm__n_estimators: [300, 500, 750]
+    lgbm__learning_rate: [0.01, 0.05, 0.1]
+    lgbm__max_depth: [4, 5, 6]
+    lgbm__num_leaves: [31, 50, 70]
+
+# SMOTE (Synthetic Minority Oversampling Technique) parameters
+smote:
+  enabled: true  # SMOTE is used to handle class imbalance
+  random_state: 42
+  # Additional SMOTE parameters can be added here if needed
+  # k_neighbors: 5
+  # sampling_strategy: "auto"
+
+# Data splitting parameters
+data_split:
+  test_size: 0.3  # Proportion of data for test set
+  random_state: 42  # Random state for reproducibility
+  shuffle: true
+
+# Feature engineering parameters
+feature_engineering:
+  apply_cyclic_encoding: true  # Apply cyclic encoding for temporal features
+  apply_interactions: true  # Create interaction features
+
+# Paths and directories
+paths:
+  features: "data/preprocessed/features.csv"
+  model_output: "models/trained_model.joblib"
+  metrics_dir: "data/metrics"
+  label_encoders: "models/label_encoders.joblib"
+  model_metadata: "models/trained_model_metadata.joblib"
+
+# Evaluation metrics to compute
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+  save_confusion_matrix: true  # Save confusion matrix (for ML-3 ticket)
+  save_classification_report: true
+
+# MLflow tracking
+mlflow:
+  enabled: true  # Enable MLflow logging
+  tracking_uri: ""  # Will be set from environment or constructed from DAGSHUB_REPO
+  experiment_name: "accident_prediction"
+  log_model: true
+  log_artifacts: true
+  # Model Registry configuration
+  model_registry:
+    registered_model_name: "Accident_Prediction"  # Base name - model type will be appended automatically (format: Accident_Prediction_{ModelType})
+    default_stage: "None"  # Options: None, Staging, Production, Archived
+    auto_transition_to_staging: false  # Auto-promote to Staging after registration. Keep it to false for normal operation.
+    production_stage: "Production"  # Stage name for production models.
+    
+    # Enhanced registry features
+    # Automated model comparison
+    auto_comparison:
+      enabled: true  # Enable automated comparison when models are registered
+      include_stages: ["Production"]  # Stages to include in comparison
+    
+    # Automated promotion workflow
+    auto_promotion:
+      enabled: true  # Enable automated promotion based on performance thresholds
+      target_stage: "Staging"  # Target stage for auto-promotion
+      comparison_stage: ["Staging", "Production"]  # Stage(s) to compare against when evaluating promotion (must outperform this stage)
+                                      # Can be a string (single stage) or array (multiple stages - compares against best)
+                                      # Examples: "Production" or ["Production", "Staging"]
+    
+    # Promotion rules configuration
+    promotion:
+      rules:
+        primary_metric: "f1_score"  # Primary metric for promotion evaluation
+        min_threshold:  # Minimum thresholds for promotion
+          f1_score: 0.65
+          accuracy: 0.77
+        improvement_threshold_pct: 0.1  # Minimum improvement percentage over current Production model
+

@@ -1,0 +1,6 @@
+{
+  "logistic_regression_test_accuracy": 0.7283765101881349,
+  "logistic_regression_test_precision": 0.6220345798150382,
+  "logistic_regression_test_recall": 0.5396825396825397,
+  "logistic_regression_test_f1_score": 0.5779396656393014
+}

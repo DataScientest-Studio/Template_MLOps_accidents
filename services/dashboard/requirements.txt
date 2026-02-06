@@ -1,0 +1,5 @@
+streamlit>=1.33.0,<2.0.0
+streamlit-folium>=0.15.0
+httpx>=0.26.0
+python-dotenv>=1.0.0
+folium>=0.15.0

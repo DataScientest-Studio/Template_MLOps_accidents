@@ -1,0 +1,6 @@
+{
+  "xgboost_test_accuracy": 0.7909478872392859,
+  "xgboost_test_precision": 0.7261785356068204,
+  "xgboost_test_recall": 0.6314320600034886,
+  "xgboost_test_f1_score": 0.6754991602910991
+}

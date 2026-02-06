@@ -1,0 +1,440 @@
+# =============================================================================
+# Docker Compose - MLOps Accidents
+# =============================================================================
+# Microservices:
+#   - nginx:   Reverse proxy / API Gateway (port 80)
+#   - auth:    Authentication service (port 8004)
+#   - data:    Data preprocessing service (port 8001)
+#   - train:   Model training service (port 8002)
+#   - predict: Prediction service (port 8003)
+#   - docs:    OpenAPI aggregator - unified /docs and /openapi.json (port 8010)
+#   - test:    API endpoint test service (profile: test)
+#
+# Data:
+#   - postgres: PostgreSQL (user data + job logs persist via volume)
+#
+# Development:
+#   - dev:     Development shell
+#   - dvc-pull: DVC data sync (profile: dvc)
+#
+# MLflow: Uses remote DagsHub instance (configured via MLFLOW_TRACKING_URI)
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # PostgreSQL - Persistent storage for users and job logs
+  # ===========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: mlops-postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ===========================================================================
+  # Nginx - Reverse Proxy / API Gateway
+  # ===========================================================================
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    container_name: mlops-nginx
+    ports:
+      - "80:80"
+      # Uncomment for HTTPS
+      # - "443:443"
+    volumes:
+      # Mount nginx config for hot reload during development
+      - ./services/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Uncomment for SSL certificates
+      # - ./services/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      auth:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+      train:
+        condition: service_healthy
+      predict:
+        condition: service_healthy
+      geocode:
+        condition: service_healthy
+      docs:
+        condition: service_healthy
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ===========================================================================
+  # Data Service - Preprocessing & Feature Engineering
+  # ===========================================================================
+  data:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: data_service
+    container_name: mlops-data-service
+    cpu_shares: 512
+    environment:
+      - SERVICE_NAME=data-service
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - MLFLOW_TRACKING_USERNAME=${MLFLOW_TRACKING_USERNAME}
+      - MLFLOW_TRACKING_PASSWORD=${MLFLOW_TRACKING_PASSWORD}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATA_DIR=/app/data
+      - MODELS_DIR=/app/models
+      - PYTHONUNBUFFERED=1
+      - PYTHONWARNINGS=ignore
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./src:/app/src:ro
+      - ~/.dvc:/home/mlops/.dvc:ro
+    ports:
+      - "8001:8001"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ===========================================================================
+  # Train Service - Model Training & Registry
+  # ===========================================================================
+  train:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: train_service
+    container_name: mlops-train-service
+    cpu_shares: 512
+    environment:
+      - SERVICE_NAME=train-service
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - MLFLOW_TRACKING_USERNAME=${MLFLOW_TRACKING_USERNAME}
+      - MLFLOW_TRACKING_PASSWORD=${MLFLOW_TRACKING_PASSWORD}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATA_DIR=/app/data
+      - MODELS_DIR=/app/models
+      - MODEL_CONFIG_PATH=/app/data/model_config.yaml
+      - PYTHONUNBUFFERED=1
+      - PYTHONWARNINGS=ignore
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./src:/app/src:ro
+      - ~/.dvc:/home/mlops/.dvc:ro
+    ports:
+      - "8002:8002"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ===========================================================================
+  # Auth Service - Authentication & User Management
+  # ===========================================================================
+  auth:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: auth_service
+    container_name: mlops-auth-service
+    environment:
+      - SERVICE_NAME=auth-service
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - REFRESH_TOKEN_EXPIRE_DAYS=${REFRESH_TOKEN_EXPIRE_DAYS:-7}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - LOGIN_RATE_LIMIT_PER_USER=${LOGIN_RATE_LIMIT_PER_USER:-5}
+      - LOGIN_RATE_WINDOW_SECONDS=${LOGIN_RATE_WINDOW_SECONDS:-900}
+      - REFRESH_RATE_LIMIT_PER_USER=${REFRESH_RATE_LIMIT_PER_USER:-20}
+      - REFRESH_RATE_WINDOW_SECONDS=${REFRESH_RATE_WINDOW_SECONDS:-60}
+      - MAX_FAILED_LOGIN_ATTEMPTS=${MAX_FAILED_LOGIN_ATTEMPTS:-5}
+      - LOGIN_LOCKOUT_MINUTES=${LOGIN_LOCKOUT_MINUTES:-15}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - PYTHONUNBUFFERED=1
+      - PYTHONWARNINGS=ignore
+    ports:
+      - "8004:8004"
+    networks:
+      - mlops-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ===========================================================================
+  # Predict Service - Model Inference (production-serving; must not be starved)
+  # ===========================================================================
+  predict:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: predict_service
+    container_name: mlops-predict-service
+    # Ensure predict stays responsive when data/train are busy (CPU/memory share)
+    cpu_shares: 1024
+    mem_reservation: 256M
+    environment:
+      - SERVICE_NAME=predict-service
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - MLFLOW_TRACKING_USERNAME=${MLFLOW_TRACKING_USERNAME}
+      - MLFLOW_TRACKING_PASSWORD=${MLFLOW_TRACKING_PASSWORD}
+      - DATA_DIR=/app/data
+      - MODELS_DIR=/app/models
+      - PYTHONUNBUFFERED=1
+      - PYTHONWARNINGS=ignore
+    volumes:
+      - ./data:/app/data:ro
+      - ./models:/app/models:ro
+      - ./src:/app/src:ro
+    ports:
+      - "8003:8003"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ===========================================================================
+  # Geocode Service - Address to Latitude/Longitude Conversion
+  # ===========================================================================
+  geocode:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: geocode_service
+    container_name: mlops-geocode-service
+    environment:
+      - SERVICE_NAME=geocode-service
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - GEOCODE_PROVIDER=${GEOCODE_PROVIDER:-nominatim}
+      - NOMINATIM_BASE_URL=${NOMINATIM_BASE_URL:-https://nominatim.openstreetmap.org}
+      - NOMINATIM_USER_AGENT=${NOMINATIM_USER_AGENT:-MLOps-Accidents-Geocoding/1.0}
+      - GOOGLE_GEOCODING_API_KEY=${GOOGLE_GEOCODING_API_KEY:-}
+      - GEOCODE_RATE_LIMIT_PER_SECOND=${GEOCODE_RATE_LIMIT_PER_SECOND:-1}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:8080}
+      - PYTHONUNBUFFERED=1
+      - PYTHONWARNINGS=ignore
+    ports:
+      - "8005:8005"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ===========================================================================
+  # Docs Service - Unified OpenAPI /docs and /openapi.json
+  # ===========================================================================
+  docs:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: docs_service
+    container_name: mlops-docs-service
+    environment:
+      - SERVICE_NAME=docs-service
+      - PYTHONUNBUFFERED=1
+      - PYTHONWARNINGS=ignore
+    ports:
+      - "8010:8010"
+    networks:
+      - mlops-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+      train:
+        condition: service_healthy
+      predict:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ===========================================================================
+  # Streamlit Dashboard - Control Center UI
+  # ===========================================================================
+  streamlit:
+    build:
+      context: .
+      dockerfile: services/dashboard/Dockerfile
+    container_name: mlops-dashboard
+    environment:
+      - API_BASE_URL=http://nginx:80
+      - SESSION_EXPIRE_MINUTES=30
+    ports:
+      - "8501:8501"
+    networks:
+      - mlops-network
+    depends_on:
+      - nginx
+    restart: unless-stopped
+
+  # ===========================================================================
+  # Test Service - API Endpoint Testing
+  # ===========================================================================
+  test:
+    build:
+      context: .
+      dockerfile: ./services/Dockerfile.python
+      target: test_service
+    container_name: mlops-test-service
+    environment:
+      - PYTHONUNBUFFERED=1
+      - BASE_URL=http://nginx:80
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - TEST_USER_USERNAME=${TEST_USER_USERNAME}
+      - TEST_USER_PASSWORD=${TEST_USER_PASSWORD}
+      - PYTHONPATH=/app
+      - TEST_RAW_DIR=/app/data/test/raw
+      - NOCONFIRM=1
+    volumes:
+      - ./tests:/app/tests:ro
+      - ./data:/app/data
+    networks:
+      - mlops-network
+    depends_on:
+      auth:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+      train:
+        condition: service_healthy
+      predict:
+        condition: service_healthy
+    profiles:
+      - test
+    # Override command via docker-compose run or environment
+    # Example: docker compose --profile test run --rm test pytest tests/test_auth_service.py -v
+
+  # ===========================================================================
+  # Development Environment
+  # ===========================================================================
+  dev:
+    build:
+      context: .
+      target: dev
+    container_name: mlops-dev
+    volumes:
+      - .:/app
+      - ~/.dvc:/home/mlops/.dvc:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - MLFLOW_TRACKING_USERNAME=${MLFLOW_TRACKING_USERNAME}
+      - MLFLOW_TRACKING_PASSWORD=${MLFLOW_TRACKING_PASSWORD}
+    stdin_open: true
+    tty: true
+    command: bash
+    profiles:
+      - dev
+
+  # ===========================================================================
+  # DVC Pull Service (for data sync)
+  # ===========================================================================
+  dvc-pull:
+    build:
+      context: .
+      target: dev
+    container_name: mlops-dvc-pull
+    volumes:
+      - .:/app
+      - ~/.dvc:/home/mlops/.dvc
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: dvc pull --force
+    profiles:
+      - dvc
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  mlops-network:
+    driver: bridge
+    name: mlops-microservices-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    name: mlops-postgres-data
