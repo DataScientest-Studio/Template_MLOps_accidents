@@ -1,0 +1,35 @@
+# requirements.txt (version ed01) à la racine Template_MLOps_accidents
+
+# local package
+# le . pour dire de regarder dans le répertoire courant
+# le -e (--editable): installe le dossier comme si c'était une bibliothèque
+# Avantage : permet d'utiliser 'import src' partout sans manipuler sys.path
+# from src.data.evaluate_model import evaluate
+-e .
+
+# external requirements
+click
+Sphinx
+coverage
+#awscli>=1.29.0
+
+# Data engineering
+pandas
+numpy
+scikit-learn
+imbalanced-learn
+joblib
+requests
+
+# Outils de développement et CI
+dvc
+dvc-s3
+black
+flake8
+pytest
+
+# ci-dessous déjà présent dans python 3.12
+# logging
+# sys
+# json
+# pathlib

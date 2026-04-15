@@ -1,11 +1,18 @@
+# python-app.yml (version ed01) dans .github/workflows/
+
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# Makefile is the reference for install, quality and
+
 name: Python application
 
 on:
   push:
+    # Déclenche le workflow lors d'un push sur la branche par défaut
+    # Vérifié sur GitHub (sélecteur de branche) et via 'git branch' en local
     branches: [ "master" ]
   pull_request:
+    # Vérification aussi lors des demandes de fusion vers master
     branches: [ "master" ]
 
 permissions:
@@ -13,26 +20,49 @@ permissions:
 
 jobs:
   build:
-
+    # VM contenant déjà make, git, curl, et d'autres outils de base pré-installés
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest
+      - name: 📥 Récupération du code
+        uses: actions/checkout@v3
+
+      - name: 🐍 Installation de Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: 🛠️ Installation de uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          # Permet de dire d'aller chercher uv dans ce répertoire pour tout ce qui suit
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: 🏗️ Installation des dépendances de l'environnement (via Makefile)
+        # On injecte les secrets ici car 'make setup-ci' fait un 'dvc remote modify'
+        # La configuration sur GitHub à faire impérativement:
+        # dépôt GitHub sur le web / Settings / Secrets and variables > Actions. Cliquer sur New repository secret
+        # Nom : DAGSHUB_SECRET_ACCESS_KEY | Valeur : xxx ; Nom : DAGSHUB_SECRET_ACCESS_KEY | Valeur : yyy
+        # Dès que le Makefile tournera sur GitHub, il aspirera ces valeurs automatiquement.
+        env:
+          DAGSHUB_ACCESS_KEY_ID: ${{ secrets.DAGSHUB_ACCESS_KEY_ID }}
+          DAGSHUB_SECRET_ACCESS_KEY: ${{ secrets.DAGSHUB_SECRET_ACCESS_KEY }}
+        run: |
+          make setup-ci
+
+      - name: 📥 Récupération des résultats via DVC
+        run: |
+          # comme origin est défini par défaut grâce au -d fait avant, on remplace uv run dvc pull origin par
+          uv run dvc pull  # DVC utilise le .dvc/config et les secrets ci-dessus
+
+      - name: 🔍 Vérification Qualité (Linting)
+        run: make quality
+
+      - name: 🚀 Génération de la Pipeline (Data)
+        # Exécute la préparation des données sur la VM
+        run: make pipeline
+
+      - name: 🧪 Tests unitaires (Pytest)
+        # Scanne le projet et lance toutes les fonctions test_xxx() 
+        # contenues dans les fichiers test_*.py ou *_test.py
+        # Vérification sur GitHub onglet Actions et dernier commit
+        run: uv run pytest

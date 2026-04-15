@@ -1,4 +1,4 @@
-Project Name
+Project Template_MLOps_accidents
 ==============================
 
 This project is a starting Pack for MLOps projects based on the subject "road accident". It's not perfect so feel free to make some modifications on it.
@@ -8,6 +8,9 @@ Project Organization
 
     ├── LICENSE
     ├── README.md          <- The top-level README for developers using this project.
+    ├── api
+    ├── ci-cd
+    ├── docker    
     ├── data
     │   ├── external       <- Data from third party sources.
     │   ├── interim        <- Intermediate data that has been transformed.
@@ -16,7 +19,9 @@ Project Organization
     │
     ├── logs               <- Logs from training and predicting
     │
+    ├── mlflow
     ├── models             <- Trained and serialized models, model predictions, or model summaries
+    ├── monitoring
     │
     ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
     │                         the creator's initials, and a short `-` delimited description, e.g.
@@ -49,6 +54,7 @@ Project Organization
     │   ├── visualization  <- Scripts to create exploratory and results oriented visualizations
     │   │   └── visualize.py
     │   └── config         <- Describe the parameters used in train_model.py and predict_model.py
+    ├── tests
 
 ---------
 

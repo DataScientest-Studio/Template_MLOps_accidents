@@ -1,0 +1,54 @@
+# dvc.yaml (version ed01) à la racine Template_MLOps_accidents
+
+# NB: le "dvc add XXX/YYY.." est implicitement fait dans tous les outs
+# stages, deps, outs sont des mots clés
+
+stages:
+  import: 
+    cmd: uv run --active python src/data/import_raw_data.py data/raw
+    outs:
+      - data/raw
+
+  process:
+    cmd: uv run --active python src/data/make_dataset.py data/raw data/preprocessed
+    deps:
+      - data/raw
+      - src/data/make_dataset.py
+    outs:
+      - data/preprocessed/X_train.csv
+      - data/preprocessed/X_test.csv
+      - data/preprocessed/y_train.csv
+      - data/preprocessed/y_test.csv
+
+  train:
+    cmd: uv run --active python -m src.models.train_model data/preprocessed models/model.joblib
+    deps:
+      - data/preprocessed/X_train.csv
+      - data/preprocessed/y_train.csv
+      - src/models/train_model.py
+    outs:
+      - models/model.joblib
+
+  evaluate:
+    cmd: uv run --active python -m src.models.evaluate_model models/model.joblib data/preprocessed metrics.json
+    deps:
+      - models/model.joblib
+      - data/preprocessed/X_test.csv
+      - data/preprocessed/y_test.csv
+      - src/models/evaluate_model.py
+  
+  # ===================================================================
+  # Déclenchement du predict_model (peut-être pas important)
+  # ===================================================================
+  predict:
+    cmd: uv run --active python -m src.models.predict_model src/models/test_features.json
+    deps:
+      - models/model.joblib
+      - src/models/predict_model.py
+      - src/models/test_features.json
+
+    # cache: false ==> ne pas le mettre dans .dvc/cache
+    # On veut le voir dans le github, donc faire git add metrics.json
+    metrics:
+      - metrics.json:
+          cache: false

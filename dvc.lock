@@ -1,0 +1,86 @@
+schema: '2.0'
+stages:
+  import:
+    cmd: uv run --active python src/data/import_raw_data.py data/raw
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 90c3e04bb8fa1558eb70f9096b5b6010.dir
+      size: 31082914
+      nfiles: 4
+  process:
+    cmd: uv run --active python src/data/make_dataset.py data/raw 
+      data/preprocessed
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 90c3e04bb8fa1558eb70f9096b5b6010.dir
+      size: 31082914
+      nfiles: 4
+    - path: src/data/make_dataset.py
+      hash: md5
+      md5: 37a60d9a97427dbe29f0519a9e70bbca
+      size: 8850
+    outs:
+    - path: data/preprocessed/X_test.csv
+      hash: md5
+      md5: 984b7f6c56e32ae00e0533e1f3fd6e59
+      size: 1732263
+    - path: data/preprocessed/X_train.csv
+      hash: md5
+      md5: 6d44bdbd3da74801a34d3947b412bd71
+      size: 4040600
+    - path: data/preprocessed/y_test.csv
+      hash: md5
+      md5: 83061f3f8b1b8fcaf00638d1c89fae7d
+      size: 32825
+    - path: data/preprocessed/y_train.csv
+      hash: md5
+      md5: 4201106fa338c961187a0653ac139046
+      size: 76581
+  train:
+    cmd: uv run --active python -m src.models.train_model data/preprocessed 
+      models/model.joblib
+    deps:
+    - path: data/preprocessed/X_train.csv
+      hash: md5
+      md5: 6d44bdbd3da74801a34d3947b412bd71
+      size: 4040600
+    - path: data/preprocessed/y_train.csv
+      hash: md5
+      md5: 4201106fa338c961187a0653ac139046
+      size: 76581
+    - path: src/models/train_model.py
+      hash: md5
+      md5: a57c85fa00257016130906b9ac1d5e43
+      size: 2110
+    outs:
+    - path: models/model.joblib
+      hash: md5
+      md5: 53783782af1e72604250e923d1c717c0
+      size: 107258361
+  evaluate:
+    cmd: uv run --active python -m src.models.evaluate_model models/model.joblib
+      data/preprocessed metrics.json
+    deps:
+    - path: data/preprocessed/X_test.csv
+      hash: md5
+      md5: 984b7f6c56e32ae00e0533e1f3fd6e59
+      size: 1732263
+    - path: data/preprocessed/y_test.csv
+      hash: md5
+      md5: 83061f3f8b1b8fcaf00638d1c89fae7d
+      size: 32825
+    - path: models/model.joblib
+      hash: md5
+      md5: 53783782af1e72604250e923d1c717c0
+      size: 107258361
+    - path: src/models/evaluate_model.py
+      hash: md5
+      md5: a0e293d1944f72c379685eb3183beb0e
+      size: 5061
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: a77f0bbc20adb11fad516e8779a9227b
+      size: 402

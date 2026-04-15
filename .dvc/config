@@ -1,0 +1,6 @@
+[core]
+    no_scm = True
+    remote = origin
+['remote "origin"']
+    url = s3://dvc
+    endpointurl = https://dagshub.com/sage-flfay/Template_MLOps_accidents.s3

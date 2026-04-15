@@ -1,0 +1,30 @@
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/dockerfile
+    deploy:
+      replicas: 3
+    expose:
+      - "8000"    
+
+  front:
+    build:      
+      context: .
+      dockerfile: docker/front/dockerfile
+    container_name: nginx_revproxy
+    ports:
+      - "8080:80"
+      - "443:443"
+    volumes:
+      - ./deployments/front/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deployments/front/certs:/etc/nginx/certs:ro
+      - ./deployments/front/.htpasswd:/etc/nginx/.htpasswd:ro
+    depends_on:
+      - api     
+
+  
+
+  
+  

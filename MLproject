@@ -1,0 +1,30 @@
+# ===================================================================================
+# MLproject file for the apple project
+# This file defines the project name and the entry points for running the project.
+# ===================================================================================
+# Nom du projet = apple_project
+# Ce nom est utilisé quand tu fais : mlflow run .
+name: accident_project
+
+# Sans cette clé ("conda_env: rf_apples/conda.yaml"), mlflow exécute --pyton_env=local (à utiliser en ligne de commande)
+# Spécifie l'environnement conda à utiliser pour ce projet. C'est le fichier conda.yaml qui contient les dépendances 
+# nécessaires pour exécuter le MLprojet.
+#conda_env: rf_accidents/conda.yaml
+
+# Déclare des points d"entrée dans le projet.
+entry_points:
+  # main = point d'entrée principal du projet, c'est celui qui sera exécuté par défaut quand tu fais : "mlflow run ."
+  # utilise ../data/fake_data.csv
+  main:
+    parameters:
+    # Liste des paramètres que le point d'entrée main accepte. Ici, on a un paramètre data_path.
+    # Rend le pipeline reproductible en permettant de spécifier le chemin vers les données d'entrée.
+    # Rend le pipeline flexible en permettant d'utiliser différentes sources de données sans modifier le code.
+      # Définit le type du paramètre : data_path, son type :(str) et sa valeur par défaut : ("../data/fake_data.csv").
+      # AVec argument : mlflow run . -p data_path=autre_fichier.csv
+      train_data: {type: str, default: "data/preprocessed/X_train.csv"}
+      target_data: {type: str, default: "data/preprocessed/y_train.csv"}
+    
+    # MLflow va exécuter : "python3 src/models/train_model.py --train_path {train_data} --target_path {target_data}"
+    #command: "python3 -m src.models.train_model --train_path {train_data} --target_path {target_data}"
+    command: "python3 -m src.models.train_model --train_path data/preprocessed --model_output models/model.joblib"

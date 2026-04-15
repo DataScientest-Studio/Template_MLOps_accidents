@@ -1,0 +1,13 @@
+# .gitattributes (version ed01) à la racine Template_MLOps_accidents
+
+# "Nettoyage" géré automatiquement avec Git et nom de fichier spécifique .gitattributes
+# Après le git commit / push, tous les fichiers sont vérifier pour eof=lf et non pas crlf
+# Ainsi on évite toute mauvaise surprise
+
+# Traiter tous les fichiers textes pour forcer le LF
+# * : s'applique à tous les fichiers, sans exception
+# text=auto : Git analyse le contenu. S'il détecte que c'est du texte
+#             (et non un fichier binaire comme une image ou un modèle .pkl ou .joblib),
+#             il active la conversion.
+# eol=lf : force la fin de ligne en LF dès que le fichier "entre" dans la base de données de Git.
+* text=auto eol=lf
