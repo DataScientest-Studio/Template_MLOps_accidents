@@ -1,0 +1,10 @@
+FROM apache/airflow:2.9.3
+RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org \
+    pandas \
+    numpy \
+    scikit-learn \
+    imbalanced-learn \
+    joblib \
+    requests \
+    mlflow \
+    apache-airflow-providers-docker

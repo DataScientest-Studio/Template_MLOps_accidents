@@ -1,0 +1,225 @@
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.3
+    ports:
+      - "5000:5000"
+    command: mlflow server --backend-store-uri sqlite:///mlflow.db --artifacts-destination /app/mlruns --serve-artifacts --host 0.0.0.0 --port 5000
+    volumes:
+      - ./mlruns:/app/mlruns
+
+  postgres-airflow:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-airflow-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  airflow-init:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
+    user: root
+    command: >
+      bash -c "
+        su -s /bin/bash airflow -c '
+          airflow db migrate &&
+          airflow users create --username admin --password admin --firstname Admin --lastname Admin --role Admin --email admin@example.com || true
+        '
+      "
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'accidents_mlops_secret'
+      PYTHONPATH: /opt/airflow/src:/opt/airflow/src/data:/opt/airflow/src/models
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      AIRFLOW__WEBSERVER__WORKERS: '1'
+      # Ajout important pour éviter les erreurs de permissions sur les fichiers de logs/PID
+      AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - accidents-data:/opt/airflow/data
+      - airflow-logs:/opt/airflow/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+    user: root
+    command: >
+      bash -c "
+        chmod 666 /var/run/docker.sock || true &&
+        rm -f /opt/airflow/airflow-webserver.pid &&
+        su -s /bin/bash airflow -c '
+          airflow scheduler &
+          exec airflow webserver
+        '
+      "
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+      mlflow:
+        condition: service_started
+    restart: on-failure
+
+  preprocess:
+    build:
+      context: .
+      dockerfile: src/preprocess/Dockerfile
+    volumes:
+      - accidents-data:/app/data
+    restart: "no"
+
+  train:
+    build:
+      context: .
+      dockerfile: src/train/Dockerfile
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    volumes:
+      - ./mlruns:/app/mlruns
+    depends_on:
+      preprocess:
+        condition: service_completed_successfully
+      mlflow:
+        condition: service_started
+    restart: "no"
+
+  ml-api:
+    build:
+      context: .
+      dockerfile: src/bentoml/Dockerfile
+    container_name: accident-prediction-api
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    expose:
+      - "3000"
+    restart: unless-stopped
+    depends_on:
+      mlflow:
+        condition: service_started
+      airflow:
+        condition: service_started
+  streamlit:
+    build:
+      context: .
+      dockerfile: src/streamlit/Dockerfile
+    environment:
+      - MODEL_API_URL=http://ml-api:3000
+    ports:
+      - "8501"
+    depends_on:
+      ml-api:
+        condition: service_started
+    volumes:
+      - ./src/streamlit:/app
+
+  nginx:
+    build:
+      context: src/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+      - "80:80"
+    depends_on:
+      streamlit:
+        condition: service_started
+      ml-api:
+        condition: service_started
+    restart: unless-stopped
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    command:
+      - '-nginx.scrape-uri=http://nginx/stub_status' # Nécessite d'activer stub_status dans nginx.conf
+    ports:
+      - "9113:9113"
+    depends_on:
+      - nginx
+      
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./src/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      ml-api:
+        condition: service_started
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    depends_on:
+      prometheus:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  grafana-init:
+      build:
+        context: src/grafana
+        dockerfile: Dockerfile
+      container_name: grafana-init-job
+      environment:
+        # Récupère la variable depuis .env
+        - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+        - GRAFANA_URL=http://${ID_GRAFANA}:${MP_GRAFANA}@grafana:3000
+      volumes:
+        # Correction des chemins pour correspondre au script Python
+        # Le script s'attend à trouver les règles dans /alert-rules/
+        - ./src/grafana/alert-error-rate.json:/alert-rules/alert-error-rate.json
+        - ./src/grafana/alert-latency.json:/alert-rules/alert-latency.json
+        # Le script est monté à la racine /app/ pour correspondre au CMD et au WORKDIR
+        - ./src/grafana/init_grafana_alerts.py:/app/init_grafana_alerts.py
+        # Si vous avez vraiment besoin de ces fichiers JSON séparés (le script Python actuel ne les lit pas directement)
+        - ./src/grafana/notification-policies.json:/config/notification-policies.json
+        - ./src/grafana/contact-points.json:/config/contact-points.json
+      command: python /app/init_grafana_alerts.py
+      depends_on:
+        grafana:
+          condition: service_healthy  # Attend que Grafana soit prêt
+      restart: "no"
+
+volumes:
+  postgres-airflow-data:
+  airflow-logs:
+  accidents-data:
+  prometheus_data:
+  grafana_data:

@@ -1,0 +1,43 @@
+{
+  "title": "Taux d'erreur sur l'API de prédiction",
+  "tags": ["MLOps", "SRE"],
+  "folderUID": "mlops-alerts-folder",
+  "ruleGroup": "MLOps_Alerts",
+  "uid": "alert_error_rate",
+  "condition": "B",
+  "data": [
+    {
+      "refId": "A",
+      "relativeTimeRange": { "from": 600, "to": 0 },
+      "datasourceUid": "prometheus",
+      "model": {
+        "expr": "sum(rate(app_requests_total{endpoint=\"/predict\", status=\"error\"}[5m])) / (sum(rate(app_requests_total{endpoint=\"/predict\"}[5m])) or vector(1)) * 100",
+        "instant": true,
+        "legendFormat": "__auto",
+        "range": false,
+        "refId": "A"
+      }
+    },
+    {
+      "refId": "B",
+      "relativeTimeRange": { "from": 600, "to": 0 },
+      "datasourceUid": "__expr__",
+      "model": {
+        "type": "threshold",
+        "expression": "$A > 5",
+        "refId": "B"
+      }
+    }
+  ],
+  "for": "5m",
+  "annotations": {
+    "description": "Le taux d'erreur sur l'endpoint /predict est supérieur à 5% depuis 5 minutes.",
+    "summary": "Alerte Critique : Taux d'erreur élevé"
+  },
+  "labels": {
+    "severity": "critical"
+  },
+  "noDataState": "OK",
+  "execErrState": "OK",
+  "isPaused": false
+}

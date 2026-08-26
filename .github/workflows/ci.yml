@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  compile-check:
+    name: Vérification compilation / syntaxe
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Vérifier que tous les fichiers .py du src compilent
+        run: python -m py_compile $(find src -name "*.py")
+
+  docker-build:
+    name: Test de build du container
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: compile-check
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v5
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build de toutes les images via docker-compose
+        run: docker compose build

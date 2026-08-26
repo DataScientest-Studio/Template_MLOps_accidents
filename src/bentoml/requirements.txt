@@ -1,0 +1,8 @@
+pandas==2.3.3
+bentoml==1.4.39
+pydantic==2.11.0
+mlflow==2.11.3
+setuptools<81
+scikit-learn==1.6.1
+prometheus-client
+starlette

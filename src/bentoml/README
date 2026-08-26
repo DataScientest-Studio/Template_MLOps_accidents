@@ -1,0 +1,48 @@
+Ce script est une implémentation complète d'un service de prédiction MLOps en production, construit avec BentoML. Il charger un modèle fait des prédictions ; il intègre nativement les bonnes pratiques d'observabilité (métriques Prometheus) et de gestion du cycle de vie du modèle (MLflow).
+
+## 1. L'Infrastructure de Monitoring (Prometheus)
+
+Dès le début du script, quatre métriques sont définies pour couvrir les deux aspects critiques : la santé de l'API et la performance du modèle.
+- `REQUEST_COUNT` **(Counter)** : Surveille le trafic HTTP global.
+Labels : `method`, `endpoint`, `status`.
+Usage : Permet de calculer le taux d'erreur (ex: `status="error"` vs `status="success"`) et le débit (requêtes par seconde). Notez qu'il est incrémenté deux fois : une fois au début ("started") et une fois à la fin ("success" ou "error"), ce qui permet de tracer les requêtes en cours si nécessaire.
+- `REQUEST_LATENCY` **(Histogram)** : Mesure la performance     globale de l'API (réseau + sérialisation + prédiction).
+Buckets : De 0.1s à 5.0s. Utile pour détecter des ralentissements infrastructurels.
+- `PREDICTIONS_TOTAL` **(Counter)** : C'est la métrique métier clé.
+Labels : `model`, `status`, `class`.
+Usage crucial : Le label class (la prédiction 0 ou 1) permet de surveiller la distribution des prédictions. Si le modèle se met à prédire "1" (accident grave) à 90% alors qu'historiquement c'est 10%, vous le verrez immédiatement ici (signe potentiel de data drift ou de problème d'entrée).
+- `PREDICTION_LATENCY` **(Histogram)** : Mesure uniquement le temps d'exécution du modèle (`model.predict`).
+Buckets : Plus fins (0.01s à 1.0s) car l'inférence d'un modèle Scikit-Learn doit être très rapide. C'est ici qu'on détecte si le modèle lui-même devient lent.
+
+## 2. La Gestion du Cycle de Vie du Modèle (MLflow & BentoML)
+
+Le script implémente un pattern avancé de mise à jour de modèle sans redéploiement (Hot Reloading).
+
+- **Chargement initial** (`__init__`) : Au démarrage du service, il charge la version `latest` du modèle depuis MLflow. C'est une sécurité pour démarrer même si l'alias "champion" n'existe pas encore.
+- **Alias "Champion"** (`MODEL_URI`) : La variable cible pointe vers `models:/Modèle_Gravité_Accidents@champion`. Dans une pipeline MLOps (ex: avec Airflow), quand un nouveau modèle est validé, on change simplement l'alias champion dans MLflow pour pointer vers la nouvelle version.
+- **Endpoint** `/reload_model` : C'est le point clé de l'automatisation.
+    - Il expose une API publique (à sécuriser en production !) qui force le service à recharger le modèle depuis MLflow.
+    - _Scénario typique_ : Airflow entraîne un nouveau modèle -> Le valide -> Met à jour l'alias `champion` dans MLflow -> Appelle `/reload_model` sur tous les pods BentoML. Le nouveau modèle est en production instantanément, sans redémarrage des conteneurs.
+
+## 3. La Logique de Prédiction (/predict)
+
+La méthode `predict` illustre une gestion rigoureuse des erreurs et des métriques :
+1. **Timing précis** : Utilisation de `time.perf_counter()` pour une mesure haute précision de la latence.
+2. **Validation des données** : L'objet `InputModel` (Pydantic) assure que les données entrantes respectent le schéma attendu avant même d'atteindre la logique métier.
+3. **Préparation des features** : Les données sont converties en `DataFrame` Pandas avec un ordre de colonnes strict (`feature_names`). C'est critique : si l'ordre ne correspond pas à l'entraînement, les prédictions seront fausses.
+4. **Gestion des erreurs (Try/Except)** :
+- Si la prédiction réussit : On incrémente `PREDICTIONS_TOTAL` avec la classe prédite et `REQUEST_COUNT` en "success".
+- Si une exception survient : On incrémente les compteurs en "error" (sans la classe, car il n'y en a pas) et on propage l'erreur. Cela garantit que vos métriques reflètent toujours la réalité, même en cas de panne.
+
+## 4. L'Exposition des Métriques (`on_asgi_app`)
+
+BentoML utilise Starlette (ASGI) en interne. La méthode statique `on_asgi_app` est un "hook" qui permet d'injecter du code dans l'application web générée.
+- Elle ajoute manuellement une route `/metrics`.
+- Quand Prometheus scrape cette URL, la fonction `generate_latest()` est appelée. Elle lit l'état actuel de toutes les variables (`REQUEST_COUNT`, `PREDICTION_LATENCY`, etc.) définies plus haut et les renvoie au format texte que Prometheus comprend.
+
+## Conclusion
+
+- **Observabilité granulaire** : On peut distinguer une lenteur réseau d'une lenteur du modèle, et surveiller la dérive des prédictions (label `class`).
+- **Mise à jour continue** : L'endpoint de rechargement permet des déploiements fréquents et automatisés via MLflow.
+- **Robustesse** : La gestion des erreurs assure que les métriques d'erreur sont fiables, condition sine qua non pour créer des alertes pertinentes (ex: "Alerter si le taux d'erreur > 1% sur 5 minutes").
+- **Validation** : L'usage de Pydantic empêche les erreurs de format de données de faire planter le modèle silencieusement.

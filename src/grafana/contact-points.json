@@ -1,0 +1,10 @@
+{
+  "name": "Discord-MLOps",
+  "uid": "discord-mlops-uid",
+  "type": "discord",
+  "settings": {
+    "url": "WEBHOOK_URL_PLACEHOLDER",
+    "use_discord_username": false
+  },
+  "disableResolveMessage": false
+}

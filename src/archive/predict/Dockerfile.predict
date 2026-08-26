@@ -1,0 +1,14 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Installation des dépendances
+COPY src/models/requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copie du dossier
+COPY src/models/predict_model.py .
+COPY src/models/trained_model.joblib .
+
+# Commande par défaut
+CMD ["uvicorn", "predict_model:app", "--host", "0.0.0.0", "--port", "8000"]

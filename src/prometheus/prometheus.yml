@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # 1. Prometheus se monitor lui-même
+  - job_name: "prometheus"
+
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # 2. Notre service BentoML
+  - job_name: "bentoml-api"
+
+    static_configs:
+      - targets: ["ml-api:3000"]

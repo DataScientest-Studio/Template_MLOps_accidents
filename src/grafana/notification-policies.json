@@ -1,0 +1,29 @@
+{
+  "routes": [
+    {
+      "receiver": "Discord-MLOps",
+      "object_matchers": [
+        ["severity", "=", "critical"]
+      ],
+      "group_by": ["alertname"],
+      "group_wait": "30s",
+      "group_interval": "5m",
+      "repeat_interval": "4h"
+    },
+    {
+      "receiver": "Discord-MLOps",
+      "object_matchers": [
+        ["severity", "=", "warning"]
+      ],
+      "group_by": ["alertname"],
+      "group_wait": "30s",
+      "group_interval": "5m",
+      "repeat_interval": "4h"
+    }
+  ],
+  "receiver": "Discord-MLOps",
+  "group_by": ["alertname"],
+  "group_wait": "30s",
+  "group_interval": "5m",
+  "repeat_interval": "4h"
+}

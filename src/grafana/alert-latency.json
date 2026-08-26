@@ -1,0 +1,43 @@
+{
+  "title": "Alerte MLOps : Dérive de Performance",
+  "tags": ["MLOps", "Performance"],
+  "folderUID": "mlops-alerts-folder",
+  "ruleGroup": "MLOps_Alerts",
+  "uid": "alert_latency_p95",
+  "condition": "B",
+  "data": [
+    {
+      "refId": "A",
+      "relativeTimeRange": { "from": 600, "to": 0 },
+      "datasourceUid": "prometheus",
+      "model": {
+        "expr": "histogram_quantile(0.95, sum(rate(model_prediction_latency_seconds_bucket[5m])) by (le))",
+        "instant": true,
+        "legendFormat": "__auto",
+        "range": false,
+        "refId": "A"
+      }
+    },
+    {
+      "refId": "B",
+      "relativeTimeRange": { "from": 600, "to": 0 },
+      "datasourceUid": "__expr__",
+      "model": {
+        "type": "threshold",
+        "expression": "$A > 1",
+        "refId": "B"
+      }
+    }
+  ],
+  "for": "5m",
+  "annotations": {
+    "description": "La latence p95 du modèle est supérieure à 1 seconde. Risque de saturation CPU ou problème mémoire.",
+    "summary": "Alerte MLOps : Dérive de Performance"
+  },
+  "labels": {
+    "severity": "warning"
+  },
+  "noDataState": "NoData",
+  "execErrState": "OK",
+  "isPaused": false
+}
