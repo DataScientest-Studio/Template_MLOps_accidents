@@ -4,6 +4,6 @@
 ['remote "remote_storage"']
     url = ../../dvc_remote
 ['remote "remote_gdrive"']
-    url = gdrive://1Xksic5I2SLJT8jeT73JV1NsNY72IBvhU
-    gdrive_client_id = 1082756940669-9vba79ie2i7m2kcalln8hcgag6cos5ka.apps.googleusercontent.com
-    gdrive_client_secret = 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
+    url = 
+    gdrive_client_id =
+    gdrive_client_secret =
